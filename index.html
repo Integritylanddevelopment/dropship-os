@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dropship OS — Command Center</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#0f1923;--navy2:#16222e;--navy3:#1c2f3f;
+  --blue:#1a6cf6;--teal:#00c9a7;--gold:#f5a623;
+  --red:#e8413e;--green:#22c55e;--purple:#8b5cf6;
+  --text:#e4eaf0;--muted:#7a9ab5;--border:#253447;
+  --card:#19293a;--card2:#1e3347;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── TICKER BAR ── */
+.ticker-bar{background:#0a1520;border-bottom:1px solid var(--border);padding:8px 0;overflow:hidden;white-space:nowrap}
+.ticker-inner{display:inline-block;animation:ticker 35s linear infinite}
+.ticker-inner:hover{animation-play-state:paused}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tick-item{display:inline-block;margin:0 32px;font-size:12px;font-weight:700;letter-spacing:.04em}
+.tick-up{color:var(--teal)}
+.tick-down{color:var(--red)}
+.tick-neutral{color:var(--gold)}
+.tick-label{color:var(--muted);font-weight:400;margin-right:6px}
+
+/* ── HEADER ── */
+.header{background:var(--navy2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo-block{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0}
+.header-title{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.header-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:12px}
+.status-pill{border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px}
+.pill-green{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.pill-gold{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green);animation:pulse 2s infinite}
+.dot-gold{background:var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.date-badge{font-size:12px;color:var(--muted);background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:5px 12px}
+
+/* ── NAV TABS ── */
+.nav-tabs{background:var(--navy2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:2px;overflow-x:auto}
+.nav-tab{padding:13px 20px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* ── MAIN ── */
+.main{padding:24px 28px;max-width:1700px;margin:0 auto}
+.page{display:none}.page.active{display:block}
+
+/* ── SECTION HEADERS ── */
+.sec-header{margin-bottom:20px}
+.sec-title{font-size:21px;font-weight:800;margin-bottom:4px}
+.sec-sub{font-size:13px;color:var(--muted)}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s}
+.kpi-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-blue::before{background:var(--blue)}
+.kpi-teal::before{background:var(--teal)}
+.kpi-gold::before{background:var(--gold)}
+.kpi-red::before{background:var(--red)}
+.kpi-purple::before{background:var(--purple)}
+.kpi-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.kpi-value{font-size:30px;font-weight:800;line-height:1;margin-bottom:6px}
+.kpi-change{font-size:12px;color:var(--muted)}
+.kpi-change.up{color:var(--teal)}
+.kpi-change.down{color:var(--red)}
+
+/* ── 2-COL & 3-COL GRIDS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:900px){.grid-2,.grid-3,.grid-2-1{grid-template-columns:1fr}}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.icon-blue{background:rgba(26,108,246,.2);color:var(--blue)}
+.icon-teal{background:rgba(0,201,167,.2);color:var(--teal)}
+.icon-gold{background:rgba(245,166,35,.2);color:var(--gold)}
+.icon-red{background:rgba(232,65,62,.2);color:var(--red)}
+.icon-purple{background:rgba(139,92,246,.2);color:var(--purple)}
+.icon-green{background:rgba(34,197,94,.2);color:var(--green)}
+
+/* ── WINNER TABLE ── */
+.winner-table{width:100%;border-collapse:collapse;font-size:13px}
+.winner-table th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--border)}
+.winner-table td{padding:10px 10px;border-bottom:1px solid rgba(37,52,71,.5)}
+.winner-table tr:last-child td{border-bottom:none}
+.winner-table tr:hover td{background:rgba(26,108,246,.06)}
+.badge{display:inline-block;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(34,197,94,.15);color:var(--teal)}
+.badge-gold{background:rgba(245,166,35,.15);color:var(--gold)}
+.badge-red{background:rgba(232,65,62,.15);color:var(--red)}
+.badge-blue{background:rgba(26,108,246,.15);color:var(--blue)}
+.badge-muted{background:rgba(122,154,181,.12);color:var(--muted)}
+.rank-num{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.rank-1{background:var(--gold);color:#000}
+.rank-2{background:#aaa;color:#000}
+.rank-3{background:#a0522d;color:#fff}
+
+/* ── DASHBOARD LAUNCHER ── */
+.launcher-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:24px}
+.launcher-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s;text-decoration:none;display:block}
+.launcher-card:hover{border-color:var(--blue);transform:translateY(-3px);background:var(--card2)}
+.launcher-icon{font-size:32px;margin-bottom:10px}
+.launcher-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.launcher-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.launcher-status{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700}
+.ls-live{color:var(--teal)}
+.ls-scaffold{color:var(--gold)}
+.ls-todo{color:var(--red)}
+
+/* ── CHANNEL BARS ── */
+.channel-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.channel-name{font-size:13px;font-weight:600;min-width:130px}
+.bar-track{flex:1;height:8px;background:rgba(37,52,71,.8);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.channel-cpm{font-size:12px;color:var(--muted);min-width:50px;text-align:right}
+.channel-score{font-size:12px;font-weight:700;min-width:36px;text-align:right}
+
+/* ── PRODUCT ROWS ── */
+.product-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(37,52,71,.5)}
+.product-row:last-child{border-bottom:none}
+.product-emoji{font-size:24px;width:36px;text-align:center}
+.product-info{flex:1}
+.product-name{font-size:13px;font-weight:700}
+.product-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.product-margin{font-size:16px;font-weight:800;color:var(--teal)}
+
+/* ── CONTENT CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
+.cal-day-header{text-align:center;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:4px 0}
+.cal-cell{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:8px;min-height:64px;font-size:10px;cursor:pointer;transition:border-color .2s}
+.cal-cell:hover{border-color:var(--blue)}
+.cal-cell.today{border-color:var(--blue);background:rgba(26,108,246,.08)}
+.cal-date{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.cal-post{border-radius:4px;padding:2px 5px;margin-bottom:2px;font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-tiktok{background:rgba(0,201,167,.2);color:var(--teal)}
+.cp-pin{background:rgba(232,65,62,.2);color:var(--red)}
+.cp-ig{background:rgba(139,92,246,.2);color:var(--purple)}
+.cp-yt{background:rgba(245,166,35,.2);color:var(--gold)}
+
+/* ── MEMORY SEARCH ── */
+.search-box{display:flex;gap:10px;margin-bottom:20px}
+.search-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--blue)}
+.search-btn{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s}
+.search-btn:hover{opacity:.85}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px}
+.result-source{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.result-text{font-size:13px;line-height:1.6;color:var(--text)}
+.result-score{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* ── BUILD STATUS ── */
+.build-list{display:flex;flex-direction:column;gap:8px}
+.build-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--navy3);border:1px solid var(--border);border-radius:10px;font-size:13px}
+.build-num{font-size:11px;font-weight:800;color:var(--muted);min-width:20px}
+.build-label{flex:1;font-weight:600}
+.build-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.b-done{border-left:3px solid var(--teal)}
+.b-scaffold{border-left:3px solid var(--gold)}
+.b-todo{border-left:3px solid var(--border)}
+.b-icon{font-size:16px;min-width:20px;text-align:center}
+
+/* ── AGENT STATUS GRID ── */
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.agent-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:16px}
+.agent-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.agent-type{font-size:11px;color:var(--muted);margin-bottom:10px}
+.agent-status{font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
+.as-live{color:var(--teal)}
+.as-scaffold{color:var(--gold)}
+.as-todo{color:var(--red)}
+.agent-actions{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.a-tag{font-size:10px;background:rgba(26,108,246,.15);color:var(--blue);border-radius:5px;padding:2px 7px;font-weight:600}
+
+/* ── FRAMEWORK LAYERS ── */
+.layer-row{display:flex;align-items:flex-start;gap:16px;padding:16px;background:var(--navy3);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;transition:border-color .2s}
+.layer-row:hover{border-color:var(--blue)}
+.layer-num{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
+.ln-1{background:var(--blue)}
+.ln-2{background:var(--purple)}
+.ln-3{background:var(--gold)}
+.ln-4{background:var(--teal)}
+.ln-5{background:var(--red)}
+.ln-6{background:var(--green)}
+.layer-content{flex:1}
+.layer-title{font-size:14px;font-weight:800;margin-bottom:4px}
+.layer-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.layer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--navy)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:20px 0}
+.mb-18{margin-bottom:18px}
+.mb-24{margin-bottom:24px}
+</style>
+</head>
+<body>
+
+<!-- TICKER BAR -->
+<div class="ticker-bar">
+  <div class="ticker-inner">
+    <span class="tick-item"><span class="tick-label">PINTEREST ORGANIC</span><span class="tick-up">CPM $0.28 ▲</span></span>
+    <span class="tick-item"><span class="tick-label">TIKTOK ORGANIC</span><span class="tick-up">CPM $0.00 FREE ▲</span></span>
+    <span class="tick-item"><span class="tick-label">META PAID</span><span class="tick-neutral">CPM $14.20 →</span></span>
+    <span class="tick-item"><span class="tick-label">YT SHORTS</span><span class="tick-up">CPM $0.41 ▲</span></span>
+    <span class="tick-item"><span class="tick-label">GOOGLE PAID</span><span class="tick-down">CPM $22.80 ▼</span></span>
+    <span class="tick-item"><span class="tick-label">HOME & KITCHEN</span><span class="tick-up">MARGIN 68% ▲</span></span>
+    <span class="tick-item"><span class="tick-label">PET NICHE</span><span class="tick-up">MARGIN 72% ▲</span></span>
+    <span class="tick-item"><span class="tick-label">FITNESS</span><span class="tick-neutral">MARGIN 55% →</span></span>
+    <span class="tick-item"><span class="tick-label">GADGETS</span><span class="tick-down">MARGIN 38% ▼</span></span>
+    <span class="tick-item"><span class="tick-label">#1 COMBO</span><span class="tick-up">PET×PINTEREST SCORE 94 ▲▲</span></span>
+    <!-- repeat for seamless loop -->
+    <span class="tick-item"><span class="tick-label">PINTEREST ORGANIC</span><span class="tick-up">CPM $0.28 ▲</span></span>
+    <span class="tick-item"><span class="tick-label">TIKTOK ORGANIC</span><span class="tick-up">CPM $0.00 FREE ▲</span></span>
+    <span class="tick-item"><span class="tick-label">META PAID</span><span class="tick-neutral">CPM $14.20 →</span></span>
+    <span class="tick-item"><span class="tick-label">YT SHORTS</span><span class="tick-up">CPM $0.41 ▲</span></span>
+    <span class="tick-item"><span class="tick-label">GOOGLE PAID</span><span class="tick-down">CPM $22.80 ▼</span></span>
+    <span class="tick-item"><span class="tick-label">HOME & KITCHEN</span><span class="tick-up">MARGIN 68% ▲</span></span>
+    <span class="tick-item"><span class="tick-label">PET NICHE</span><span class="tick-up">MARGIN 72% ▲</span></span>
+    <span class="tick-item"><span class="tick-label">FITNESS</span><span class="tick-neutral">MARGIN 55% →</span></span>
+    <span class="tick-item"><span class="tick-label">GADGETS</span><span class="tick-down">MARGIN 38% ▼</span></span>
+    <span class="tick-item"><span class="tick-label">#1 COMBO</span><span class="tick-up">PET×PINTEREST SCORE 94 ▲▲</span></span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-block">
+    <div class="logo">⚡</div>
+    <div>
+      <div class="header-title">Dropship OS — Command Center</div>
+      <div class="header-sub">Gary Vee × Hormozi × Kamil Sattar Intelligence Stack</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-pill pill-green"><div class="dot dot-green"></div>Quinn Memory LIVE</div>
+    <div class="status-pill pill-gold"><div class="dot dot-gold"></div>Agents: Scaffolded</div>
+    <div class="date-badge" id="date-badge">Loading...</div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showPage('overview')">📊 Overview</button>
+  <button class="nav-tab" onclick="showPage('decision')">🎯 Decision Engine</button>
+  <button class="nav-tab" onclick="showPage('channels')">📡 Channels</button>
+  <button class="nav-tab" onclick="showPage('products')">📦 Products</button>
+  <button class="nav-tab" onclick="showPage('content')">🎬 Content</button>
+  <button class="nav-tab" onclick="showPage('agents')">🤖 Agents</button>
+  <button class="nav-tab" onclick="showPage('memory')">🧠 Memory Search</button>
+  <button class="nav-tab" onclick="showPage('dashboards')">🖥️ Dashboards</button>
+  <button class="nav-tab" onclick="showPage('buildplan')">🏗️ Build Plan</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="page active" id="page-overview">
+  <div class="sec-header">
+    <div class="sec-title">Command Center Overview</div>
+    <div class="sec-sub">Real-time intelligence — cheapest attention × highest margin → execute</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-teal">
+      <div class="kpi-label">Top Channel CPM</div>
+      <div class="kpi-value">$0.00</div>
+      <div class="kpi-change up">▲ TikTok Organic — FREE</div>
+    </div>
+    <div class="kpi-card kpi-gold">
+      <div class="kpi-label">Top Product Margin</div>
+      <div class="kpi-value">72%</div>
+      <div class="kpi-change up">▲ Pet Niche / AutoDS</div>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-label">Decision Score #1</div>
+      <div class="kpi-value">94</div>
+      <div class="kpi-change up">▲ Pet × Pinterest</div>
+    </div>
+    <div class="kpi-card kpi-purple">
+      <div class="kpi-label">Active Combos</div>
+      <div class="kpi-value">3</div>
+      <div class="kpi-change">Tracked this week</div>
+    </div>
+    <div class="kpi-card kpi-red">
+      <div class="kpi-label">Agents Live</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-change down">↓ All scaffolded — connect now</div>
+    </div>
+    <div class="kpi-card kpi-teal">
+      <div class="kpi-label">Memory Sessions</div>
+      <div class="kpi-value">74</div>
+      <div class="kpi-change up">▲ In Qdrant</div>
+    </div>
+  </div>
+
+  <div class="grid-2-1">
+    <!-- FRAMEWORK FLOW -->
+    <div class="card">
+      <div class="card-title"><div class="icon icon-blue">⚡</div>Operating System — 6-Layer Framework</div>
+      <div class="layer-row">
+        <div class="layer-num ln-1">1</div>
+        <div class="layer-content">
+          <div class="layer-title">Research Engine</div>
+          <div class="layer-desc">Cheapest attention tracker · Highest margin product scanner · Viral content tracker · Competitor copy log</div>
+        </div>
+        <div class="layer-right"><span class="badge badge-gold">Scaffolded</span></div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num ln-2">2</div>
+        <div class="layer-content">
+          <div class="layer-title">Decision Layer</div>
+          <div class="layer-desc">Match product × channel · Score and rank · Weekly reallocation · Kill/scale signals</div>
+        </div>
+        <div class="layer-right"><span class="badge badge-gold">Scaffolded</span></div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num ln-3">3</div>
+        <div class="layer-content">
+          <div class="layer-title">Asset Stack</div>
+          <div class="layer-desc">One-pagers on GitHub Pages · Stripe checkout · Template library</div>
+        </div>
+        <div class="layer-right"><span class="badge badge-red">Todo</span></div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num ln-4">4</div>
+        <div class="layer-content">
+          <div class="layer-title">Content Machine</div>
+          <div class="layer-desc">Gary V pillar content → TikTok / Reels / Shorts / Pinterest / X micro-repurposing</div>
+        </div>
+        <div class="layer-right"><span class="badge badge-gold">Scaffolded</span></div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num ln-5">5</div>
+        <div class="layer-content">
+          <div class="layer-title">Automation Pipeline</div>
+          <div class="layer-desc">Auto site spin-up · Auto posting · Auto data pull · Auto fulfillment</div>
+        </div>
+        <div class="layer-right"><span class="badge badge-red">Todo</span></div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-num ln-6">6</div>
+        <div class="layer-content">
+          <div class="layer-title">Metrics Dashboard</div>
+          <div class="layer-desc">CPM/CPC/CTR by channel · Margin by product · ROAS by combo</div>
+        </div>
+        <div class="layer-right"><span class="badge badge-green">This File</span></div>
+      </div>
+    </div>
+
+    <!-- INTEL SOURCES -->
+    <div class="card">
+      <div class="card-title"><div class="icon icon-gold">👥</div>Intelligence Sources</div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:36px;height:36px;background:rgba(26,108,246,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">📣</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">Gary Vee</div>
+            <div style="font-size:11px;color:var(--muted)">Cheapest attention · Channel arbitrage</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--teal);padding:8px 12px;background:rgba(0,201,167,.08);border-radius:8px;border-left:3px solid var(--teal)">
+          "Chase the cheapest CPM. Volume beats perfection. Post everywhere, double down on what works."
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:36px;height:36px;background:rgba(245,166,35,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💰</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">Alex Hormozi</div>
+            <div style="font-size:11px;color:var(--muted)">Offer construction · $100M Offers</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--gold);padding:8px 12px;background:rgba(245,166,35,.08);border-radius:8px;border-left:3px solid var(--gold)">
+          "Stack value until yes is the only logical answer. Price on value, never cost."
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:36px;height:36px;background:rgba(139,92,246,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🤖</div>
+          <div>
+            <div style="font-size:13px;font-weight:700">Kamil Sattar (Ecom King)</div>
+            <div style="font-size:11px;color:var(--muted)">AI execution · Zendrop / AutoDS</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--purple);padding:8px 12px;background:rgba(139,92,246,.08);border-radius:8px;border-left:3px solid var(--purple)">
+          "Move fast with AI tools. Zendrop builds the store, AutoDS imports products. Ship in hours."
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DECISION ENGINE ═══════════════ -->
+<div class="page" id="page-decision">
+  <div class="sec-header">
+    <div class="sec-title">🎯 Decision Engine</div>
+    <div class="sec-sub">Top product × channel combos ranked by Score = Margin% × (1/CPM) × Viral Coefficient</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Rank #1 Combo</div><div class="kpi-value" style="font-size:18px">Pet × Pinterest</div><div class="kpi-change up">Score 94 — SCALE NOW</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Rank #2 Combo</div><div class="kpi-value" style="font-size:18px">Home × TikTok</div><div class="kpi-change up">Score 81 — SCALE</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Rank #3 Combo</div><div class="kpi-value" style="font-size:18px">Fitness × YT Shorts</div><div class="kpi-change">Score 67 — TEST</div></div>
+    <div class="kpi-card kpi-red"><div class="kpi-label">Kill Signal</div><div class="kpi-value" style="font-size:18px">Gadgets × Meta</div><div class="kpi-change down">Score 22 — CUT</div></div>
+  </div>
+
+  <div class="card mb-18">
+    <div class="card-title"><div class="icon icon-teal">🏆</div>Weekly Decision Table — Product × Channel Combos</div>
+    <table class="winner-table">
+      <thead>
+        <tr>
+          <th>Rank</th><th>Product Niche</th><th>Channel</th><th>Margin</th><th>CPM</th><th>Score</th><th>Status</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="rank-num rank-1">1</span></td>
+          <td>🐾 Pet Accessories</td>
+          <td>Pinterest Organic</td>
+          <td style="color:var(--teal);font-weight:700">72%</td>
+          <td style="color:var(--teal);font-weight:700">$0.28</td>
+          <td style="color:var(--teal);font-weight:800;font-size:16px">94</td>
+          <td><span class="badge badge-green">SCALE</span></td>
+          <td style="font-size:12px;color:var(--muted)">Max volume →</td>
+        </tr>
+        <tr>
+          <td><span class="rank-num rank-2">2</span></td>
+          <td>🏠 Home & Kitchen</td>
+          <td>TikTok Organic</td>
+          <td style="color:var(--teal);font-weight:700">68%</td>
+          <td style="color:var(--teal);font-weight:700">$0.00</td>
+          <td style="color:var(--blue);font-weight:800;font-size:16px">81</td>
+          <td><span class="badge badge-blue">SCALE</span></td>
+          <td style="font-size:12px;color:var(--muted)">Build 5 vids/day</td>
+        </tr>
+        <tr>
+          <td><span class="rank-num rank-3">3</span></td>
+          <td>💪 Fitness Tools</td>
+          <td>YouTube Shorts</td>
+          <td style="color:var(--gold);font-weight:700">55%</td>
+          <td style="color:var(--gold);font-weight:700">$0.41</td>
+          <td style="color:var(--gold);font-weight:800;font-size:16px">67</td>
+          <td><span class="badge badge-gold">TEST</span></td>
+          <td style="font-size:12px;color:var(--muted)">3 vids, watch ROAS</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>📚 Desk Organizers</td>
+          <td>Instagram Reels</td>
+          <td style="font-weight:700">61%</td>
+          <td>$3.20</td>
+          <td style="font-weight:800;font-size:16px">44</td>
+          <td><span class="badge badge-muted">HOLD</span></td>
+          <td style="font-size:12px;color:var(--muted)">Low CPM efficiency</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>📱 Phone Gadgets</td>
+          <td>Meta Paid</td>
+          <td style="color:var(--red);font-weight:700">38%</td>
+          <td style="color:var(--red);font-weight:700">$14.20</td>
+          <td style="color:var(--red);font-weight:800;font-size:16px">22</td>
+          <td><span class="badge badge-red">KILL</span></td>
+          <td style="font-size:12px;color:var(--muted)">Cut all spend</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-blue">⚙️</div>Score Formula</div>
+      <div style="background:var(--navy3);border-radius:10px;padding:16px;font-family:monospace;font-size:13px;color:var(--teal);line-height:1.8">
+        Score = Margin% × (100 / CPM_cents) × ViralCoeff<br><br>
+        <span style="color:var(--muted)">ViralCoeff:</span> Pinterest=1.4, TikTok=1.6, YT Shorts=1.2<br>
+        <span style="color:var(--muted)">             </span> IG Reels=1.0, Meta Paid=0.8<br><br>
+        <span style="color:var(--gold)">Kill if Score &lt; 30 two weeks running</span><br>
+        <span style="color:var(--teal)">Scale if Score &gt; 70 first week</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-gold">📅</div>Weekly Cadence</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Monday</span><span style="color:var(--muted)">Run Decision Engine · Pick top 3 combos</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Tue–Thu</span><span style="color:var(--muted)">Max content volume on #1 combo</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Friday</span><span style="color:var(--muted)">Review ROAS · Kill bottom performers</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--gold);font-weight:700;min-width:70px">Sunday</span><span style="color:var(--muted)">Research session · Update scores · Plan next week</span></div>
+        <div class="divider"></div>
+        <div style="font-size:12px;color:var(--muted)">Kill trigger: Score &lt; 30 for 2 consecutive weeks<br>Scale trigger: ROAS &gt; 3× after first 5 posts</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CHANNELS ═══════════════ -->
+<div class="page" id="page-channels">
+  <div class="sec-header">
+    <div class="sec-title">📡 Channel Intelligence</div>
+    <div class="sec-sub">Cheapest attention wins — Gary Vee framework. Lower CPM = more volume per dollar.</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-teal">📉</div>CPM Ranking (Cheapest → Most Expensive)</div>
+      <div style="margin-top:4px">
+        <div class="channel-row">
+          <div class="channel-name">🎵 TikTok Organic</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--teal)"></div></div>
+          <div class="channel-cpm" style="color:var(--teal)">FREE</div>
+          <div class="channel-score" style="color:var(--teal)">100</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-name">📌 Pinterest Organic</div>
+          <div class="bar-track"><div class="bar-fill" style="width:97%;background:var(--teal)"></div></div>
+          <div class="channel-cpm" style="color:var(--teal)">$0.28</div>
+          <div class="channel-score" style="color:var(--teal)">97</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-name">▶️ YouTube Shorts</div>
+          <div class="bar-track"><div class="bar-fill" style="width:88%;background:var(--blue)"></div></div>
+          <div class="channel-cpm" style="color:var(--blue)">$0.41</div>
+          <div class="channel-score" style="color:var(--blue)">88</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-name">📸 Instagram Reels</div>
+          <div class="bar-track"><div class="bar-fill" style="width:62%;background:var(--gold)"></div></div>
+          <div class="channel-cpm">$3.20</div>
+          <div class="channel-score" style="color:var(--gold)">62</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-name">🐦 X / Twitter</div>
+          <div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--gold)"></div></div>
+          <div class="channel-cpm">$5.80</div>
+          <div class="channel-score" style="color:var(--gold)">55</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-name">📘 Meta Paid</div>
+          <div class="bar-track"><div class="bar-fill" style="width:32%;background:var(--red)"></div></div>
+          <div class="channel-cpm" style="color:var(--red)">$14.20</div>
+          <div class="channel-score" style="color:var(--red)">32</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-name">🔍 Google Paid</div>
+          <div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--red)"></div></div>
+          <div class="channel-cpm" style="color:var(--red)">$22.80</div>
+          <div class="channel-score" style="color:var(--red)">18</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="icon icon-blue">📊</div>Channel Properties</div>
+      <table class="winner-table" style="font-size:12px">
+        <thead>
+          <tr><th>Channel</th><th>Traffic Type</th><th>Best Niche Fit</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pinterest Organic</td><td>Search intent</td><td>Home, Pet, Beauty</td><td><span class="badge badge-green">Priority 1</span></td></tr>
+          <tr><td>TikTok Organic</td><td>Discovery</td><td>Viral products</td><td><span class="badge badge-green">Priority 1</span></td></tr>
+          <tr><td>YouTube Shorts</td><td>Search + feed</td><td>Fitness, Gadgets</td><td><span class="badge badge-blue">Priority 2</span></td></tr>
+          <tr><td>Instagram Reels</td><td>Discovery</td><td>Fashion, Lifestyle</td><td><span class="badge badge-gold">Test</span></td></tr>
+          <tr><td>X / Twitter</td><td>Conversation</td><td>Finance, Trend</td><td><span class="badge badge-muted">Monitor</span></td></tr>
+          <tr><td>Meta Paid</td><td>Paid interrupt</td><td>Retargeting only</td><td><span class="badge badge-red">Low Priority</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon icon-gold">💡</div>Gary Vee Rules — Channel Playbook</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--teal)">
+        <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px">Rule 1: Cheapest First</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">Always max out organic (free) channels before spending a dollar on paid. TikTok and Pinterest organic before any Meta spend.</div>
+      </div>
+      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--blue)">
+        <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">Rule 2: Volume Over Perfection</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">Post 3–5× per day on priority channels. Don't wait for the perfect post. Let data tell you what works, then double down.</div>
+      </div>
+      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--gold)">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">Rule 3: Piggyback Viral</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">Find viral content in your niche. Copy the format, the structure, the hook. Swap in your product. Never copy content — copy the strategy.</div>
+      </div>
+      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--purple)">
+        <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">Rule 4: Repurpose Everything</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">One pillar piece → 10 micro-content pieces. TikTok video → Reels → Shorts → Pinterest pin → X thread → email. One effort, 6 channels.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PRODUCTS ═══════════════ -->
+<div class="page" id="page-products">
+  <div class="sec-header">
+    <div class="sec-title">📦 Product Intelligence</div>
+    <div class="sec-sub">Highest margin × cheapest to source × easiest to fulfill. Kamil Sattar framework.</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Highest Margin Niche</div><div class="kpi-value">Pet</div><div class="kpi-change up">72% avg margin</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Best Supplier</div><div class="kpi-value" style="font-size:20px">Zendrop</div><div class="kpi-change up">AI store + fulfillment</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Products Tracked</div><div class="kpi-value">12</div><div class="kpi-change">Manual — connect AutoDS</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-label">Avg Fulfillment</div><div class="kpi-value" style="font-size:20px">7–14d</div><div class="kpi-change">US warehouse preferred</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-teal">🏆</div>Top Product Opportunities</div>
+      <div class="product-row">
+        <div class="product-emoji">🐾</div>
+        <div class="product-info">
+          <div class="product-name">Pet Automatic Feeder</div>
+          <div class="product-meta">Source: AutoDS · Fulfill: Zendrop · Ship: 7d US</div>
+        </div>
+        <div class="product-margin">72%</div>
+      </div>
+      <div class="product-row">
+        <div class="product-emoji">🏠</div>
+        <div class="product-info">
+          <div class="product-name">Space-Saving Kitchen Organizer</div>
+          <div class="product-meta">Source: AliExpress · Fulfill: CJDropshipping</div>
+        </div>
+        <div class="product-margin">68%</div>
+      </div>
+      <div class="product-row">
+        <div class="product-emoji">💪</div>
+        <div class="product-info">
+          <div class="product-name">Resistance Band Set</div>
+          <div class="product-meta">Source: AutoDS · High Pinterest traction</div>
+        </div>
+        <div class="product-margin">55%</div>
+      </div>
+      <div class="product-row">
+        <div class="product-emoji">🌿</div>
+        <div class="product-info">
+          <div class="product-name">LED Grow Light (Mini)</div>
+          <div class="product-meta">Source: AliExpress · Trending Pinterest</div>
+        </div>
+        <div class="product-margin">61%</div>
+      </div>
+      <div class="product-row">
+        <div class="product-emoji">🧴</div>
+        <div class="product-info">
+          <div class="product-name">Posture Corrector</div>
+          <div class="product-meta">Source: Zendrop · US warehouse stock</div>
+        </div>
+        <div class="product-margin">64%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="icon icon-gold">🏗️</div>Supplier Stack — Kamil Sattar Method</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
+          <div style="font-size:24px">⚡</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px">Zendrop</div>
+            <div style="font-size:11px;color:var(--muted)">AI store builder + automated fulfillment. First choice for US products. Shrine theme integration.</div>
+            <div style="margin-top:6px"><span class="badge badge-gold">Connect API</span></div>
+          </div>
+        </div>
+        <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
+          <div style="font-size:24px">🤖</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px">AutoDS</div>
+            <div style="font-size:11px;color:var(--muted)">Product import automation. Price monitoring. Auto-order fulfillment. ROI product finder already scaffolded.</div>
+            <div style="margin-top:6px"><span class="badge badge-gold">Connect API</span></div>
+          </div>
+        </div>
+        <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
+          <div style="font-size:24px">🛒</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px">AliExpress / CJDropshipping</div>
+            <div style="font-size:11px;color:var(--muted)">Fallback supplier. Wider catalog. 14–21d shipping unless CJ warehouse stock available.</div>
+            <div style="margin-top:6px"><span class="badge badge-muted">Manual</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="page" id="page-content">
+  <div class="sec-header">
+    <div class="sec-title">🎬 Content Machine</div>
+    <div class="sec-sub">Gary V method: 1 pillar piece → 10+ micro-content pieces → max channel distribution</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-blue">🔁</div>Repurposing Pipeline</div>
+      <div style="text-align:center;padding:16px 0">
+        <div style="display:inline-block;background:var(--blue);color:#fff;border-radius:12px;padding:12px 24px;font-weight:700;font-size:15px;margin-bottom:16px">
+          📹 1 Pillar Video (60–90s)
+        </div>
+        <div style="color:var(--muted);font-size:22px;margin-bottom:16px">↓</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">🎵</span><br>TikTok 15s</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">📸</span><br>IG Reel 30s</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">▶️</span><br>YT Short</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">📌</span><br>Pinterest Pin</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">🐦</span><br>X Thread</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">📧</span><br>Email</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="icon icon-gold">✍️</div>Hook Templates (Copy These)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+        <div style="padding:10px;background:var(--navy3);border-radius:8px;border-left:3px solid var(--teal)">
+          <div style="font-weight:700;color:var(--teal);margin-bottom:4px">Problem Hook</div>
+          "POV: Your [problem] is costing you [pain]. Here's the fix nobody talks about."
+        </div>
+        <div style="padding:10px;background:var(--navy3);border-radius:8px;border-left:3px solid var(--blue)">
+          <div style="font-weight:700;color:var(--blue);margin-bottom:4px">Before/After Hook</div>
+          "I spent $X and 3 months on [problem]. This $[price] thing fixed it in [time]."
+        </div>
+        <div style="padding:10px;background:var(--navy3);border-radius:8px;border-left:3px solid var(--gold)">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:4px">Curiosity Hook</div>
+          "This [product] has 47K 5-star reviews and nobody talks about it. Here's why."
+        </div>
+        <div style="padding:10px;background:var(--navy3);border-radius:8px;border-left:3px solid var(--purple)">
+          <div style="font-weight:700;color:var(--purple);margin-bottom:4px">Social Proof Hook</div>
+          "[Number] people bought this [product] last month. I finally tried it. [Result]."
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Calendar -->
+  <div class="card">
+    <div class="card-title"><div class="icon icon-teal">📅</div>Content Calendar — This Week</div>
+    <div class="cal-grid">
+      <div class="cal-day-header">MON</div><div class="cal-day-header">TUE</div><div class="cal-day-header">WED</div>
+      <div class="cal-day-header">THU</div><div class="cal-day-header">FRI</div><div class="cal-day-header">SAT</div><div class="cal-day-header">SUN</div>
+    </div>
+    <div class="cal-grid" id="cal-week"></div>
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-tiktok" style="display:inline-block">■</span> TikTok</span>
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-pin" style="display:inline-block">■</span> Pinterest</span>
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-ig" style="display:inline-block">■</span> Instagram</span>
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-yt" style="display:inline-block">■</span> YouTube</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ AGENTS ═══════════════ -->
+<div class="page" id="page-agents">
+  <div class="sec-header">
+    <div class="sec-title">🤖 Agent Status</div>
+    <div class="sec-sub">All agents scaffolded — none connected to live data yet. Wire in order below.</div>
+  </div>
+
+  <div class="agent-grid mb-24">
+    <div class="agent-card">
+      <div class="agent-name">Social AI Agent</div>
+      <div class="agent-type">Python · social_ai_agent/</div>
+      <div class="agent-status as-scaffold">🟡 Scaffolded</div>
+      <div class="agent-actions">
+        <span class="a-tag">Pinterest</span><span class="a-tag">TikTok</span><span class="a-tag">Content Gen</span>
+      </div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Dropship Agent</div>
+      <div class="agent-type">Node.js · dropship-agent/</div>
+      <div class="agent-status as-scaffold">🟡 Scaffolded</div>
+      <div class="agent-actions">
+        <span class="a-tag">Products</span><span class="a-tag">Reports</span><span class="a-tag">Dashboard</span>
+      </div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">ROI Product Finder</div>
+      <div class="agent-type">HTML/JS · roi-product-finder/</div>
+      <div class="agent-status as-scaffold">🟡 Scaffolded</div>
+      <div class="agent-actions">
+        <span class="a-tag">Margin Score</span><span class="a-tag">AutoDS API</span>
+      </div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Pinterest Agent</div>
+      <div class="agent-type">Python · pinterest_agent/</div>
+      <div class="agent-status as-scaffold">🟡 Scaffolded</div>
+      <div class="agent-actions">
+        <span class="a-tag">Trend Research</span><span class="a-tag">Pin Scraper</span>
+      </div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Decision Engine</div>
+      <div class="agent-type">Python · To Be Built</div>
+      <div class="agent-status as-todo">🔴 Not Started</div>
+      <div class="agent-actions">
+        <span class="a-tag">Scoring</span><span class="a-tag">Daily Run</span>
+      </div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">Memory Indexer</div>
+      <div class="agent-type">Qdrant · Quinn Stack</div>
+      <div class="agent-status as-live">🟢 Live</div>
+      <div class="agent-actions">
+        <span class="a-tag">74 Sessions</span><span class="a-tag">Auto-ingest</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon icon-blue">🔌</div>Wire Order — Connect Agents in This Sequence</div>
+    <div class="build-list">
+      <div class="build-item b-done">
+        <div class="b-icon">✅</div>
+        <div><div class="build-label">Quinn Memory + ChromaDB</div><div class="build-desc">dropshipping.md created, re-index triggered</div></div>
+        <span class="badge badge-green">Done</span>
+      </div>
+      <div class="build-item b-done">
+        <div class="b-icon">✅</div>
+        <div><div class="build-label">Unified Command Center</div><div class="build-desc">This dashboard — DROPSHIP_OS_COMMAND_CENTER.html</div></div>
+        <span class="badge badge-green">Done</span>
+      </div>
+      <div class="build-item b-scaffold">
+        <div class="b-icon">3</div>
+        <div><div class="build-label">Wire social_ai_agent</div><div class="build-desc">Connect Pinterest + TikTok trend APIs → store in Qdrant</div></div>
+        <span class="badge badge-gold">Next</span>
+      </div>
+      <div class="build-item b-scaffold">
+        <div class="b-icon">4</div>
+        <div><div class="build-label">Wire roi-product-finder</div><div class="build-desc">Connect AutoDS or AliExpress API → live margin scoring</div></div>
+        <span class="badge badge-gold">Up Next</span>
+      </div>
+      <div class="build-item b-todo">
+        <div class="b-icon">5</div>
+        <div><div class="build-label">Build Decision Engine</div><div class="build-desc">Daily script: CPM data + margin data → top 3 combos</div></div>
+        <span class="badge badge-muted">Queued</span>
+      </div>
+      <div class="build-item b-todo">
+        <div class="b-icon">6</div>
+        <div><div class="build-label">Asset Machine</div><div class="build-desc">Auto-spin GitHub Pages landing page from template on winning combo</div></div>
+        <span class="badge badge-muted">Queued</span>
+      </div>
+      <div class="build-item b-todo">
+        <div class="b-icon">7</div>
+        <div><div class="build-label">Content Pipeline</div><div class="build-desc">Ollama local LLM + Gary Vee playbook → auto-generate posts</div></div>
+        <span class="badge badge-muted">Queued</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MEMORY SEARCH ═══════════════ -->
+<div class="page" id="page-memory">
+  <div class="sec-header">
+    <div class="sec-title">🧠 Quinn Memory Search</div>
+    <div class="sec-sub">Semantic search across 74 research sessions + 598 project files in Qdrant</div>
+  </div>
+
+  <div class="card mb-18">
+    <div class="card-title"><div class="icon icon-purple">🔍</div>Search Research Memory</div>
+    <div class="search-box">
+      <input class="search-input" id="search-input" type="text" placeholder="e.g. cheapest CPM channels, pet product margins, TikTok hooks..."/>
+      <button class="search-btn" onclick="runSearch()">Search Quinn</button>
+    </div>
+    <div id="search-results">
+      <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Enter a query above to search the memory stack</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon icon-blue">📊</div>Memory Stack Status</div>
+    <div class="kpi-grid" style="margin-bottom:0">
+      <div class="kpi-card kpi-teal"><div class="kpi-label">Qdrant Sessions</div><div class="kpi-value">74</div><div class="kpi-change up">general_knowledge</div></div>
+      <div class="kpi-card kpi-blue"><div class="kpi-label">Project Files</div><div class="kpi-value">598</div><div class="kpi-change up">Indexed</div></div>
+      <div class="kpi-card kpi-purple"><div class="kpi-label">Agent Configs</div><div class="kpi-value">169</div><div class="kpi-change up">commandcore_memory</div></div>
+      <div class="kpi-card kpi-gold"><div class="kpi-label">Auto-Ingest</div><div class="kpi-value" style="font-size:18px">10 min</div><div class="kpi-change up">Windows task — LIVE</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DASHBOARDS ═══════════════ -->
+<div class="page" id="page-dashboards">
+  <div class="sec-header">
+    <div class="sec-title">🖥️ Individual Dashboards</div>
+    <div class="sec-sub">Click any card to open the dashboard. All located in the Drop shipping project folder.</div>
+  </div>
+
+  <div class="launcher-grid">
+    <a class="launcher-card" href="GaryVee_Agent_Dashboard.html" target="_blank">
+      <div class="launcher-icon">📣</div>
+      <div class="launcher-title">Gary Vee Agent Dashboard</div>
+      <div class="launcher-desc">Channel CPM tracker, attention arbitrage signals, posting cadence monitor</div>
+      <div class="launcher-status ls-live">🟢 Built — Open</div>
+    </a>
+    <a class="launcher-card" href="GaryVee_Agent_Dashboard_DEPLOY.html" target="_blank">
+      <div class="launcher-icon">🚀</div>
+      <div class="launcher-title">Gary Vee Dashboard (Deploy Ver.)</div>
+      <div class="launcher-desc">Deploy-ready version with Vercel config</div>
+      <div class="launcher-status ls-live">🟢 Built — Open</div>
+    </a>
+    <a class="launcher-card" href="Hormozi_Dashboard_v2.html" target="_blank">
+      <div class="launcher-icon">💰</div>
+      <div class="launcher-title">Hormozi Dashboard v2</div>
+      <div class="launcher-desc">Offer scoring, value stack builder, Hormozi offer framework tracker</div>
+      <div class="launcher-status ls-live">🟢 Built — Open</div>
+    </a>
+    <a class="launcher-card" href="Kamil_Marketing_Dashboard.html" target="_blank">
+      <div class="launcher-icon">🤖</div>
+      <div class="launcher-title">Kamil Marketing Dashboard</div>
+      <div class="launcher-desc">AI tool execution tracker, Zendrop + AutoDS status, Shrine theme</div>
+      <div class="launcher-status ls-live">🟢 Built — Open</div>
+    </a>
+    <a class="launcher-card" href="Marketing_Scoring_Sheet.html" target="_blank">
+      <div class="launcher-icon">📊</div>
+      <div class="launcher-title">Marketing Scoring Sheet</div>
+      <div class="launcher-desc">Channel × product scoring matrix, CPM vs margin analysis</div>
+      <div class="launcher-status ls-live">🟢 Built — Open</div>
+    </a>
+    <a class="launcher-card" href="arbitrage-dashboard.html" target="_blank">
+      <div class="launcher-icon">⚡</div>
+      <div class="launcher-title">Arbitrage Dashboard</div>
+      <div class="launcher-desc">Attention arbitrage signals, channel opportunity tracker</div>
+      <div class="launcher-status ls-live">🟢 Built — Open</div>
+    </a>
+    <a class="launcher-card" href="roi-product-finder/index.html" target="_blank">
+      <div class="launcher-icon">🔍</div>
+      <div class="launcher-title">ROI Product Finder</div>
+      <div class="launcher-desc">Product margin scorer, AutoDS integration (API not yet connected)</div>
+      <div class="launcher-status ls-scaffold">🟡 Scaffolded — Connect API</div>
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════ BUILD PLAN ═══════════════ -->
+<div class="page" id="page-buildplan">
+  <div class="sec-header">
+    <div class="sec-title">🏗️ Build Plan</div>
+    <div class="sec-sub">Full recommended build order for the Dropship OS</div>
+  </div>
+
+  <div class="card mb-18">
+    <div class="card-title"><div class="icon icon-teal">✅</div>Completed</div>
+    <div class="build-list">
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Quinn Memory Context</div><div class="build-desc">dropshipping.md written to ChromaDB project context, re-indexed</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Unified Command Center</div><div class="build-desc">DROPSHIP_OS_COMMAND_CENTER.html — this file</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Individual Dashboards</div><div class="build-desc">Gary Vee, Hormozi, Kamil, Arbitrage, Scoring — all built</div></div><span class="badge badge-green">Done</span></div>
+    </div>
+  </div>
+
+  <div class="card mb-18">
+    <div class="card-title"><div class="icon icon-gold">⚡</div>Next Up — Wire Live Data</div>
+    <div class="build-list">
+      <div class="build-item b-scaffold"><div class="b-icon">3</div><div><div class="build-label">Wire social_ai_agent — Pinterest API</div><div class="build-desc">Get it pulling real trend data from Pinterest and storing in Qdrant via MemoryIndexerAgent. social_ai_agent/research/ already scaffolded.</div></div><span class="badge badge-gold">Next</span></div>
+      <div class="build-item b-scaffold"><div class="b-icon">4</div><div><div class="build-label">Wire roi-product-finder — AutoDS API</div><div class="build-desc">Connect to AutoDS API or AliExpress product feed. Score products by margin in real time. roi-product-finder/api/ already scaffolded.</div></div><span class="badge badge-gold">Next</span></div>
+    </div>
+  </div>
+
+  <div class="card mb-18">
+    <div class="card-title"><div class="icon icon-blue">🔮</div>Build Queue</div>
+    <div class="build-list">
+      <div class="build-item b-todo"><div class="b-icon">5</div><div><div class="build-label">Decision Engine Script</div><div class="build-desc">Python daily script: pulls channel CPM + product margins → scores every combo → outputs top 3 to Qdrant and this dashboard</div></div><span class="badge badge-muted">Queued</span></div>
+      <div class="build-item b-todo"><div class="b-icon">6</div><div><div class="build-label">Asset Machine</div><div class="build-desc">Auto-spin GitHub Pages landing page from HTML template when a winning combo is found. Stripe checkout embedded.</div></div><span class="badge badge-muted">Queued</span></div>
+      <div class="build-item b-todo"><div class="b-icon">7</div><div><div class="build-label">Content Pipeline (Ollama)</div><div class="build-desc">Local Ollama (qwen2.5:7b) + Gary Vee playbook → auto-generate TikTok/Pinterest captions, hooks, scripts for top combo</div></div><span class="badge badge-muted">Queued</span></div>
+      <div class="build-item b-todo"><div class="b-icon">8</div><div><div class="build-label">Auto-Posting</div><div class="build-desc">Buffer / Later API or custom scheduler → auto-post content to TikTok and Pinterest on cadence</div></div><span class="badge badge-muted">Queued</span></div>
+      <div class="build-item b-todo"><div class="b-icon">9</div><div><div class="build-label">Live Metrics Feed</div><div class="build-desc">Pull real ROAS, CPM, CTR into this dashboard via channel APIs. Replace static placeholders.</div></div><span class="badge badge-muted">Queued</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Date badge
+const d = new Date();
+document.getElementById('date-badge').textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+
+// Tab navigation
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Build calendar
+(function buildCal(){
+  const grid = document.getElementById('cal-week');
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0=Sun
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+  const plans = [
+    [{type:'cp-pin',label:'Pet Feeder Pin'},{type:'cp-tiktok',label:'Pet Hook #1'},{type:'cp-yt',label:'Pet Short'}],
+    [{type:'cp-tiktok',label:'Home Org Hook'},{type:'cp-pin',label:'Kitchen Board'},{type:'cp-ig',label:'Reel Repost'}],
+    [{type:'cp-pin',label:'Pet Feeder #2'},{type:'cp-tiktok',label:'Fitness Hook'},{type:'cp-yt',label:'Home Short'}],
+    [{type:'cp-tiktok',label:'Pet Hook #3'},{type:'cp-pin',label:'LED Grow Pin'},{type:'cp-ig',label:'Pet Reel'}],
+    [{type:'cp-pin',label:'Weekly Recap'},{type:'cp-tiktok',label:'Review Clip'},{type:'cp-yt',label:'Shorts Bundle'}],
+    [{type:'cp-tiktok',label:'Weekend Push'},{type:'cp-pin',label:'Weekend Pin'}],
+    [{type:'cp-pin',label:'Inspiration Pin'},{type:'cp-tiktok',label:'Sunday Hook'}],
+  ];
+
+  for(let i=0;i<7;i++){
+    const d = new Date(monday);
+    d.setDate(monday.getDate()+i);
+    const isToday = d.toDateString() === today.toDateString();
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell' + (isToday?' today':'');
+    cell.innerHTML = `<div class="cal-date">${d.getDate()}</div>`;
+    (plans[i]||[]).forEach(p=>{
+      const el = document.createElement('div');
+      el.className = 'cal-post '+p.type;
+      el.textContent = p.label;
+      cell.appendChild(el);
+    });
+    grid.appendChild(cell);
+  }
+})();
+
+// Memory search (calls local Quinn stack)
+async function runSearch(){
+  const query = document.getElementById('search-input').value.trim();
+  if(!query) return;
+  const resultsDiv = document.getElementById('search-results');
+  resultsDiv.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Searching Quinn memory stack...</div>';
+  try {
+    const resp = await fetch('http://localhost:4001/search',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({query,top_k:5})
+    });
+    if(!resp.ok) throw new Error('Quinn not reachable');
+    const data = await resp.json();
+    const results = data.results || [];
+    if(results.length===0){
+      resultsDiv.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">No results found. Is Quinn stack running?</div>';
+      return;
+    }
+    resultsDiv.innerHTML = results.map(r=>`
+      <div class="result-card">
+        <div class="result-source">${r.project||'general'} · ${r.section||'—'}</div>
+        <div class="result-text">${r.text}</div>
+        <div class="result-score">Score: ${(r.score||0).toFixed(3)} · ${r.source||''}</div>
+      </div>
+    `).join('');
+  } catch(e){
+    resultsDiv.innerHTML = `
+      <div class="result-card" style="border-color:var(--red)">
+        <div class="result-source" style="color:var(--red)">Quinn Stack Offline</div>
+        <div class="result-text">Memory search requires the local Quinn stack to be running.<br><br>
+        Run: <code style="background:var(--navy3);padding:2px 6px;border-radius:4px">start_quinn.bat</code></div>
+      </div>`;
+  }
+}
+
+document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch()});
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ANTHROPIC CLAUDE CHAT — WIRED IN                   -->
+<!-- ═══════════════════════════════════════════════════ -->
+<style>
+#ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+#ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
+#ai-chat-btn svg{width:26px;height:26px;fill:white}
+#ai-chat-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-height:560px;background:#0d1117;border:1px solid #21262d;border-radius:16px;box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+#ai-chat-panel.open{display:flex}
+#ai-chat-header{background:#161b22;border-bottom:1px solid #21262d;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+#ai-chat-header .title{font-size:14px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
+#ai-chat-header .dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;animation:cpulse 2s infinite}
+@keyframes cpulse{0%,100%{opacity:1}50%{opacity:.4}}
+#ai-chat-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+#ai-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:380px}
+#ai-chat-msgs::-webkit-scrollbar{width:4px}
+#ai-chat-msgs::-webkit-scrollbar-track{background:transparent}
+#ai-chat-msgs::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.cm{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;max-width:88%;word-wrap:break-word}
+.cm-user{background:#1f3461;color:#e6edf3;align-self:flex-end;border-radius:12px 12px 2px 12px}
+.cm-ai{background:#161b22;color:#c9d1d9;border:1px solid #21262d;align-self:flex-start;border-radius:12px 12px 12px 2px}
+.cm-ai strong{color:#7c3aed}
+.cm-typing{color:#8b949e;font-style:italic;font-size:12px}
+#ai-chat-input-row{border-top:1px solid #21262d;padding:12px;display:flex;gap:8px;background:#0d1117}
+#ai-chat-input{flex:1;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:inherit;resize:none;height:38px;line-height:1.4}
+#ai-chat-input:focus{border-color:#7c3aed}
+#ai-chat-send{background:#7c3aed;border:none;color:white;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:background .2s}
+#ai-chat-send:hover{background:#6d28d9}
+#ai-chat-send:disabled{background:#374151;cursor:not-allowed}
+</style>
+
+<button id="ai-chat-btn" title="Ask Claude AI" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+</button>
+
+<div id="ai-chat-panel">
+  <div id="ai-chat-header">
+    <div class="title"><span class="dot"></span>Claude AI — Drop Ship Intel</div>
+    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="ai-chat-msgs">
+    <div class="cm cm-ai">Hey Alex 👋 I'm your Drop Ship AI. Ask me anything — products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
+  </div>
+  <div id="ai-chat-input-row">
+    <input id="ai-chat-input" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+    <button id="ai-chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PAGE_CONTEXT = document.title || 'Dropship OS';
+  
+  function toggleChat(){
+    const p = document.getElementById('ai-chat-panel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open')) document.getElementById('ai-chat-input').focus();
+  }
+  window.toggleChat = toggleChat;
+
+  function addMsg(text, role){
+    const msgs = document.getElementById('ai-chat-msgs');
+    const div = document.createElement('div');
+    div.className = 'cm ' + (role==='user' ? 'cm-user' : 'cm-ai');
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  const history = [];
+
+  async function sendChat(){
+    const input = document.getElementById('ai-chat-input');
+    const btn   = document.getElementById('ai-chat-send');
+    const text  = input.value.trim();
+    if(!text) return;
+
+    addMsg(text, 'user');
+    history.push({role:'user', content:text});
+    input.value = '';
+    btn.disabled = true;
+
+    const typing = addMsg('Thinking…', 'ai');
+    typing.classList.add('cm-typing');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          messages: history,
+          context: PAGE_CONTEXT
+        })
+      });
+
+      const data = await res.json();
+
+      if(!res.ok || data.error){
+        typing.textContent = data.error || 'Error — check your ANTHROPIC_API_KEY in Vercel env vars.';
+        typing.style.color = '#f87171';
+      } else {
+        const reply = data.content;
+        typing.textContent = reply;
+        typing.classList.remove('cm-typing');
+        history.push({role:'assistant', content:reply});
+      }
+    } catch(e) {
+      typing.textContent = 'Connection error. Make sure ANTHROPIC_API_KEY is set in Vercel → Settings → Environment Variables.';
+      typing.style.color = '#f87171';
+    }
+
+    btn.disabled = false;
+    document.getElementById('ai-chat-msgs').scrollTop = 99999;
+    input.focus();
+  }
+  window.sendChat = sendChat;
+})();
+</script>
+
+</body>
+</html>

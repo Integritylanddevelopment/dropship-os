@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dropship Strategy Playbook</title>
+<style>
+  :root {
+    --ink: #111;
+    --muted: #555;
+    --faint: #999;
+    --border: #ddd;
+    --bg: #f7f5f0;
+    --card: #fff;
+    --accent: #c8391b;
+    --accent2: #1a5f3f;
+    --accent3: #1c3f7a;
+    --yellow: #f5c842;
+    --tag-bg: #111;
+    --tag-text: #fff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--ink);
+    color: #fff;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav .logo { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; font-family: sans-serif; font-weight: 700; }
+  nav .logo span { color: var(--yellow); }
+  nav .tabs { display: flex; gap: 0; }
+  nav .tabs button {
+    background: none; border: none; color: #aaa;
+    font-family: sans-serif; font-size: 12px; letter-spacing: 1px;
+    text-transform: uppercase; padding: 0 18px; height: 56px;
+    cursor: pointer; transition: color 0.2s, border-bottom 0.2s;
+    border-bottom: 3px solid transparent;
+  }
+  nav .tabs button:hover { color: #fff; }
+  nav .tabs button.active { color: var(--yellow); border-bottom: 3px solid var(--yellow); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 40px; max-width: 1100px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* HERO */
+  .hero {
+    background: var(--ink);
+    color: #fff;
+    padding: 60px 40px;
+    margin-bottom: 0;
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; }
+  .hero .label { font-family: sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 16px; }
+  .hero h1 { font-size: 48px; line-height: 1.15; margin-bottom: 20px; font-weight: normal; }
+  .hero h1 em { color: var(--yellow); font-style: normal; }
+  .hero p { font-size: 18px; color: #aaa; max-width: 600px; font-family: sans-serif; font-weight: 300; }
+  .hero-stats { display: flex; gap: 40px; margin-top: 40px; padding-top: 40px; border-top: 1px solid #333; }
+  .hero-stat .num { font-size: 36px; font-weight: bold; color: var(--yellow); font-family: sans-serif; }
+  .hero-stat .label2 { font-family: sans-serif; font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* CARDS */
+  .grid { display: grid; gap: 24px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    border-radius: 2px;
+  }
+  .card.dark { background: var(--ink); color: #fff; border-color: #333; }
+  .card.accent { border-left: 4px solid var(--accent); }
+  .card.accent2 { border-left: 4px solid var(--accent2); }
+  .card.accent3 { border-left: 4px solid var(--accent3); }
+  .card h3 { font-size: 16px; margin-bottom: 12px; font-family: sans-serif; font-weight: 700; }
+  .card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .card.dark p { color: #aaa; }
+
+  /* SECTION HEADERS */
+  .section-header { margin-bottom: 32px; }
+  .section-header .eyebrow { font-family: sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .section-header h2 { font-size: 32px; font-weight: normal; line-height: 1.2; }
+  .section-header p { font-size: 16px; color: var(--muted); margin-top: 10px; font-family: sans-serif; }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 0;
+    border-left: 3px solid var(--border);
+    padding-left: 28px; padding-bottom: 36px;
+    position: relative;
+  }
+  .step:last-child { border-left: 3px solid transparent; }
+  .step-num {
+    position: absolute; left: -18px; top: 0;
+    width: 32px; height: 32px;
+    background: var(--ink); color: var(--yellow);
+    font-family: sans-serif; font-size: 13px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .step-body h4 { font-size: 17px; font-family: sans-serif; font-weight: 700; margin-bottom: 8px; }
+  .step-body p { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+  .step-body .tools { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-family: sans-serif; font-size: 11px; letter-spacing: 0.5px;
+    background: #eee; color: #333;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .tag.red { background: #fde8e3; color: var(--accent); }
+  .tag.green { background: #e3f5ec; color: var(--accent2); }
+  .tag.blue { background: #e3eaf5; color: var(--accent3); }
+  .tag.dark { background: var(--ink); color: #fff; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { font-family: sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; text-align: left; padding: 10px 14px; background: var(--ink); color: var(--yellow); font-weight: 700; }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: #faf9f6; }
+  td:first-child { font-weight: 600; font-family: sans-serif; }
+
+  /* CALLOUT */
+  .callout {
+    border: 2px solid var(--yellow);
+    background: #fffbea;
+    padding: 20px 24px;
+    border-radius: 2px;
+    margin: 24px 0;
+  }
+  .callout .icon { font-size: 20px; margin-bottom: 8px; }
+  .callout strong { font-family: sans-serif; font-size: 15px; display: block; margin-bottom: 6px; }
+  .callout p { font-size: 14px; color: var(--muted); }
+
+  /* AVATAR CARDS */
+  .avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .avatar-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-top: 4px solid;
+  }
+  .avatar-card:nth-child(4n+1) { border-top-color: var(--accent); }
+  .avatar-card:nth-child(4n+2) { border-top-color: var(--accent2); }
+  .avatar-card:nth-child(4n+3) { border-top-color: var(--accent3); }
+  .avatar-card:nth-child(4n+4) { border-top-color: var(--yellow); }
+  .avatar-card .av-name { font-family: sans-serif; font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+  .avatar-card .av-pain { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .avatar-card .av-platform { font-family: sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); }
+
+  /* FORMULA */
+  .formula {
+    background: var(--ink);
+    color: #fff;
+    padding: 32px;
+    border-radius: 2px;
+    margin: 24px 0;
+    font-family: sans-serif;
+  }
+  .formula .f-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 16px; }
+  .formula .f-eq { font-size: 22px; font-weight: 300; color: #fff; line-height: 1.8; }
+  .formula .f-eq strong { color: var(--yellow); font-weight: 800; }
+  .formula .f-eq .op { color: #666; padding: 0 12px; }
+
+  /* PLATFORM TABLE */
+  .platform-row { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .platform-row:last-child { border-bottom: none; }
+  .plat-name { font-family: sans-serif; font-weight: 700; font-size: 15px; min-width: 140px; }
+  .plat-bar-wrap { flex: 1; background: #eee; height: 10px; border-radius: 2px; }
+  .plat-bar { height: 10px; border-radius: 2px; background: var(--accent); }
+  .plat-score { font-family: sans-serif; font-size: 13px; font-weight: 700; min-width: 40px; text-align: right; }
+  .plat-meta { font-size: 12px; color: var(--muted); min-width: 180px; font-family: sans-serif; }
+
+  /* DO / DON'T */
+  .dos-donts { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .do-col, .dont-col { }
+  .do-col h4 { font-family: sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent2); margin-bottom: 16px; }
+  .dont-col h4 { font-family: sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .do-item, .dont-item { display: flex; gap: 10px; margin-bottom: 12px; font-size: 14px; }
+  .do-item::before { content: '✓'; color: var(--accent2); font-weight: 800; flex-shrink: 0; }
+  .dont-item::before { content: '✕'; color: var(--accent); font-weight: 800; flex-shrink: 0; }
+
+  /* SCROLL MARGIN */
+  h2, h3 { scroll-margin-top: 70px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .dos-donts { grid-template-columns: 1fr; }
+    nav .tabs button { padding: 0 10px; font-size: 10px; }
+    .hero h1 { font-size: 32px; }
+    .hero-stats { flex-wrap: wrap; gap: 24px; }
+    .section { padding: 24px 16px; }
+    .hero { padding: 40px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="label">Dropship Strategy Playbook · 2025–2026</div>
+    <h1>Where Cheap Attention<br>Meets <em>High-Margin</em> Product</h1>
+    <p>A GaryVee + Hormozi framework for building profitable dropshipping operations at scale.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">10</div>
+        <div class="label2">Launch Steps</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">20+</div>
+        <div class="label2">Micro-Avatars</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">3×</div>
+        <div class="label2">Min LTV:CAC</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">60%+</div>
+        <div class="label2">Gross Margin Target</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Drop<span>ship</span> OS</div>
+  <div class="tabs">
+    <button class="active" onclick="show('strategy',this)">Strategy</button>
+    <button onclick="show('avatars',this)">Avatars</button>
+    <button onclick="show('launch',this)">10-Step Launch</button>
+    <button onclick="show('content',this)">Content</button>
+    <button onclick="show('metrics',this)">KPIs</button>
+    <button onclick="show('tools',this)">Tool Stack</button>
+  </div>
+</nav>
+
+<!-- =================== STRATEGY =================== -->
+<div id="strategy" class="section active">
+  <div class="section-header">
+    <div class="eyebrow">Core Framework</div>
+    <h2>The Attention Arbitrage Model</h2>
+    <p>Track where attention is cheapest. Match to highest-margin products. Pour volume.</p>
+  </div>
+
+  <div class="formula">
+    <div class="f-label">The Fundamental Equation</div>
+    <div class="f-eq">
+      <strong>Cheapest Attention</strong>
+      <span class="op">+</span>
+      <strong>Highest Margin Product</strong>
+      <span class="op">+</span>
+      <strong>Volume of Content</strong>
+      <span class="op">=</span>
+      <strong style="color:#4ade80;">Profit</strong>
+    </div>
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:24px;">
+    <div class="card accent">
+      <h3>GaryVee PAC Framework</h3>
+      <p><strong>Platforms.</strong> Know which ones are underpriced right now (TikTok, Pinterest, YouTube Shorts). Move before everyone else does.<br><br>
+      <strong>Algorithms.</strong> Non-follower reach = Interest Media. You don't need an audience, you need a hook.<br><br>
+      <strong>Culture.</strong> Content must feel native — not like an ad. DJ Remix: rip viral formats, apply your product.</p>
+    </div>
+    <div class="card accent2">
+      <h3>Hormozi Value Equation</h3>
+      <p><strong>Dream Outcome</strong> × <strong>Likelihood of Achievement</strong><br>÷ <strong>Time Delay</strong> × <strong>Effort & Sacrifice</strong><br><br>
+      Every product page, every ad angle, every offer must score high on this formula. Maximize dream + likelihood. Crush time delay + effort.</p>
+    </div>
+    <div class="card accent3">
+      <h3>The Stock Market Model</h3>
+      <p>Operate like a research firm. Constantly track:<br><br>
+      — Where is attention cheapest today?<br>
+      — Which products have the highest margin?<br>
+      — Switch volume to the best signal.<br><br>
+      Kill slow channels fast. Double the winners. Never fall in love with a platform.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="icon">⚡</div>
+    <strong>The GaryVee 2025–2026 Shift: "Interest Media"</strong>
+    <p>TikTok, Instagram, and YouTube Shorts now push content to non-followers based on interest, not connections. This means a brand-new account can go viral Day 1. The platform IS your distribution. Post volume beats follower count every time.</p>
+  </div>
+
+  <div class="dos-donts">
+    <div class="do-col">
+      <h4>Do This</h4>
+      <div class="do-item">Post 3–5 pieces of content per platform daily</div>
+      <div class="do-item">Piggyback off viral formats (DJ Remix method)</div>
+      <div class="do-item">Organic first — validate before spending on paid</div>
+      <div class="do-item">Use 20+ micro-avatars per product, test all angles</div>
+      <div class="do-item">Kill underperformers in 48 hours, double winners</div>
+      <div class="do-item">Branded micro-store with 3–7 adjacent SKUs</div>
+      <div class="do-item">AI image ads when they look real — faster iteration</div>
+      <div class="do-item">Human keeps judgment: product pick, kill/scale</div>
+    </div>
+    <div class="dont-col">
+      <h4>Don't Do This</h4>
+      <div class="dont-item">Fall in love with one platform</div>
+      <div class="dont-item">Launch paid before organic signal</div>
+      <div class="dont-item">Choose products by gut, not data</div>
+      <div class="dont-item">Build a junk-drawer 500-product general store</div>
+      <div class="dont-item">Edit ads after 6 clicks — wait for real data</div>
+      <div class="dont-item">Trust AI to make budget or scale decisions</div>
+      <div class="dont-item">Fake-looking AI faces, glossy scam visuals</div>
+      <div class="dont-item">Copy revenue screenshots without margin context</div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== AVATARS =================== -->
+<div id="avatars" class="section">
+  <div class="section-header">
+    <div class="eyebrow">Consumer Segmentation</div>
+    <h2>The 20+ Micro-Avatar System</h2>
+    <p>GaryVee's core insight: most brands talk to one person. Winners talk to 20. Each avatar gets its own hook, angle, and platform assignment.</p>
+  </div>
+
+  <div class="callout">
+    <strong>How to Find the Underserved Avatar</strong>
+    <p>Search TikTok comments on competitor content. Look for "I wish this worked for [specific group]" or "but what about people who [X]?" Those are your underserved avatars. Create content specifically for that sub-group — the algorithm will find them for you.</p>
+  </div>
+
+  <div class="avatar-grid">
+    <div class="avatar-card">
+      <div class="av-name">The Overwhelmed Mom</div>
+      <div class="av-pain">Pain: No time, stretched thin, wants solutions that actually work fast</div>
+      <div class="av-platform">TikTok · Instagram Reels</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Side Hustle Guy</div>
+      <div class="av-pain">Pain: Wants passive income, skeptical, needs proof not hype</div>
+      <div class="av-platform">YouTube · Reddit</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Budget-Conscious Gifter</div>
+      <div class="av-pain">Pain: Wants to look generous without overspending, seasonal urgency</div>
+      <div class="av-platform">Pinterest · Facebook</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Health Optimizer</div>
+      <div class="av-pain">Pain: Wants to feel better, distrust big pharma, loves "natural"</div>
+      <div class="av-platform">Instagram · YouTube</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Pet Parent</div>
+      <div class="av-pain">Pain: Guilt about pet comfort, will spend premium for animal care</div>
+      <div class="av-platform">TikTok · Pinterest</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Home Glow-Upper</div>
+      <div class="av-pain">Pain: Wants HGTV results on an IKEA budget, impulse visual buyer</div>
+      <div class="av-platform">Pinterest · TikTok</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Fitness Beginner</div>
+      <div class="av-pain">Pain: Intimidated by gyms, wants to start at home, low commitment</div>
+      <div class="av-platform">TikTok · Instagram</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Remote Worker</div>
+      <div class="av-pain">Pain: Home office is chaos, wants productive environment, desk setups</div>
+      <div class="av-platform">YouTube · Reddit · X</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Trendy Teen Buyer</div>
+      <div class="av-pain">Pain: FOMO, wants to be first, status-driven purchases</div>
+      <div class="av-platform">TikTok · Instagram</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Gadget-Curious Boomer</div>
+      <div class="av-pain">Pain: Lonely, wants to feel relevant, easy-to-use tech gifts</div>
+      <div class="av-platform">Facebook · YouTube</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The New Parent</div>
+      <div class="av-pain">Pain: Sleep-deprived, safety-obsessed, convenience is king</div>
+      <div class="av-platform">Pinterest · Facebook Groups</div>
+    </div>
+    <div class="avatar-card">
+      <div class="av-name">The Travel Minimalist</div>
+      <div class="av-pain">Pain: Wants to pack light, hates overpacking, values clever design</div>
+      <div class="av-platform">YouTube · TikTok</div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;">
+    <div class="section-header">
+      <div class="eyebrow">Avatar Research Process</div>
+      <h2>Finding the Underserved</h2>
+    </div>
+    <div class="grid grid-2">
+      <div class="card accent">
+        <h3>Step 1: Mine Comments</h3>
+        <p>Go to the top 5 competitors' TikTok/Instagram. Read 200+ comments. Look for: "but what about X?" or "I wish this worked for Y." Those are untapped avatars your competitor ignores.</p>
+      </div>
+      <div class="card accent2">
+        <h3>Step 2: Subreddit Dive</h3>
+        <p>Search Reddit for your product category + "but" or "except" or "doesn't work for." Real complaints = real avatars. Cross-reference with Meta Ad Library — are any ads targeting that sub-group? If not, you found your gap.</p>
+      </div>
+      <div class="card accent3">
+        <h3>Step 3: TikTok Creative Center</h3>
+        <p>Search your product niche. Filter by highest engagement. What hooks dominate? Who are the commenters? Reverse-engineer the avatar from the content, not the product.</p>
+      </div>
+      <div class="card">
+        <h3>Step 4: Validate with Organic</h3>
+        <p>Before paid, post 5 pieces of content aimed at the new avatar. If engagement spikes (saves, shares, comments from that group) — you found a real sub-niche. Now pour paid behind the organic winner.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== LAUNCH =================== -->
+<div id="launch" class="section">
+  <div class="section-header">
+    <div class="eyebrow">Execution Framework</div>
+    <h2>The 10-Step Fast Launch</h2>
+    <p>Compress idea → store → creative → launch → iteration. Speed is the only unfair advantage left.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Pick One Niche Direction</h4>
+        <p>Choose one lane: problem-solving home, fashion sub-niche, beauty/wellness, supplements, or giftable impulse. Pick where multiple adjacent SKUs can live under one brand. Do NOT start with 20 unrelated products.</p>
+        <div class="tools">
+          <span class="tag">ChatGPT</span><span class="tag">Claude</span><span class="tag">Perplexity</span>
+          <span class="tag green">Deliverable: 1 niche, 3–5 adjacent SKUs</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Build a Short Product Shortlist</h4>
+        <p>Research 10–20 products, narrow to 3. Require: visual demo potential, clear pain/solution angle, room for 3× markup, proof of demand from ads, non-copyrighted, non-fragile.</p>
+        <div class="tools">
+          <span class="tag">Minea</span><span class="tag">TikTok Creative Center</span><span class="tag">Meta Ad Library</span>
+          <span class="tag green">Deliverable: Top 3 products</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Validate Supplier Before Branding Anything</h4>
+        <p>Check: landed cost, shipping regions, delivery times, branding options, return/refund friction. Prevent the clown show where ads work and fulfillment destroys you.</p>
+        <div class="tools">
+          <span class="tag">Zendrop</span><span class="tag">AutoDS</span><span class="tag blue">Zendrop-supported SKUs only to start</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Launch a Branded Storefront</h4>
+        <p>One niche, one branded Shopify store. Simple logo, one premium theme, 3–7 live SKUs, category-consistent colors, strong hero, trust blocks, sticky ATC. Do NOT overbuild the homepage for a week.</p>
+        <div class="tools">
+          <span class="tag">Shopify</span><span class="tag">Shrine Theme</span><span class="tag">Zendrop AI Store Builder</span><span class="tag">Canva</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Create the Product Page Around One Dominant Angle</h4>
+        <p>Headline with pain/benefit → demo section → 3–5 USP bullets → social proof → FAQ → shipping/guarantee → upsell. Do NOT copy-paste AliExpress text.</p>
+        <div class="tools">
+          <span class="tag">Claude/ChatGPT</span><span class="tag">Loox</span><span class="tag">Vitals</span><span class="tag">Google Stitch</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h4>Generate Creatives in Batches</h4>
+        <p>Build 8–15 creatives per product: 3 problem-solution image ads, 2 benefit-focused statics, 2 comparisons, 2 UGC-style scripts, 1 founder angle, 1 offer graphic. Start with statics — they're faster and cheaper to iterate.</p>
+        <div class="tools">
+          <span class="tag">Midjourney/Flux</span><span class="tag">Canva</span><span class="tag">CapCut</span>
+          <span class="tag red">Avoid: fake-looking AI faces, impossible anatomy, glossy scam visuals</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <h4>Write Ad Angles Before Writing Ad Copy</h4>
+        <p>5 angles: pain relief, transformation/result, convenience/time saved, social proof, gift/seasonal. Write 2 hooks per angle. Test hooks before creative. Most people do it backwards.</p>
+        <div class="tools">
+          <span class="tag">ChatGPT/Claude</span><span class="tag">Perplexity</span>
+          <span class="tag green">Template: "20 hooks for [product] aimed at [avatar]..."</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <h4>Launch Ads with a Structured Small Test</h4>
+        <p>1 campaign, 3–5 ad sets, 3–5 creatives, same product page, same offer. No mid-test tinkering for first 24 hours. Choose: Meta for visual impulse products, TikTok for viral demo products.</p>
+        <div class="tools">
+          <span class="tag">Meta Ads</span><span class="tag">TikTok Ads</span>
+          <span class="tag red">DO NOT: edit everything after 6 clicks</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <h4>Optimize Offer and Page Before Blaming the Product</h4>
+        <p>Tune: headline, price anchor, bundle/quantity breaks, post-purchase upsell, review placement, shipping promise. If CTR is strong but CVR is low, fix the page — not the product.</p>
+        <div class="tools">
+          <span class="tag">Aftersell</span><span class="tag">Vitals</span><span class="tag">Hotjar/Clarity</span><span class="tag">Loox</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">10</div>
+      <div class="step-body">
+        <h4>Systemize What AI Can Do, Keep Humans on Judgment</h4>
+        <p>AI handles: research sweeps, ad summaries, support macros, KPI digests, creative variants, page draft. Human handles: product greenlight, brand positioning, creative taste, budget decisions, kill/scale calls.</p>
+        <div class="tools">
+          <span class="tag">OpenClaw</span><span class="tag">Zapier/Make</span><span class="tag">ChatGPT/Claude</span>
+          <span class="tag green">Rule: AI drafts everything. Human approves anything money-moving.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== CONTENT =================== -->
+<div id="content" class="section">
+  <div class="section-header">
+    <div class="eyebrow">Distribution Strategy</div>
+    <h2>Cheapest Attention by Platform</h2>
+    <p>Treat platforms like a stock market. Track CPM, organic reach cost, and engagement quality. Switch volume to the cheapest signal.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <h3>Platform Attention Cost Index (Lower = Cheaper Attention)</h3>
+    <div style="margin-top:16px;">
+      <div class="platform-row">
+        <div class="plat-name">TikTok Organic</div>
+        <div class="plat-bar-wrap"><div class="plat-bar" style="width:15%;background:#4ade80;"></div></div>
+        <div class="plat-score" style="color:#4ade80;">15</div>
+        <div class="plat-meta">Non-follower reach, viral loops, highest ROI</div>
+      </div>
+      <div class="platform-row">
+        <div class="plat-name">Pinterest</div>
+        <div class="plat-bar-wrap"><div class="plat-bar" style="width:22%;background:#86efac;"></div></div>
+        <div class="plat-score" style="color:#86efac;">22</div>
+        <div class="plat-meta">Evergreen content, high buyer intent, underused</div>
+      </div>
+      <div class="platform-row">
+        <div class="plat-name">YouTube Shorts</div>
+        <div class="plat-bar-wrap"><div class="plat-bar" style="width:30%;background:#fde047;"></div></div>
+        <div class="plat-score" style="color:#888;">30</div>
+        <div class="plat-meta">Growing fast, SEO bonus, trust building</div>
+      </div>
+      <div class="platform-row">
+        <div class="plat-name">Instagram Reels</div>
+        <div class="plat-bar-wrap"><div class="plat-bar" style="width:45%;"></div></div>
+        <div class="plat-score">45</div>
+        <div class="plat-meta">Good reach, saturating, still strong for visual products</div>
+      </div>
+      <div class="platform-row">
+        <div class="plat-name">Facebook Organic</div>
+        <div class="plat-bar-wrap"><div class="plat-bar" style="width:65%;background:#f97316;"></div></div>
+        <div class="plat-score" style="color:#f97316;">65</div>
+        <div class="plat-meta">Declining organic, but strong for 35–65 demo</div>
+      </div>
+      <div class="platform-row">
+        <div class="plat-name">Meta Paid</div>
+        <div class="plat-bar-wrap"><div class="plat-bar" style="width:80%;background:#ef4444;"></div></div>
+        <div class="plat-score" style="color:#ef4444;">80</div>
+        <div class="plat-meta">Expensive, but scalable once organic validates</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:24px;">
+    <div class="card accent2">
+      <h3>The DJ Remix Method</h3>
+      <p>Find the 3 most viral pieces of content in your niche. Don't copy — extract the <em>format</em>: the hook structure, the pacing, the reveal moment, the audio style. Apply that format to your product. This is how you get viral reach without starting from zero.</p>
+      <br>
+      <p style="font-size:13px;font-family:sans-serif;"><strong>Step 1:</strong> Identify viral format<br>
+      <strong>Step 2:</strong> Extract what made it work (hook? twist? emotion?)<br>
+      <strong>Step 3:</strong> Reapply format with your product/angle<br>
+      <strong>Step 4:</strong> Post within 48h of trend peak</p>
+    </div>
+    <div class="card accent3">
+      <h3>Content Volume Formula</h3>
+      <p>GaryVee's core belief: most brands underpost by 10×. The cost of creating is near zero with AI. There is no excuse for posting 3× per week.</p>
+      <br>
+      <div style="font-family:sans-serif;font-size:14px;line-height:2;">
+        <strong>Minimum viable:</strong> 1 post/day per platform<br>
+        <strong>Competitive:</strong> 3–5 posts/day per platform<br>
+        <strong>Dominant:</strong> 5+ posts/day across 3+ platforms<br>
+        <strong>Document → Create:</strong> Show the process, not just the product
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:40px;">
+    <div class="eyebrow">Creative System</div>
+    <h2>The 5-Angle Ad Matrix</h2>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Angle</th>
+        <th>Hook Formula</th>
+        <th>Best Format</th>
+        <th>Platform Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Pain Agitation</td>
+        <td>"Still dealing with [problem]? Here's why..."</td>
+        <td>UGC-style video</td>
+        <td>TikTok, Instagram</td>
+      </tr>
+      <tr>
+        <td>Transformation / Before-After</td>
+        <td>"I was [old state]. Now I'm [new state]. This is what changed."</td>
+        <td>Split image ad, carousel</td>
+        <td>Instagram, Facebook</td>
+      </tr>
+      <tr>
+        <td>Convenience / Time Saved</td>
+        <td>"I used to spend [X hours]. Now it takes [Y minutes]."</td>
+        <td>Demo video, static</td>
+        <td>TikTok, YouTube Shorts</td>
+      </tr>
+      <tr>
+        <td>Social Proof / "TikTok Made Me Buy It"</td>
+        <td>"Everyone's talking about [product] and here's why I finally caved."</td>
+        <td>Review-style, UGC</td>
+        <td>TikTok, Instagram</td>
+      </tr>
+      <tr>
+        <td>Gift / Seasonal</td>
+        <td>"If you have a [person] in your life who [X], get them this."</td>
+        <td>Static image, carousel</td>
+        <td>Pinterest, Facebook</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- =================== METRICS =================== -->
+<div id="metrics" class="section">
+  <div class="section-header">
+    <div class="eyebrow">Hormozi KPI Framework</div>
+    <h2>The Numbers That Actually Matter</h2>
+    <p>Revenue is vanity. Margin is sanity. These are the only KPIs worth obsessing over.</p>
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:32px;">
+    <div class="card dark">
+      <h3 style="color:var(--yellow);">Gross Margin</h3>
+      <p>(Revenue − COGS) ÷ Revenue<br><br><strong style="color:#4ade80;">Target: 60–70%+</strong><br><br>If you're below 50%, the business math breaks at scale. Fix product selection or supplier pricing before scaling ads.</p>
+    </div>
+    <div class="card dark">
+      <h3 style="color:var(--yellow);">Contribution Margin</h3>
+      <p>(Revenue − COGS − Variable Costs) ÷ Revenue<br><br><strong style="color:#4ade80;">Target: 30–40%+</strong><br><br>Variable costs = ad spend, payment processing, fulfillment apps. This is the real test of unit economics.</p>
+    </div>
+    <div class="card dark">
+      <h3 style="color:var(--yellow);">LTV : CAC Ratio</h3>
+      <p>Lifetime Value ÷ Customer Acquisition Cost<br><br><strong style="color:#4ade80;">Hormozi minimum: 3×</strong><br><br>Below 3× you're working for your ad platform. Above 5× you have a real business. Build email/SMS to push LTV up.</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>KPI</th>
+        <th>Formula</th>
+        <th>Benchmark</th>
+        <th>Action if Below</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CTR (Click-Through Rate)</td>
+        <td>Clicks ÷ Impressions</td>
+        <td>&gt; 1.5% (image), &gt; 2.5% (video)</td>
+        <td>Fix hook — first 3 seconds is wrong</td>
+      </tr>
+      <tr>
+        <td>CVR (Conversion Rate)</td>
+        <td>Orders ÷ Sessions</td>
+        <td>&gt; 2.5%</td>
+        <td>Fix page — offer, trust, or price anchor</td>
+      </tr>
+      <tr>
+        <td>AOV (Avg Order Value)</td>
+        <td>Revenue ÷ Orders</td>
+        <td>3× landed cost</td>
+        <td>Add bundle, upsell, or quantity break</td>
+      </tr>
+      <tr>
+        <td>ROAS (Return on Ad Spend)</td>
+        <td>Revenue ÷ Ad Spend</td>
+        <td>&gt; 3× to break even, 5× to scale</td>
+        <td>Improve creative angle or kill ad set</td>
+      </tr>
+      <tr>
+        <td>CPA (Cost Per Acquisition)</td>
+        <td>Ad Spend ÷ Customers</td>
+        <td>&lt; 33% of AOV</td>
+        <td>Tighten targeting or improve CVR</td>
+      </tr>
+      <tr>
+        <td>Gross Margin</td>
+        <td>(Rev − COGS) ÷ Rev</td>
+        <td>&gt; 60%</td>
+        <td>Renegotiate supplier or raise price</td>
+      </tr>
+      <tr>
+        <td>Net Margin</td>
+        <td>(Rev − All Costs) ÷ Rev</td>
+        <td>&gt; 15%</td>
+        <td>Cut overhead, reduce ad waste</td>
+      </tr>
+      <tr>
+        <td>LTV (Lifetime Value)</td>
+        <td>Avg Order × Avg Frequency × Lifespan</td>
+        <td>3× CAC minimum</td>
+        <td>Build email/SMS retention flows</td>
+      </tr>
+      <tr>
+        <td>Refund Rate</td>
+        <td>Refunds ÷ Orders</td>
+        <td>&lt; 3%</td>
+        <td>Fix product expectations or quality</td>
+      </tr>
+      <tr>
+        <td>Email/SMS Revenue %</td>
+        <td>Retention Rev ÷ Total Rev</td>
+        <td>&gt; 20%</td>
+        <td>Install flows: abandon cart, win-back</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top:24px;">
+    <strong>The Hormozi Unit Economics Test</strong>
+    <p>Before scaling any product, answer: If I acquire 1000 customers at current CPA, what is my net margin after all costs? If the answer is negative, you are paying to work. Fix the unit economics before touching the ad budget.</p>
+  </div>
+</div>
+
+<!-- =================== TOOLS =================== -->
+<div id="tools" class="section">
+  <div class="section-header">
+    <div class="eyebrow">AI Tool Stack</div>
+    <h2>The Operating System</h2>
+    <p>Every tool should compress labor, not replace judgment. AI does the volume. You do the thinking.</p>
+  </div>
+
+  <table style="margin-bottom:32px;">
+    <thead>
+      <tr>
+        <th>Function</th>
+        <th>Primary Tool</th>
+        <th>Budget Alternative</th>
+        <th>Tier</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Store Building</td>
+        <td>Zendrop AI Store Builder</td>
+        <td>Shopify free theme + manual</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Supplier + Fulfillment</td>
+        <td>Zendrop</td>
+        <td>DSers / CJ Dropshipping</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Product Import + Automation</td>
+        <td>AutoDS</td>
+        <td>DSers</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Storefront Theme</td>
+        <td>Shrine Theme</td>
+        <td>Dawn + paid sections</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Page Design + Layout</td>
+        <td>Google Stitch</td>
+        <td>Figma + ChatGPT wireframe</td>
+        <td><span class="tag green">Optional/Core</span></td>
+      </tr>
+      <tr>
+        <td>Ops Automation</td>
+        <td>OpenClaw Agent</td>
+        <td>ChatGPT Tasks + Zapier</td>
+        <td><span class="tag blue">Advanced</span></td>
+      </tr>
+      <tr>
+        <td>Reviews / Social Proof</td>
+        <td>Loox</td>
+        <td>Judge.me</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Post-Purchase Upsells</td>
+        <td>Aftersell</td>
+        <td>ReConvert</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>CRO Bundle</td>
+        <td>Vitals</td>
+        <td>Separate single-purpose apps</td>
+        <td><span class="tag green">Optional/Core</span></td>
+      </tr>
+      <tr>
+        <td>Product Research / Ad Spy</td>
+        <td>Minea</td>
+        <td>TikTok Creative Center + Meta Ad Library</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Copy / Angle Generation</td>
+        <td>Claude / ChatGPT</td>
+        <td>Gemini free</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Image Ad Generation</td>
+        <td>Midjourney / Flux / GPT Image</td>
+        <td>Canva Magic Media</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+      <tr>
+        <td>Video Ad Creation</td>
+        <td>CapCut + AI avatar tools</td>
+        <td>CapCut only</td>
+        <td><span class="tag green">Optional</span></td>
+      </tr>
+      <tr>
+        <td>Email / SMS</td>
+        <td>Klaviyo / TxtCart</td>
+        <td>Shopify Email</td>
+        <td><span class="tag green">Optional</span></td>
+      </tr>
+      <tr>
+        <td>Analytics</td>
+        <td>Shopify + Google Sheets</td>
+        <td>Google Sheets alone</td>
+        <td><span class="tag dark">Core</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid grid-3">
+    <div class="card accent">
+      <h3>AI-Doable (Automate It)</h3>
+      <p style="font-size:13px;">
+        ✓ Product research sweeps<br>
+        ✓ Competitor ad scraping summaries<br>
+        ✓ FAQ drafts + policy drafts<br>
+        ✓ Creative variant generation<br>
+        ✓ Support macros + canned replies<br>
+        ✓ Daily KPI digest emails<br>
+        ✓ Page copy drafts<br>
+        ✓ Supplier communication drafts
+      </p>
+    </div>
+    <div class="card accent3">
+      <h3>AI-Assisted (Human Reviews)</h3>
+      <p style="font-size:13px;">
+        ◐ Product scoring + shortlist<br>
+        ◐ Offer positioning decisions<br>
+        ◐ Retention strategy ideas<br>
+        ◐ Supplier risk triage<br>
+        ◐ Creative taste + selection<br>
+        ◐ Ad angle prioritization<br>
+        ◐ Page layout choices<br>
+        ◐ Email sequence structure
+      </p>
+    </div>
+    <div class="card accent2">
+      <h3>Human Only (Never Delegate)</h3>
+      <p style="font-size:13px;">
+        ✗ Final product greenlight<br>
+        ✗ Budget allocation decisions<br>
+        ✗ Brand positioning voice<br>
+        ✗ Legal / compliance review<br>
+        ✗ Refund edge cases<br>
+        ✗ Kill / scale decisions<br>
+        ✗ Supplier relationship calls<br>
+        ✗ Crisis / PR situations
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav .tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ANTHROPIC CLAUDE CHAT — WIRED IN                   -->
+<!-- ═══════════════════════════════════════════════════ -->
+<style>
+#ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+#ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
+#ai-chat-btn svg{width:26px;height:26px;fill:white}
+#ai-chat-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-height:560px;background:#0d1117;border:1px solid #21262d;border-radius:16px;box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+#ai-chat-panel.open{display:flex}
+#ai-chat-header{background:#161b22;border-bottom:1px solid #21262d;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+#ai-chat-header .title{font-size:14px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
+#ai-chat-header .dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;animation:cpulse 2s infinite}
+@keyframes cpulse{0%,100%{opacity:1}50%{opacity:.4}}
+#ai-chat-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+#ai-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:380px}
+#ai-chat-msgs::-webkit-scrollbar{width:4px}
+#ai-chat-msgs::-webkit-scrollbar-track{background:transparent}
+#ai-chat-msgs::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.cm{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;max-width:88%;word-wrap:break-word}
+.cm-user{background:#1f3461;color:#e6edf3;align-self:flex-end;border-radius:12px 12px 2px 12px}
+.cm-ai{background:#161b22;color:#c9d1d9;border:1px solid #21262d;align-self:flex-start;border-radius:12px 12px 12px 2px}
+.cm-ai strong{color:#7c3aed}
+.cm-typing{color:#8b949e;font-style:italic;font-size:12px}
+#ai-chat-input-row{border-top:1px solid #21262d;padding:12px;display:flex;gap:8px;background:#0d1117}
+#ai-chat-input{flex:1;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:inherit;resize:none;height:38px;line-height:1.4}
+#ai-chat-input:focus{border-color:#7c3aed}
+#ai-chat-send{background:#7c3aed;border:none;color:white;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:background .2s}
+#ai-chat-send:hover{background:#6d28d9}
+#ai-chat-send:disabled{background:#374151;cursor:not-allowed}
+</style>
+
+<button id="ai-chat-btn" title="Ask Claude AI" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+</button>
+
+<div id="ai-chat-panel">
+  <div id="ai-chat-header">
+    <div class="title"><span class="dot"></span>Claude AI — Drop Ship Intel</div>
+    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="ai-chat-msgs">
+    <div class="cm cm-ai">Hey Alex 👋 I'm your Drop Ship AI. Ask me anything — products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
+  </div>
+  <div id="ai-chat-input-row">
+    <input id="ai-chat-input" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+    <button id="ai-chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PAGE_CONTEXT = document.title || 'Dropship OS';
+  
+  function toggleChat(){
+    const p = document.getElementById('ai-chat-panel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open')) document.getElementById('ai-chat-input').focus();
+  }
+  window.toggleChat = toggleChat;
+
+  function addMsg(text, role){
+    const msgs = document.getElementById('ai-chat-msgs');
+    const div = document.createElement('div');
+    div.className = 'cm ' + (role==='user' ? 'cm-user' : 'cm-ai');
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  const history = [];
+
+  async function sendChat(){
+    const input = document.getElementById('ai-chat-input');
+    const btn   = document.getElementById('ai-chat-send');
+    const text  = input.value.trim();
+    if(!text) return;
+
+    addMsg(text, 'user');
+    history.push({role:'user', content:text});
+    input.value = '';
+    btn.disabled = true;
+
+    const typing = addMsg('Thinking…', 'ai');
+    typing.classList.add('cm-typing');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          messages: history,
+          context: PAGE_CONTEXT
+        })
+      });
+
+      const data = await res.json();
+
+      if(!res.ok || data.error){
+        typing.textContent = data.error || 'Error — check your ANTHROPIC_API_KEY in Vercel env vars.';
+        typing.style.color = '#f87171';
+      } else {
+        const reply = data.content;
+        typing.textContent = reply;
+        typing.classList.remove('cm-typing');
+        history.push({role:'assistant', content:reply});
+      }
+    } catch(e) {
+      typing.textContent = 'Connection error. Make sure ANTHROPIC_API_KEY is set in Vercel → Settings → Environment Variables.';
+      typing.style.color = '#f87171';
+    }
+
+    btn.disabled = false;
+    document.getElementById('ai-chat-msgs').scrollTop = 99999;
+    input.focus();
+  }
+  window.sendChat = sendChat;
+})();
+</script>
+
+</body>
+</html>

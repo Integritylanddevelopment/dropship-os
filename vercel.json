@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "dropship-os",
+  "builds": [
+    { "src": "api/chat.js", "use": "@vercel/edge" },
+    { "src": "*.html",      "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/chat",     "dest": "/api/chat.js" },
+    { "src": "/",             "dest": "/index.html" },
+    { "src": "/playbook",     "dest": "/playbook.html" },
+    { "src": "/hormozi",      "dest": "/hormozi.html" },
+    { "src": "/ecom-king",    "dest": "/ecom-king.html" },
+    { "src": "/pinterest",    "dest": "/pinterest.html" },
+    { "src": "/roi",          "dest": "/roi.html" },
+    { "src": "/(.*)\\.html",  "dest": "/$1.html" },
+    { "src": "/(.*)",         "dest": "/index.html" }
+  ]
+}

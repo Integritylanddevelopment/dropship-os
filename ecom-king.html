@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GaryVee Agent Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--navy:#0f1923;--navy2:#16222e;--navy3:#1c2f3f;--blue:#1a6cf6;--teal:#00c9a7;--gold:#f5a623;--red:#e8413e;--green:#22c55e;--text:#e4eaf0;--muted:#7a9ab5;--border:#253447;--card:#19293a;--card2:#1e3347}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.header{background:var(--navy2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+.header-title{font-size:17px;font-weight:700}
+.header-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.status-pill{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.35);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tabs{background:var(--navy2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:4px;overflow-x:auto}
+.tab{padding:13px 18px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.main{padding:24px 28px;max-width:1600px}
+.page{display:none}.page.active{display:block}
+.sec-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.sec-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.kpi-card:hover{border-color:var(--blue)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue)}
+.kpi-card.green::before{background:var(--teal)}
+.kpi-card.gold::before{background:var(--gold)}
+.kpi-card.red::before{background:var(--red)}
+.kpi-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.kpi-value{font-size:28px;font-weight:800;line-height:1;margin-bottom:6px;min-height:34px;display:flex;align-items:center}
+.kpi-value input{background:transparent;border:none;border-bottom:2px solid var(--blue);color:inherit;font-size:28px;font-weight:800;width:100%;outline:none;padding-bottom:2px}
+.kpi-change{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.kpi-change textarea,.kpi-change input{background:transparent;border:none;color:var(--muted);font-size:12px;width:100%;outline:none;resize:none;font-family:inherit}
+.kpi-desc{font-size:11px;color:var(--muted);margin-top:4px}
+.edit-hint{position:absolute;top:8px;right:10px;font-size:10px;color:var(--border);opacity:0}
+.kpi-card:hover .edit-hint{opacity:1}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px;margin-bottom:24px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.chart-card.wide{grid-column:span 2}
+.chart-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.chart-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.chart-wrap{position:relative;height:200px}
+.chart-wrap.tall{height:270px}
+
+/* TABLES */
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden}
+.table-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.table-title{font-size:14px;font-weight:700}
+.badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600}
+.badge-blue{background:rgba(26,108,246,.18);color:#60a5fa}
+.badge-green{background:rgba(34,197,94,.15);color:var(--green)}
+.badge-gold{background:rgba(245,166,35,.15);color:var(--gold)}
+.badge-red{background:rgba(232,65,62,.15);color:#f87171}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:10px 20px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:11px 20px;font-size:13px;border-bottom:1px solid rgba(37,52,71,.5)}
+td[contenteditable]{outline:none;border-bottom-color:var(--blue);min-width:60px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* PROGRESS */
+.prog{background:var(--border);border-radius:4px;height:6px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:4px;transition:width .4s}
+
+/* MARGIN */
+.margin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.margin-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.margin-lbl{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.margin-val{font-size:36px;font-weight:900;margin-bottom:4px;cursor:pointer}
+.margin-val input{background:transparent;border:none;border-bottom:2px solid var(--blue);color:inherit;font-size:36px;font-weight:900;width:100%;outline:none}
+.margin-formula{font-size:11px;color:var(--muted);font-style:italic}
+.margin-bench{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+
+/* AGENT */
+.agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.agent-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.agent-status{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.agent-name{font-size:15px;font-weight:700}
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.task-item:last-child{border-bottom:none}
+.task-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px}
+.ti-done{background:rgba(34,197,94,.15);color:var(--green)}
+.ti-run{background:rgba(26,108,246,.18);color:#60a5fa}
+.ti-q{background:rgba(245,166,35,.15);color:var(--gold)}
+.ti-warn{background:rgba(232,65,62,.15);color:#f87171}
+.task-label{font-weight:600;margin-bottom:2px;outline:none}
+.task-meta{font-size:11px;color:var(--muted);outline:none}
+
+/* ADD ROW BTN */
+.add-row{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:12px;color:var(--muted);cursor:pointer;border-top:1px solid var(--border);transition:color .2s}
+.add-row:hover{color:var(--blue)}
+.add-row-btn{width:20px;height:20px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1}
+
+/* AVATAR */
+.avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-bottom:24px}
+.av-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.av-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.av-emoji{font-size:28px}
+.av-title{font-size:14px;font-weight:700;outline:none}
+.av-niche{font-size:11px;color:var(--muted);outline:none}
+.av-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.av-metric{background:var(--navy3);border-radius:8px;padding:8px 10px}
+.av-metric-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.av-metric-val{font-size:15px;font-weight:800;outline:none;min-width:40px}
+.tag-list{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:10px;background:var(--navy3);color:var(--muted);padding:3px 8px;border-radius:4px}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#2d7cf8}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--text)}
+.btn-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+
+/* PLATFORM TABLE */
+.plat-val{font-weight:700}
+
+/* NOTIFICATION */
+.notif{position:fixed;bottom:24px;right:24px;background:var(--teal);color:#000;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.notif.show{opacity:1}
+
+@media(max-width:768px){
+  .main{padding:16px}
+  .chart-card.wide{grid-column:span 1}
+  .agent-grid{grid-template-columns:1fr}
+  .margin-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="logo">GV</div>
+    <div>
+      <div class="header-title">GaryVee Agent Dashboard</div>
+      <div class="header-sub">Marketing Intelligence · Drop Shipping Operations · <span style="color:var(--gold)">Click any value to edit</span></div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div class="status-pill"><div class="dot"></div> Agent Active</div>
+    <button class="btn btn-green" onclick="exportData()">⬇ Export Data</button>
+    <button class="btn btn-primary" onclick="importData()">⬆ Import Data</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="loadFile(event)">
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('garyvee',this)">📊 GaryVee KPIs</button>
+  <button class="tab" onclick="showTab('hormozi',this)">💰 Hormozi Metrics</button>
+  <button class="tab" onclick="showTab('content',this)">🎬 Content</button>
+  <button class="tab" onclick="showTab('avatars',this)">🎯 Avatars</button>
+  <button class="tab" onclick="showTab('platforms',this)">🌐 Platform Intel</button>
+  <button class="tab" onclick="showTab('campaigns',this)">🚀 Campaigns</button>
+  <button class="tab" onclick="showTab('agent',this)">🤖 Agent Tasks</button>
+</div>
+
+<div class="main">
+
+<!-- ===== GARYVEE TAB ===== -->
+<div id="page-garyvee" class="page active">
+  <div class="sec-title">GaryVee KPI Dashboard</div>
+  <div class="sec-sub">PAC Framework · Attention Economy · Organic-to-Paid · Interest Media · Click any card to edit</div>
+
+  <div class="kpi-grid" id="gv-kpis">
+    <!-- JS rendered -->
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Organic vs Paid Reach</div>
+      <div class="chart-sub">Monthly trend · Organic validates, paid amplifies</div>
+      <div class="chart-wrap"><canvas id="reachChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Content by Type</div>
+      <div class="chart-sub">Baskin-Robbins model — many flavors per audience</div>
+      <div class="chart-wrap"><canvas id="contentTypeChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Hook Performance</div>
+      <div class="chart-sub">Avg reach multiplier by hook type</div>
+      <div class="chart-wrap"><canvas id="hookChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">PAC Score Radar</div>
+      <div class="chart-sub">Platforms · Algorithms · Culture alignment</div>
+      <div class="chart-wrap"><canvas id="pacChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <div class="table-title">GaryVee Strategy Concept Tracker</div>
+      <span class="badge badge-blue">Click cells to edit</span>
+    </div>
+    <table id="conceptTable">
+      <tr><th>Concept</th><th>Status</th><th>Implementation</th><th>KPI Being Tracked</th><th>Score (0–100)</th><th>Next Action</th></tr>
+    </table>
+    <div class="add-row" onclick="addConceptRow()"><div class="add-row-btn">+</div> Add Concept</div>
+  </div>
+</div>
+
+<!-- ===== HORMOZI TAB ===== -->
+<div id="page-hormozi" class="page">
+  <div class="sec-title">Hormozi KPI Dashboard</div>
+  <div class="sec-sub">$100M Framework · Gross/Net Margin · Value Equation · LTV:CAC · Click to edit all values</div>
+
+  <div class="margin-grid">
+    <div class="margin-card">
+      <div class="margin-lbl">Gross Margin</div>
+      <div class="margin-val" id="grossMarginVal" onclick="editMargin('grossMargin','%')">—</div>
+      <div class="margin-formula">(Revenue − COGS) ÷ Revenue × 100</div>
+      <div style="margin-top:12px">
+        <div class="prog"><div class="prog-fill" id="grossProg" style="width:0%;background:var(--teal)"></div></div>
+        <div class="margin-bench"><span>Your margin</span><span>Target: 70%+</span></div>
+      </div>
+    </div>
+    <div class="margin-card">
+      <div class="margin-lbl">Net Margin</div>
+      <div class="margin-val" id="netMarginVal" onclick="editMargin('netMargin','%')">—</div>
+      <div class="margin-formula">(Revenue − All Expenses) ÷ Revenue × 100</div>
+      <div style="margin-top:12px">
+        <div class="prog"><div class="prog-fill" id="netProg" style="width:0%;background:var(--blue)"></div></div>
+        <div class="margin-bench"><span>Your margin</span><span>Target: 30%+</span></div>
+      </div>
+    </div>
+    <div class="margin-card">
+      <div class="margin-lbl">Contribution Margin</div>
+      <div class="margin-val" id="contribMarginVal" onclick="editMargin('contribMargin','%')">—</div>
+      <div class="margin-formula">(Revenue − Variable Costs) ÷ Revenue × 100</div>
+      <div style="margin-top:12px">
+        <div class="prog"><div class="prog-fill" id="contribProg" style="width:0%;background:var(--gold)"></div></div>
+        <div class="margin-bench"><span>Per-unit economics</span><span>Target: 50%+</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="hormozi-kpis"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Revenue · COGS · Net Profit</div>
+      <div class="chart-sub">Monthly P&amp;L — Hormozi view. Edit month labels and values below.</div>
+      <div class="chart-wrap tall"><canvas id="profitChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Value Equation Radar</div>
+      <div class="chart-sub">Dream Outcome × Probability ÷ Time × Effort (click spokes to edit)</div>
+      <div class="chart-wrap tall"><canvas id="valueChart"></canvas></div>
+    </div>
+    <div class="chart-card wide">
+      <div class="chart-title">LTV Cohort by Avatar</div>
+      <div class="chart-sub">Lifetime value vs CAC per segment — find your top 20%</div>
+      <div class="chart-wrap"><canvas id="ltvChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <div class="table-title">Hormozi Offer Stack — Value Drivers</div>
+      <span class="badge badge-gold">Grand Slam Offer Framework</span>
+    </div>
+    <table id="offerTable">
+      <tr><th>Value Driver</th><th>Current State</th><th>Target</th><th>Impact</th><th>Status</th></tr>
+    </table>
+    <div class="add-row" onclick="addOfferRow()"><div class="add-row-btn">+</div> Add Driver</div>
+  </div>
+</div>
+
+<!-- ===== CONTENT TAB ===== -->
+<div id="page-content" class="page">
+  <div class="sec-title">Content Performance</div>
+  <div class="sec-sub">Organic validation · Hook testing · Winner pipeline · Remix tracker</div>
+
+  <div class="kpi-grid" id="content-kpis"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card wide">
+      <div class="chart-title">Weekly Content Volume by Platform</div>
+      <div class="chart-sub">Stack shows total publishing cadence — GaryVee: volume beats perfection</div>
+      <div class="chart-wrap"><canvas id="contentVolumeChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Content Bucket Performance</div>
+      <div class="chart-sub">Avg reach by content type</div>
+      <div class="chart-wrap"><canvas id="bucketChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Hook Intro Retention %</div>
+      <div class="chart-sub">% viewers past first 3 seconds by hook type</div>
+      <div class="chart-wrap"><canvas id="hookRetChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <div class="table-title">Winner Remix Pipeline</div>
+      <span class="badge badge-green">Click cells to edit</span>
+    </div>
+    <table id="winnerTable">
+      <tr><th>Post / Title</th><th>Platform</th><th>Avatar</th><th>Hook Type</th><th>Reach</th><th>Saves</th><th>DMs</th><th>Remix Status</th><th>Paid?</th></tr>
+    </table>
+    <div class="add-row" onclick="addWinnerRow()"><div class="add-row-btn">+</div> Add Winner</div>
+  </div>
+</div>
+
+<!-- ===== AVATARS TAB ===== -->
+<div id="page-avatars" class="page">
+  <div class="sec-title">Avatar Tracker</div>
+  <div class="sec-sub">Consumer segmentation cohorts · Behavioral buckets · Click any field to edit</div>
+
+  <div class="kpi-grid" id="avatar-kpis"></div>
+
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="addAvatarCard()">+ Add Avatar</button>
+  </div>
+  <div class="avatar-grid" id="avatarGrid"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Avatar LTV vs CAC</div>
+      <div class="chart-sub">Bubble size = content volume · Red = underserved</div>
+      <div class="chart-wrap tall"><canvas id="avatarScatter"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Conversion Rate by Avatar</div>
+      <div class="chart-sub">Ranked performance across segments</div>
+      <div class="chart-wrap tall"><canvas id="avatarCvr"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PLATFORM TAB ===== -->
+<div id="page-platforms" class="page">
+  <div class="sec-title">Platform Intelligence</div>
+  <div class="sec-sub">PAC monitoring · Attention pricing · Algorithm signals · Click cells to update daily</div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Attention Value by Platform</div>
+      <div class="chart-sub">Reach per $1 of effort — find underpriced attention</div>
+      <div class="chart-wrap tall"><canvas id="attentionChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Platform Engagement Rate</div>
+      <div class="chart-sub">Avg engagement % across published content</div>
+      <div class="chart-wrap tall"><canvas id="engagementChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <div class="table-title">PAC Signal Board — Updated Daily by Agent</div>
+      <span class="badge badge-blue">Click to edit</span>
+    </div>
+    <table id="pacTable">
+      <tr><th>Platform</th><th>Algorithm Signal</th><th>Culture Trend</th><th>Attention Price</th><th>Priority</th><th>Weekly Action</th></tr>
+    </table>
+    <div class="add-row" onclick="addPacRow()"><div class="add-row-btn">+</div> Add Platform</div>
+  </div>
+</div>
+
+<!-- ===== CAMPAIGNS TAB ===== -->
+<div id="page-campaigns" class="page">
+  <div class="sec-title">Campaign Tracker</div>
+  <div class="sec-sub">Organic validation status · Paid amplification · ROI tracking · GaryVee organic-first rule enforced</div>
+
+  <div class="kpi-grid" id="campaign-kpis"></div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <div class="table-title">Active Campaigns</div>
+      <span class="badge badge-blue">Organic-First Framework</span>
+    </div>
+    <table id="campaignTable">
+      <tr><th>Campaign</th><th>Avatar</th><th>Organic Validation</th><th>Spend/Day</th><th>ROAS</th><th>Revenue</th><th>Status</th></tr>
+    </table>
+    <div class="add-row" onclick="addCampaignRow()"><div class="add-row-btn">+</div> Add Campaign</div>
+  </div>
+</div>
+
+<!-- ===== AGENT TAB ===== -->
+<div id="page-agent" class="page">
+  <div class="sec-title">Agent Task Center</div>
+  <div class="sec-sub">Automated marketing tasks · Real-world execution · GaryVee strategy implementation</div>
+
+  <div class="kpi-grid" id="agent-kpis"></div>
+
+  <div class="agent-grid" id="agentGrid"></div>
+  <button class="btn btn-primary" onclick="addAgentModule()" style="margin-bottom:16px">+ Add Agent Module</button>
+</div>
+
+</div><!-- end .main -->
+<div class="notif" id="notif">Saved ✓</div>
+
+<script>
+// ============================================================
+// STATE — all numbers live here, zero by default
+// ============================================================
+let D = {
+  garyveeKpis:[
+    {label:"Total Organic Reach",value:"",change:"",desc:"Non-follower reach across all platforms",color:""},
+    {label:"Organic Win Rate",value:"",change:"",desc:"Posts hitting 5x+ avg reach",color:"green"},
+    {label:"Paid / Organic Ratio",value:"",change:"",desc:"Paid $ for every organic equivalent",color:"gold"},
+    {label:"Content Volume (30d)",value:"",change:"",desc:"Total pieces published this month",color:""},
+    {label:"Platform Coverage",value:"",change:"",desc:"Active platforms (TikTok/IG/YT/FB/LI/Pin)",color:"green"},
+    {label:"Avg Hook Retention",value:"",change:"",desc:"% viewers past first 3 seconds",color:"gold"},
+    {label:"Segmentations Active",value:"",change:"",desc:"Consumer segmentation cohorts live",color:""},
+    {label:"Validated Creative %",value:"",change:"",desc:"Paid spend on organic-validated content",color:"red"},
+    {label:"Live Shopping GMV",value:"",change:"",desc:"Gross merch value from live sessions",color:"green"},
+    {label:"PAC Score",value:"",change:"",desc:"Platforms·Algorithms·Culture alignment",color:""},
+    {label:"Saves Rate",value:"",change:"",desc:"Saves / total impressions",color:"gold"},
+    {label:"DM Conversion Rate",value:"",change:"",desc:"DMs that result in a purchase",color:"green"},
+  ],
+  hormoziKpis:[
+    {label:"Revenue (MTD)",value:"",change:"",desc:"Month-to-date gross revenue",color:""},
+    {label:"COGS (MTD)",value:"",change:"",desc:"Products + shipping + fulfillment",color:"green"},
+    {label:"CAC (Blended)",value:"",change:"",desc:"Customer acquisition cost all channels",color:"gold"},
+    {label:"LTV",value:"",change:"",desc:"Avg lifetime value per customer",color:""},
+    {label:"LTV : CAC Ratio",value:"",change:"",desc:"Hormozi benchmark: 3x minimum",color:"green"},
+    {label:"AOV",value:"",change:"",desc:"Average order value",color:"gold"},
+    {label:"Refund Rate",value:"",change:"",desc:"Refunds / total orders",color:"red"},
+    {label:"Repeat Purchase Rate",value:"",change:"",desc:"Customers who buy 2+ times",color:"green"},
+    {label:"Offer Conversion Rate",value:"",change:"",desc:"Visitors who purchase (all traffic)",color:"gold"},
+    {label:"ROAS (Paid)",value:"",change:"",desc:"Return on ad spend paid channels",color:""},
+    {label:"Payback Period",value:"",change:"",desc:"Days to recover customer cost",color:"red"},
+    {label:"Hormozi Value Score",value:"",change:"",desc:"Dream outcome × probability ÷ effort × time",color:"green"},
+  ],
+  contentKpis:[
+    {label:"Posts Published (30d)",value:"",change:"",desc:"",color:""},
+    {label:"Winner Rate",value:"",change:"",desc:"Posts clearing 5x baseline reach",color:"green"},
+    {label:"Remix Pipeline",value:"",change:"",desc:"Winners queued for remixing",color:"gold"},
+    {label:"Paid Boost Tests",value:"",change:"",desc:"Organic-validated boosts running",color:""},
+    {label:"Avg Watch Time %",value:"",change:"",desc:"Target: 50%+",color:"green"},
+    {label:"Share Rate",value:"",change:"",desc:"Viral distribution signal",color:"gold"},
+  ],
+  avatarKpis:[
+    {label:"Active Avatars",value:"",change:"",desc:"Consumer segments with content",color:""},
+    {label:"Top Converting Avatar",value:"",change:"",desc:"Highest CVR segment",color:"green"},
+    {label:"Highest LTV Avatar",value:"",change:"",desc:"Most valuable customer segment",color:"gold"},
+    {label:"Underserved Found",value:"",change:"",desc:"New underserved segments identified",color:""},
+  ],
+  campaignKpis:[
+    {label:"Active Campaigns",value:"",change:"",desc:"",color:""},
+    {label:"Validated Creative",value:"",change:"",desc:"Organic winners ready for paid",color:"green"},
+    {label:"Total Ad Spend (MTD)",value:"",change:"",desc:"100% on validated creative",color:"gold"},
+    {label:"Blended ROAS",value:"",change:"",desc:"",color:""},
+  ],
+  agentKpis:[
+    {label:"Tasks Completed (24h)",value:"",change:"",desc:"",color:"green"},
+    {label:"In Progress",value:"",change:"",desc:"",color:""},
+    {label:"Queued",value:"",change:"",desc:"",color:"gold"},
+    {label:"Needs Review",value:"",change:"",desc:"Action required",color:"red"},
+  ],
+  grossMargin:"", netMargin:"", contribMargin:"",
+  concepts:[
+    ["Interest Media Strategy","Active","","Non-follower reach %","",""],
+    ["Organic-First Rule","Active","","Validated spend %","",""],
+    ["DJ Remix Method","Active","","Remix vs new ratio","",""],
+    ["PAC Daily Research","Active","","PAC alignment score","",""],
+    ["Consumer Segmentation","Active","","Segments with content","",""],
+    ["Live Social Shopping","Building","","Live GMV","",""],
+    ["Niche Research Accounts","Active","","Insights generated","",""],
+    ["AI Brand Memory","Monitoring","","AI mention frequency","",""],
+  ],
+  offerStack:[
+    ["Dream Outcome Clarity","","","",""],
+    ["Perceived Probability","","","",""],
+    ["Time Delay Reduction","","","",""],
+    ["Effort Reduction","","","",""],
+    ["Bonuses / Upsells","","","",""],
+    ["Risk Reversal","","","",""],
+  ],
+  winners:[
+    ["","","","","","","","",""],
+  ],
+  avatars:[
+    {emoji:"🔧",title:"Budget DIY Dad",niche:"Home improvement · TikTok-native",cvr:"",ltv:"",cac:"",content:"",tags:["Pain hook","TikTok","Savings"]},
+    {emoji:"🏠",title:"Home Upgrade Mom",niche:"Interior · Pinterest + IG native",cvr:"",ltv:"",cac:"",content:"",tags:["Aspiration","Pinterest","Visual proof"]},
+  ],
+  pacSignals:[
+    ["🎵 TikTok","","","","",""],
+    ["📸 Instagram Reels","","","","",""],
+    ["▶️ YouTube Shorts","","","","",""],
+    ["👍 Facebook","","","","",""],
+    ["💼 LinkedIn","","","","",""],
+    ["📌 Pinterest","","","","",""],
+    ["📺 Live Shopping","","","","",""],
+  ],
+  campaigns:[
+    ["","","","","","",""],
+  ],
+  agentModules:[
+    {name:"Content Research Agent",status:"Running",tasks:[
+      {icon:"ti-done",label:"",meta:"",status:"done"},
+      {icon:"ti-run",label:"",meta:"",status:"run"},
+      {icon:"ti-q",label:"",meta:"",status:"queue"},
+    ]},
+    {name:"Paid Media Agent",status:"Running",tasks:[
+      {icon:"ti-done",label:"",meta:"",status:"done"},
+      {icon:"ti-run",label:"",meta:"",status:"run"},
+      {icon:"ti-q",label:"",meta:"",status:"queue"},
+    ]},
+  ],
+  reachData:{labels:["","","","","","",""],organic:[0,0,0,0,0,0,0],paid:[0,0,0,0,0,0,0]},
+  profitData:{labels:["","","","","","",""],revenue:[0,0,0,0,0,0,0],cogs:[0,0,0,0,0,0,0],profit:[0,0,0,0,0,0,0]},
+  hookData:{labels:["Pain","Contrarian","Curiosity","Identity","Desire","Savings"],values:[0,0,0,0,0,0]},
+  pacRadar:{current:[0,0,0,0,0,0,0,0],target:[0,0,0,0,0,0,0,0]},
+  contentVolume:{labels:["Wk 1","Wk 2","Wk 3","Wk 4"],tiktok:[0,0,0,0],ig:[0,0,0,0],yt:[0,0,0,0],fb:[0,0,0,0],pin:[0,0,0,0],li:[0,0,0,0]},
+  bucketData:{labels:["Pain","Proof","Desire","Compare","Identity","Remix"],values:[0,0,0,0,0,0]},
+  hookRet:{labels:["Pain","Contrarian","Question","Visual","Curiosity","Identity"],values:[0,0,0,0,0,0]},
+  attentionData:{labels:["Pinterest","Facebook","YT Shorts","TikTok","IG Reels","LinkedIn"],values:[0,0,0,0,0,0]},
+  engagementData:{labels:["TikTok","IG","YouTube","Facebook","LinkedIn","Pinterest"],values:[0,0,0,0,0,0]},
+  valueRadar:{labels:["Dream Outcome","Probability","Speed","Ease","Risk Reversal","Upsells"],current:[0,0,0,0,0,0],target:[0,0,0,0,0,0]},
+};
+
+// ============================================================
+// PERSIST across session (memory only — no localStorage)
+// ============================================================
+function notify(msg="Saved ✓"){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),2000);
+}
+
+// ============================================================
+// KPI CARDS
+// ============================================================
+function renderKpis(containerId, kpis){
+  const el=document.getElementById(containerId);
+  el.innerHTML='';
+  kpis.forEach((k,i)=>{
+    const div=document.createElement('div');
+    div.className='kpi-card '+(k.color||'');
+    div.innerHTML=`
+      <span class="edit-hint">✎ edit</span>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value" id="${containerId}_val_${i}">${k.value||'<span style="color:var(--border)">—</span>'}</div>
+      <div class="kpi-change">${k.change||'<span style="color:var(--border)">Add a note</span>'}</div>
+      <div class="kpi-desc">${k.desc}</div>`;
+    div.onclick=()=>editKpi(containerId,kpis,i);
+    el.appendChild(div);
+  });
+}
+
+function editKpi(containerId,kpis,i){
+  const valEl=document.getElementById(`${containerId}_val_${i}`);
+  const cur=kpis[i].value;
+  valEl.innerHTML=`<input autofocus value="${cur}" placeholder="Enter value" style="color:var(--teal)">`;
+  const inp=valEl.querySelector('input');
+  inp.focus();
+  inp.onblur=()=>{kpis[i].value=inp.value;renderKpis(containerId,kpis);notify();}
+  inp.onkeydown=(e)=>{if(e.key==='Enter')inp.blur();}
+}
+
+// ============================================================
+// MARGIN EDITORS
+// ============================================================
+function editMargin(key,suffix){
+  const el=document.getElementById(key+'Val');
+  const cur=D[key];
+  el.innerHTML=`<input autofocus value="${cur}" placeholder="0" style="color:var(--teal);background:transparent;border:none;border-bottom:2px solid var(--blue);font-size:36px;font-weight:900;width:100%;outline:none">`;
+  const inp=el.querySelector('input');
+  inp.focus();
+  inp.onblur=()=>{
+    D[key]=inp.value;
+    el.textContent=inp.value?(inp.value+suffix):'—';
+    const pct=parseFloat(inp.value)||0;
+    document.getElementById(key.replace('M','')+'Prog')||document.getElementById(
+      key==='grossMargin'?'grossProg':key==='netMargin'?'netProg':'contribProg'
+    ).style.width=Math.min(pct,100)+'%';
+    notify();
+  };
+  inp.onkeydown=(e)=>{if(e.key==='Enter')inp.blur();}
+}
+
+// ============================================================
+// TABLES — editable rows
+// ============================================================
+function makeEditable(td){td.contentEditable='true';td.onblur=()=>notify();}
+
+function addConceptRow(){
+  const tb=document.getElementById('conceptTable');
+  const tr=tb.insertRow();
+  ['New Concept','—','','','0',''].forEach(v=>{
+    const td=tr.insertCell();td.textContent=v;makeEditable(td);
+  });
+}
+function addOfferRow(){
+  const tb=document.getElementById('offerTable');
+  const tr=tb.insertRow();
+  ['New Driver','','','','—'].forEach(v=>{
+    const td=tr.insertCell();td.textContent=v;makeEditable(td);
+  });
+}
+function addWinnerRow(){
+  const tb=document.getElementById('winnerTable');
+  const tr=tb.insertRow();
+  ['','','','','0','0','0','—','—'].forEach(v=>{
+    const td=tr.insertCell();td.textContent=v;makeEditable(td);
+  });
+}
+function addPacRow(){
+  const tb=document.getElementById('pacTable');
+  const tr=tb.insertRow();
+  ['New Platform','','','','—',''].forEach(v=>{
+    const td=tr.insertCell();td.textContent=v;makeEditable(td);
+  });
+}
+function addCampaignRow(){
+  const tb=document.getElementById('campaignTable');
+  const tr=tb.insertRow();
+  ['','','','0','—','—','—'].forEach(v=>{
+    const td=tr.insertCell();td.textContent=v;makeEditable(td);
+  });
+}
+
+function buildTable(id,data){
+  const tb=document.getElementById(id);
+  // keep header row, clear rest
+  while(tb.rows.length>1)tb.deleteRow(1);
+  data.forEach(row=>{
+    const tr=tb.insertRow();
+    row.forEach(v=>{const td=tr.insertCell();td.textContent=v;makeEditable(td);});
+  });
+}
+
+// ============================================================
+// AVATARS
+// ============================================================
+function renderAvatars(){
+  const grid=document.getElementById('avatarGrid');
+  grid.innerHTML='';
+  D.avatars.forEach((av,i)=>{
+    const div=document.createElement('div');
+    div.className='av-card';
+    div.innerHTML=`
+      <div class="av-header">
+        <div class="av-emoji" contenteditable="true" onblur="D.avatars[${i}].emoji=this.textContent;notify()">${av.emoji}</div>
+        <div>
+          <div class="av-title" contenteditable="true" onblur="D.avatars[${i}].title=this.textContent;notify()">${av.title||'Avatar Name'}</div>
+          <div class="av-niche" contenteditable="true" onblur="D.avatars[${i}].niche=this.textContent;notify()">${av.niche||'Niche · Platform'}</div>
+        </div>
+        <button onclick="D.avatars.splice(${i},1);renderAvatars()" style="margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px">×</button>
+      </div>
+      <div class="av-metrics">
+        <div class="av-metric"><div class="av-metric-lbl">Conv Rate</div><div class="av-metric-val" contenteditable="true" onblur="D.avatars[${i}].cvr=this.textContent;notify()">${av.cvr||'—'}</div></div>
+        <div class="av-metric"><div class="av-metric-lbl">LTV</div><div class="av-metric-val" contenteditable="true" onblur="D.avatars[${i}].ltv=this.textContent;notify()">${av.ltv||'—'}</div></div>
+        <div class="av-metric"><div class="av-metric-lbl">CAC</div><div class="av-metric-val" contenteditable="true" onblur="D.avatars[${i}].cac=this.textContent;notify()">${av.cac||'—'}</div></div>
+        <div class="av-metric"><div class="av-metric-lbl">Content Pieces</div><div class="av-metric-val" contenteditable="true" onblur="D.avatars[${i}].content=this.textContent;notify()">${av.content||'0'}</div></div>
+      </div>
+      <div class="tag-list">${av.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+function addAvatarCard(){
+  D.avatars.push({emoji:'🎯',title:'New Avatar',niche:'Niche · Platform',cvr:'',ltv:'',cac:'',content:'0',tags:['Tag']});
+  renderAvatars();
+}
+
+// ============================================================
+// AGENT MODULES
+// ============================================================
+function renderAgentModules(){
+  const grid=document.getElementById('agentGrid');
+  grid.innerHTML='';
+  D.agentModules.forEach((mod,mi)=>{
+    const card=document.createElement('div');
+    card.className='agent-card';
+    card.innerHTML=`
+      <div class="agent-status">
+        <div class="dot"></div>
+        <div class="agent-name" contenteditable="true" onblur="D.agentModules[${mi}].name=this.textContent;notify()">${mod.name}</div>
+        <span class="badge badge-green" style="margin-left:auto" contenteditable="true" onblur="D.agentModules[${mi}].status=this.textContent;notify()">${mod.status}</span>
+      </div>
+      ${mod.tasks.map((t,ti)=>`
+        <div class="task-item">
+          <div class="task-icon ${t.icon}">${t.icon==='ti-done'?'✓':t.icon==='ti-run'?'▶':t.icon==='ti-warn'?'!':'⏳'}</div>
+          <div class="task-text">
+            <div class="task-label" contenteditable="true" onblur="D.agentModules[${mi}].tasks[${ti}].label=this.textContent;notify()">${t.label||'Task description'}</div>
+            <div class="task-meta" contenteditable="true" onblur="D.agentModules[${mi}].tasks[${ti}].meta=this.textContent;notify()">${t.meta||'Status · time · detail'}</div>
+          </div>
+        </div>
+      `).join('')}
+      <div class="add-row" onclick="D.agentModules[${mi}].tasks.push({icon:'ti-q',label:'',meta:'',status:'queue'});renderAgentModules()">
+        <div class="add-row-btn">+</div> Add Task
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+function addAgentModule(){
+  D.agentModules.push({name:'New Agent Module',status:'Idle',tasks:[{icon:'ti-q',label:'',meta:'',status:'queue'}]});
+  renderAgentModules();
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+Chart.defaults.color='#7a9ab5';
+Chart.defaults.borderColor='#253447';
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size=12;
+
+const chartInstances={};
+function mkChart(id,config){
+  if(chartInstances[id])chartInstances[id].destroy();
+  chartInstances[id]=new Chart(document.getElementById(id),config);
+  return chartInstances[id];
+}
+
+function buildCharts(){
+  // Reach
+  mkChart('reachChart',{type:'bar',data:{labels:D.reachData.labels,datasets:[
+    {label:'Organic',data:D.reachData.organic,backgroundColor:'rgba(26,108,246,0.7)',borderRadius:4},
+    {label:'Paid',data:D.reachData.paid,backgroundColor:'rgba(0,201,167,0.5)',borderRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'#253447'}}}}});
+
+  // Content type donut
+  mkChart('contentTypeChart',{type:'doughnut',data:{labels:['Pain','Desire','Proof','Compare','Identity','Remix'],datasets:[{data:[0,0,0,0,0,0],backgroundColor:['#1a6cf6','#00c9a7','#f5a623','#e8413e','#a78bfa','#60a5fa'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right'}}}});
+
+  // Hook
+  mkChart('hookChart',{type:'bar',data:{labels:D.hookData.labels,datasets:[{label:'Reach Multiplier',data:D.hookData.values,backgroundColor:['#1a6cf6','#00c9a7','#f5a623','#a78bfa','#60a5fa','#34d399'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#253447'}}}}});
+
+  // PAC Radar
+  mkChart('pacChart',{type:'radar',data:{labels:['TikTok','IG','YouTube','Facebook','LinkedIn','Pinterest','Culture','Algorithm'],datasets:[
+    {label:'Current',data:D.pacRadar.current,fill:true,backgroundColor:'rgba(26,108,246,0.15)',borderColor:'#1a6cf6',pointBackgroundColor:'#1a6cf6'},
+    {label:'Target',data:D.pacRadar.target,fill:false,borderColor:'rgba(0,201,167,0.4)',borderDash:[5,5],pointBackgroundColor:'#00c9a7'}
+  ]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{grid:{color:'#253447'},pointLabels:{color:'#7a9ab5'},angleLines:{color:'#253447'},ticks:{display:false}}}}});
+
+  // Profit
+  mkChart('profitChart',{type:'bar',data:{labels:D.profitData.labels,datasets:[
+    {label:'Revenue',data:D.profitData.revenue,backgroundColor:'rgba(26,108,246,0.7)',borderRadius:4},
+    {label:'COGS',data:D.profitData.cogs,backgroundColor:'rgba(232,65,62,0.6)',borderRadius:4},
+    {label:'Net Profit',data:D.profitData.profit,backgroundColor:'rgba(0,201,167,0.7)',borderRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'#253447'}}}}});
+
+  // Value Equation
+  mkChart('valueChart',{type:'radar',data:{labels:D.valueRadar.labels,datasets:[
+    {label:'Current',data:D.valueRadar.current,fill:true,backgroundColor:'rgba(245,166,35,0.15)',borderColor:'#f5a623',pointBackgroundColor:'#f5a623'},
+    {label:'Target',data:D.valueRadar.target,fill:false,borderColor:'rgba(0,201,167,0.4)',borderDash:[4,4],pointBackgroundColor:'#00c9a7'}
+  ]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{grid:{color:'#253447'},pointLabels:{color:'#7a9ab5'},angleLines:{color:'#253447'},ticks:{display:false}}}}});
+
+  // LTV cohort
+  mkChart('ltvChart',{type:'bar',data:{labels:D.avatars.map(a=>a.title||'?'),datasets:[
+    {label:'LTV',data:D.avatars.map(a=>parseFloat(a.ltv)||0),backgroundColor:'rgba(26,108,246,0.7)',borderRadius:4},
+    {label:'CAC',data:D.avatars.map(a=>parseFloat(a.cac)||0),backgroundColor:'rgba(245,166,35,0.6)',borderRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'#253447'}}}}});
+
+  // Content volume stacked
+  mkChart('contentVolumeChart',{type:'bar',data:{labels:D.contentVolume.labels,datasets:[
+    {label:'TikTok',data:D.contentVolume.tiktok,backgroundColor:'rgba(26,108,246,0.8)',borderRadius:3},
+    {label:'IG',data:D.contentVolume.ig,backgroundColor:'rgba(0,201,167,0.7)',borderRadius:3},
+    {label:'YouTube',data:D.contentVolume.yt,backgroundColor:'rgba(245,166,35,0.7)',borderRadius:3},
+    {label:'Facebook',data:D.contentVolume.fb,backgroundColor:'rgba(167,139,250,0.7)',borderRadius:3},
+    {label:'Pinterest',data:D.contentVolume.pin,backgroundColor:'rgba(232,65,62,0.6)',borderRadius:3},
+    {label:'LinkedIn',data:D.contentVolume.li,backgroundColor:'rgba(96,165,250,0.6)',borderRadius:3},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:true},y:{stacked:true,grid:{color:'#253447'}}}}});
+
+  // Bucket
+  mkChart('bucketChart',{type:'bar',data:{labels:D.bucketData.labels,datasets:[{label:'Avg Reach',data:D.bucketData.values,backgroundColor:['#1a6cf6','#00c9a7','#f5a623','#a78bfa','#60a5fa','#34d399'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#253447'}}}}});
+
+  // Hook retention
+  mkChart('hookRetChart',{type:'bar',data:{labels:D.hookRet.labels,datasets:[{label:'Retention %',data:D.hookRet.values,backgroundColor:'rgba(26,108,246,0.7)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#253447'},min:0,max:100}}}});
+
+  // Avatar scatter (bubble)
+  mkChart('avatarScatter',{type:'bubble',data:{datasets:D.avatars.map((a,i)=>({label:a.title,data:[{x:parseFloat(a.cac)||0,y:parseFloat(a.ltv)||0,r:Math.max(4,parseInt(a.content)||4)}],backgroundColor:`hsla(${i*47},70%,60%,0.7)`}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11}}}},scales:{x:{title:{display:true,text:'CAC ($)',color:'#7a9ab5'},grid:{color:'#253447'}},y:{title:{display:true,text:'LTV ($)',color:'#7a9ab5'},grid:{color:'#253447'}}}}});
+
+  // Avatar CVR
+  mkChart('avatarCvr',{type:'bar',data:{labels:D.avatars.map(a=>a.title||'?'),datasets:[{label:'CVR %',data:D.avatars.map(a=>parseFloat(a.cvr)||0),backgroundColor:D.avatars.map((_,i)=>`hsla(${i*47},70%,60%,0.7)`),borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#253447'}}}}});
+
+  // Attention
+  mkChart('attentionChart',{type:'bar',data:{labels:D.attentionData.labels,datasets:[{label:'Reach / $1 effort',data:D.attentionData.values,backgroundColor:['#00c9a7','#1a6cf6','#f5a623','#e8413e','#a78bfa','#60a5fa'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#253447'}}}}});
+
+  // Engagement radar
+  mkChart('engagementChart',{type:'radar',data:{labels:D.engagementData.labels,datasets:[{label:'Engagement %',data:D.engagementData.values,fill:true,backgroundColor:'rgba(0,201,167,0.12)',borderColor:'#00c9a7',pointBackgroundColor:'#00c9a7'}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{grid:{color:'#253447'},pointLabels:{color:'#7a9ab5'},angleLines:{color:'#253447'},ticks:{display:false}}}}});
+}
+
+// ============================================================
+// EXPORT / IMPORT
+// ============================================================
+function exportData(){
+  const json=JSON.stringify(D,null,2);
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(json);
+  a.download='garyvee-dashboard-data.json';
+  a.click();
+  notify('Data exported ✓');
+}
+function importData(){document.getElementById('importFile').click();}
+function loadFile(e){
+  const f=e.target.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      D=JSON.parse(ev.target.result);
+      init();
+      notify('Data imported ✓');
+    }catch{notify('Invalid JSON file');}
+  };
+  r.readAsText(f);
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function showTab(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  renderKpis('gv-kpis',D.garyveeKpis);
+  renderKpis('hormozi-kpis',D.hormoziKpis);
+  renderKpis('content-kpis',D.contentKpis);
+  renderKpis('avatar-kpis',D.avatarKpis);
+  renderKpis('campaign-kpis',D.campaignKpis);
+  renderKpis('agent-kpis',D.agentKpis);
+
+  // Margin displays
+  document.getElementById('grossMarginVal').textContent=D.grossMargin?(D.grossMargin+'%'):'—';
+  document.getElementById('netMarginVal').textContent=D.netMargin?(D.netMargin+'%'):'—';
+  document.getElementById('contribMarginVal').textContent=D.contribMargin?(D.contribMargin+'%'):'—';
+  ['grossProg','netProg','contribProg'].forEach((id,i)=>{
+    const key=['grossMargin','netMargin','contribMargin'][i];
+    const el=document.getElementById(id);
+    if(el)el.style.width=Math.min(parseFloat(D[key])||0,100)+'%';
+  });
+
+  buildTable('conceptTable',D.concepts);
+  buildTable('offerTable',D.offerStack);
+  buildTable('winnerTable',D.winners);
+  buildTable('pacTable',D.pacSignals);
+  buildTable('campaignTable',D.campaigns);
+
+  renderAvatars();
+  renderAgentModules();
+  buildCharts();
+}
+
+init();
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ANTHROPIC CLAUDE CHAT — WIRED IN                   -->
+<!-- ═══════════════════════════════════════════════════ -->
+<style>
+#ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+#ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
+#ai-chat-btn svg{width:26px;height:26px;fill:white}
+#ai-chat-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-height:560px;background:#0d1117;border:1px solid #21262d;border-radius:16px;box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+#ai-chat-panel.open{display:flex}
+#ai-chat-header{background:#161b22;border-bottom:1px solid #21262d;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+#ai-chat-header .title{font-size:14px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
+#ai-chat-header .dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;animation:cpulse 2s infinite}
+@keyframes cpulse{0%,100%{opacity:1}50%{opacity:.4}}
+#ai-chat-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+#ai-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:380px}
+#ai-chat-msgs::-webkit-scrollbar{width:4px}
+#ai-chat-msgs::-webkit-scrollbar-track{background:transparent}
+#ai-chat-msgs::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.cm{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;max-width:88%;word-wrap:break-word}
+.cm-user{background:#1f3461;color:#e6edf3;align-self:flex-end;border-radius:12px 12px 2px 12px}
+.cm-ai{background:#161b22;color:#c9d1d9;border:1px solid #21262d;align-self:flex-start;border-radius:12px 12px 12px 2px}
+.cm-ai strong{color:#7c3aed}
+.cm-typing{color:#8b949e;font-style:italic;font-size:12px}
+#ai-chat-input-row{border-top:1px solid #21262d;padding:12px;display:flex;gap:8px;background:#0d1117}
+#ai-chat-input{flex:1;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:inherit;resize:none;height:38px;line-height:1.4}
+#ai-chat-input:focus{border-color:#7c3aed}
+#ai-chat-send{background:#7c3aed;border:none;color:white;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:background .2s}
+#ai-chat-send:hover{background:#6d28d9}
+#ai-chat-send:disabled{background:#374151;cursor:not-allowed}
+</style>
+
+<button id="ai-chat-btn" title="Ask Claude AI" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+</button>
+
+<div id="ai-chat-panel">
+  <div id="ai-chat-header">
+    <div class="title"><span class="dot"></span>Claude AI — Drop Ship Intel</div>
+    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="ai-chat-msgs">
+    <div class="cm cm-ai">Hey Alex 👋 I'm your Drop Ship AI. Ask me anything — products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
+  </div>
+  <div id="ai-chat-input-row">
+    <input id="ai-chat-input" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+    <button id="ai-chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PAGE_CONTEXT = document.title || 'Dropship OS';
+  
+  function toggleChat(){
+    const p = document.getElementById('ai-chat-panel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open')) document.getElementById('ai-chat-input').focus();
+  }
+  window.toggleChat = toggleChat;
+
+  function addMsg(text, role){
+    const msgs = document.getElementById('ai-chat-msgs');
+    const div = document.createElement('div');
+    div.className = 'cm ' + (role==='user' ? 'cm-user' : 'cm-ai');
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  const history = [];
+
+  async function sendChat(){
+    const input = document.getElementById('ai-chat-input');
+    const btn   = document.getElementById('ai-chat-send');
+    const text  = input.value.trim();
+    if(!text) return;
+
+    addMsg(text, 'user');
+    history.push({role:'user', content:text});
+    input.value = '';
+    btn.disabled = true;
+
+    const typing = addMsg('Thinking…', 'ai');
+    typing.classList.add('cm-typing');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          messages: history,
+          context: PAGE_CONTEXT
+        })
+      });
+
+      const data = await res.json();
+
+      if(!res.ok || data.error){
+        typing.textContent = data.error || 'Error — check your ANTHROPIC_API_KEY in Vercel env vars.';
+        typing.style.color = '#f87171';
+      } else {
+        const reply = data.content;
+        typing.textContent = reply;
+        typing.classList.remove('cm-typing');
+        history.push({role:'assistant', content:reply});
+      }
+    } catch(e) {
+      typing.textContent = 'Connection error. Make sure ANTHROPIC_API_KEY is set in Vercel → Settings → Environment Variables.';
+      typing.style.color = '#f87171';
+    }
+
+    btn.disabled = false;
+    document.getElementById('ai-chat-msgs').scrollTop = 99999;
+    input.focus();
+  }
+  window.sendChat = sendChat;
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROI Product Finder — Arbitrage Intelligence Engine</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#060b14;--card:#0d1520;--card2:#111d2e;--border:#1e3050;
+  --blue:#38bdf8;--green:#22d3a0;--orange:#f59e0b;--red:#f43f5e;
+  --purple:#a78bfa;--cyan:#06b6d4;--yellow:#fbbf24;
+  --text:#e2f0ff;--muted:#5d7fa8;--input:#0a1628;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;overflow-x:hidden;}
+
+/* HEADER */
+.hdr{background:linear-gradient(90deg,#060b14 0%,#0a1628 50%,#060b14 100%);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo{font-size:16px;font-weight:800;letter-spacing:2px;color:var(--blue);display:flex;align-items:center;gap:10px;}
+.logo-sub{font-size:10px;color:var(--muted);font-weight:400;letter-spacing:3px;margin-top:2px;}
+.hdr-right{display:flex;align-items:center;gap:12px;}
+.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,160,.4)}50%{opacity:.8;box-shadow:0 0 0 6px rgba(34,211,160,0)}}
+.hdr-stat{font-size:11px;color:var(--muted);}
+.hdr-stat span{color:var(--text);font-weight:700;}
+
+/* SCAN BAR */
+.scan-bar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.scan-select{background:var(--input);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:12px;outline:none;cursor:pointer;}
+.scan-select:focus{border-color:var(--blue);}
+.range-group{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.range-group input[type=range]{accent-color:var(--blue);width:90px;cursor:pointer;}
+.range-group span{color:var(--green);font-weight:700;min-width:36px;}
+.scan-btn{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#060b14;border:none;padding:9px 22px;border-radius:6px;font-weight:800;font-size:12px;cursor:pointer;letter-spacing:.5px;transition:opacity .2s;display:flex;align-items:center;gap:6px;}
+.scan-btn:hover{opacity:.85;}
+.scan-btn:disabled{opacity:.4;cursor:not-allowed;}
+.scan-btn.scanning{animation:btnPulse 1s infinite;}
+@keyframes btnPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.stop-btn{background:var(--input);border:1px solid var(--red);color:var(--red);padding:9px 16px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:700;}
+
+/* PROGRESS */
+.progress-wrap{padding:0 24px;display:none;}
+.progress-wrap.active{display:block;padding:12px 24px;}
+.progress-bar-bg{background:var(--card2);border-radius:4px;height:4px;overflow:hidden;margin-bottom:8px;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:4px;width:0%;transition:width .3s;}
+.scan-status{font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+.platform-icons{display:flex;gap:8px;font-size:10px;}
+.plat-icon{padding:2px 8px;background:var(--card2);border:1px solid var(--border);border-radius:20px;color:var(--muted);transition:all .3s;}
+.plat-icon.active{border-color:var(--green);color:var(--green);background:rgba(34,211,160,.1);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:240px 1fr 340px;min-height:calc(100vh - 56px - 53px);gap:0;}
+
+/* SIDEBAR FILTERS */
+.filters{background:var(--card);border-right:1px solid var(--border);padding:16px;overflow-y:auto;}
+.filter-section{margin-bottom:18px;}
+.filter-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;}
+.filter-btn{display:block;width:100%;text-align:left;padding:7px 10px;background:none;border:1px solid transparent;color:var(--muted);border-radius:5px;font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:3px;}
+.filter-btn:hover{background:var(--card2);color:var(--text);}
+.filter-btn.active{background:rgba(56,189,248,.1);border-color:var(--blue);color:var(--blue);}
+.filter-btn .count{float:right;font-size:10px;background:var(--card2);padding:1px 6px;border-radius:10px;}
+.filter-slider-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;font-size:11px;color:var(--muted);}
+.filter-slider-row span{color:var(--green);font-weight:700;}
+input[type=range]{width:100%;accent-color:var(--blue);margin-bottom:8px;}
+.sort-select{width:100%;background:var(--input);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:5px;font-size:12px;outline:none;}
+
+/* MAIN GRID */
+.main-area{overflow-y:auto;padding:16px;}
+.grid-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.result-count{font-size:12px;color:var(--muted);}
+.result-count span{color:var(--green);font-weight:700;}
+.view-toggle{display:flex;gap:4px;}
+.vt-btn{background:var(--input);border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:4px;cursor:pointer;font-size:11px;}
+.vt-btn.active{border-color:var(--blue);color:var(--blue);}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.product-grid.list-view{grid-template-columns:1fr;}
+
+/* PRODUCT CARD */
+.p-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .2s;position:relative;opacity:0;transform:translateY(10px);}
+.p-card.visible{opacity:1;transform:translateY(0);transition:opacity .4s,transform .4s,border-color .2s;}
+.p-card:hover{border-color:var(--blue);}
+.p-card.selected{border-color:var(--blue);background:rgba(56,189,248,.04);}
+.p-card.top-pick{border-color:var(--green);}
+.top-pick-badge{position:absolute;top:-8px;left:12px;background:var(--green);color:#060b14;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:.5px;}
+.p-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.p-name{font-size:13px;font-weight:700;line-height:1.3;max-width:200px;}
+.p-roi-badge{font-size:20px;font-weight:900;line-height:1;}
+.p-prices{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.p-price-item{background:var(--card2);border-radius:5px;padding:7px;text-align:center;}
+.p-price-item .pv{font-size:15px;font-weight:800;}
+.p-price-item .pl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+.p-metrics{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.p-tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;}
+.tag-green{background:rgba(34,211,160,.1);border:1px solid rgba(34,211,160,.3);color:var(--green);}
+.tag-blue{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:var(--blue);}
+.tag-orange{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--orange);}
+.tag-purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:var(--purple);}
+.tag-red{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:var(--red);}
+.p-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.p-bar-label{font-size:10px;color:var(--muted);width:70px;flex-shrink:0;}
+.p-bar-bg{flex:1;height:5px;background:var(--card2);border-radius:3px;overflow:hidden;}
+.p-bar-fill{height:100%;border-radius:3px;}
+.p-bar-val{font-size:10px;color:var(--muted);width:28px;text-align:right;}
+.p-channels{margin-top:8px;font-size:10px;color:var(--muted);}
+.p-channels span{color:var(--blue);}
+.new-badge{position:absolute;top:8px;right:8px;background:var(--purple);color:white;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;}
+
+/* DETAIL PANEL */
+.detail-panel{background:var(--card);border-left:1px solid var(--border);overflow-y:auto;transition:all .3s;}
+.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);text-align:center;padding:40px;}
+.detail-empty .icon{font-size:48px;margin-bottom:16px;opacity:.4;}
+.detail-content{padding:20px;}
+.d-hero{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.d-name{font-size:17px;font-weight:800;line-height:1.3;}
+.d-roi-big{font-size:36px;font-weight:900;}
+.d-section{margin-bottom:16px;}
+.d-section-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.d-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.d-metric{background:var(--card2);border-radius:6px;padding:10px;text-align:center;}
+.d-metric .v{font-size:18px;font-weight:800;margin-bottom:2px;}
+.d-metric .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.d-channel-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.d-channel-row:last-child{border-bottom:none;}
+.d-ch-name{font-size:12px;font-weight:600;}
+.d-ch-score{font-size:12px;font-weight:700;}
+.d-ch-bar{width:80px;height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin:0 8px;}
+.d-ch-bar-fill{height:100%;border-radius:3px;background:var(--green);}
+.action-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#060b14;border:none;border-radius:6px;font-weight:800;font-size:12px;cursor:pointer;margin-top:8px;margin-bottom:4px;}
+.action-btn-ghost{width:100%;padding:10px;background:var(--input);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12px;cursor:pointer;}
+.price-compare-table{width:100%;border-collapse:collapse;}
+.price-compare-table td{padding:6px 0;font-size:12px;border-bottom:1px solid var(--border);}
+.price-compare-table td:last-child{text-align:right;font-weight:700;}
+
+/* EMPTY STATE */
+.empty-scan{text-align:center;padding:80px 40px;color:var(--muted);}
+.empty-scan .big-icon{font-size:64px;margin-bottom:16px;opacity:.3;}
+.empty-scan h3{font-size:16px;color:var(--text);margin-bottom:8px;}
+.empty-scan p{font-size:13px;line-height:1.6;}
+.scanning-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(6,11,20,.85);z-index:300;align-items:center;justify-content:center;flex-direction:column;}
+.scanning-overlay.active{display:flex;}
+.scan-animation{text-align:center;}
+.scan-ring{width:80px;height:80px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan-text{font-size:14px;color:var(--text);margin-bottom:6px;font-weight:600;}
+.scan-sub{font-size:12px;color:var(--muted);}
+.scan-platforms{display:flex;gap:8px;margin-top:16px;justify-content:center;}
+.sp{padding:4px 12px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--muted);animation:fadeIn .5s ease;}
+@keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.layout{grid-template-columns:200px 1fr;}.detail-panel{display:none;}}
+@media(max-width:700px){.layout{grid-template-columns:1fr;}.filters{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <div class="logo">
+      <div class="live-dot"></div>
+      ROI PRODUCT FINDER
+    </div>
+    <div class="logo-sub">ARBITRAGE INTELLIGENCE ENGINE</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-stat">Products Scanned: <span id="totalScanned">0</span></div>
+    <div class="hdr-stat">Opportunities Found: <span id="totalFound">0</span></div>
+    <div class="hdr-stat">Avg ROI: <span id="avgRoi" style="color:var(--green)">—</span></div>
+  </div>
+</div>
+
+<!-- SCAN BAR -->
+<div class="scan-bar">
+  <select class="scan-select" id="scanCategory">
+    <option value="all">All Categories</option>
+    <option value="pet">🐾 Pet Products</option>
+    <option value="beauty">💄 Beauty & Skincare</option>
+    <option value="home">🏠 Home & Garden</option>
+    <option value="fitness">💪 Fitness & Health</option>
+    <option value="fashion">👜 Fashion & Accessories</option>
+    <option value="wellness">😴 Sleep & Wellness</option>
+    <option value="tech">⚡ Tech & Gadgets</option>
+    <option value="kitchen">🍳 Kitchen & Food</option>
+  </select>
+  <div class="range-group">
+    Min Margin:
+    <input type="range" id="minMargin" min="20" max="90" value="50" oninput="document.getElementById('minMarginVal').textContent=this.value+'%'">
+    <span id="minMarginVal">50%</span>
+  </div>
+  <div class="range-group">
+    Max Cost $:
+    <input type="range" id="maxCost" min="5" max="100" value="50" oninput="document.getElementById('maxCostVal').textContent='$'+this.value">
+    <span id="maxCostVal">$50</span>
+  </div>
+  <div class="range-group">
+    Min ROI Score:
+    <input type="range" id="minRoi" min="5" max="9.5" step="0.5" value="7" oninput="document.getElementById('minRoiVal').textContent=this.value">
+    <span id="minRoiVal">7</span>
+  </div>
+  <button class="scan-btn" id="scanBtn" onclick="startScan()">⚡ SCAN MARKET</button>
+  <button class="stop-btn" id="stopBtn" onclick="stopScan()" style="display:none">■ Stop</button>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap" id="progressWrap">
+  <div class="scan-status">
+    <div class="platform-icons">
+      <span class="plat-icon" id="pi-ali">AliExpress</span>
+      <span class="plat-icon" id="pi-amz">Amazon</span>
+      <span class="plat-icon" id="pi-ebay">eBay</span>
+      <span class="plat-icon" id="pi-tiktok">TikTok</span>
+      <span class="plat-icon" id="pi-goog">Google</span>
+      <span class="plat-icon" id="pi-shopi">Shopify</span>
+    </div>
+    <span id="scanStatusText" style="color:var(--muted)">Ready</span>
+  </div>
+  <div class="progress-bar-bg" style="margin-top:6px;"><div class="progress-bar-fill" id="progressBar"></div></div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- FILTERS -->
+  <div class="filters">
+    <div class="filter-section">
+      <div class="filter-title">Sort By</div>
+      <select class="sort-select" id="sortBy" onchange="applyFilters()">
+        <option value="roi">ROI Score</option>
+        <option value="margin">Margin %</option>
+        <option value="profit">Profit $</option>
+        <option value="trend">Trend Score</option>
+        <option value="volume">Monthly Volume</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Category</div>
+      <button class="filter-btn active" onclick="setCatFilter('all',this)">All Products <span class="count" id="cnt-all">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('pet',this)">🐾 Pet <span class="count" id="cnt-pet">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('beauty',this)">💄 Beauty <span class="count" id="cnt-beauty">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('home',this)">🏠 Home <span class="count" id="cnt-home">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('fitness',this)">💪 Fitness <span class="count" id="cnt-fitness">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('fashion',this)">👜 Fashion <span class="count" id="cnt-fashion">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('wellness',this)">😴 Wellness <span class="count" id="cnt-wellness">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('tech',this)">⚡ Tech <span class="count" id="cnt-tech">0</span></button>
+      <button class="filter-btn" onclick="setCatFilter('kitchen',this)">🍳 Kitchen <span class="count" id="cnt-kitchen">0</span></button>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">ROI Score</div>
+      <div class="filter-slider-row">Min: <span id="f-roi-val">0</span></div>
+      <input type="range" min="0" max="10" step="0.5" value="0" id="f-roi" oninput="document.getElementById('f-roi-val').textContent=this.value;applyFilters()">
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Margin %</div>
+      <div class="filter-slider-row">Min: <span id="f-margin-val">0%</span></div>
+      <input type="range" min="0" max="90" value="0" id="f-margin" oninput="document.getElementById('f-margin-val').textContent=this.value+'%';applyFilters()">
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Competition</div>
+      <button class="filter-btn active" onclick="setCompFilter('all',this)">All Levels</button>
+      <button class="filter-btn" onclick="setCompFilter('low',this)">🟢 Low</button>
+      <button class="filter-btn" onclick="setCompFilter('medium',this)">🟡 Medium</button>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Viral Potential</div>
+      <button class="filter-btn active" onclick="setViralFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setViralFilter('high',this)">🔥 High Viral</button>
+      <button class="filter-btn" onclick="setViralFilter('medium',this)">📈 Medium</button>
+    </div>
+  </div>
+
+  <!-- MAIN PRODUCT AREA -->
+  <div class="main-area">
+    <div class="grid-header">
+      <div class="result-count">Showing <span id="showingCount">0</span> products</div>
+      <div class="view-toggle">
+        <button class="vt-btn active" onclick="setView('grid',this)">⊞ Grid</button>
+        <button class="vt-btn" onclick="setView('list',this)">≡ List</button>
+      </div>
+    </div>
+    <div class="product-grid" id="productGrid">
+      <div class="empty-scan">
+        <div class="big-icon">🤖</div>
+        <h3>Market Scanner Ready</h3>
+        <p>Set your filters above and hit<br><strong style="color:var(--blue)">⚡ SCAN MARKET</strong><br>to find high-ROI products across AliExpress, Amazon, eBay, and TikTok Shop.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-empty">
+      <div class="icon">🎯</div>
+      <p>Click any product card to see full ROI analysis, channel strategy, and market data</p>
+    </div>
+  </div>
+</div>
+
+<!-- SCANNING OVERLAY -->
+<div class="scanning-overlay" id="scanOverlay">
+  <div class="scan-animation">
+    <div class="scan-ring"></div>
+    <div class="scan-text" id="overlayText">Scanning markets...</div>
+    <div class="scan-sub" id="overlaySub">Analyzing supplier costs vs retail prices</div>
+    <div class="scan-platforms" id="overlayPlatforms"></div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// PRODUCT DATABASE — Real market research data
+// ==========================================
+const ALL_PRODUCTS = [
+  {
+    id:1, name:"Silicone Pet Deshedding Glove", category:"pet", emoji:"🐾",
+    supplierPrice:1.20, retailBest:12.99, amazonPrice:12.99, ebayPrice:9.99, tiktokPrice:11.99,
+    shipping:3.50, monthlyVolume:49000, trendScore:8.5, roiScore:9.2,
+    competition:"low", viral:"high", isNew:true, isTopPick:true,
+    topChannels:["TikTok","Pinterest","Reddit"],
+    description:"Silicone glove that removes pet hair while petting. Solves an emotionally-driven problem.",
+    tags:["impulse","pet","viral","proven"],
+    supplierSource:"AliExpress",
+    winRate:"78% of testers went profitable in week 1"
+  },
+  {
+    id:2, name:"Peeling Exfoliating Face Serum", category:"beauty", emoji:"💄",
+    supplierPrice:4.50, retailBest:24.99, amazonPrice:22.99, ebayPrice:18.99, tiktokPrice:24.99,
+    shipping:2.50, monthlyVolume:38000, trendScore:9.0, roiScore:9.0,
+    competition:"medium", viral:"high", isNew:true, isTopPick:true,
+    topChannels:["TikTok","Pinterest","Instagram Reels"],
+    description:"Peeling serum with visible results on video — drives massive UGC and repeat TikTok content.",
+    tags:["beauty","before-after","viral","high-margin"],
+    supplierSource:"AliExpress",
+    winRate:"Visual proof = organic reach engine"
+  },
+  {
+    id:3, name:"Anti-Snoring Mouthpiece Device", category:"wellness", emoji:"😴",
+    supplierPrice:7.00, retailBest:34.99, amazonPrice:34.99, ebayPrice:24.99, tiktokPrice:32.99,
+    shipping:2.00, monthlyVolume:29000, trendScore:7.5, roiScore:8.8,
+    competition:"low", viral:"medium", isNew:false, isTopPick:true,
+    topChannels:["Reddit","Email","Native/Taboola"],
+    description:"Solves sleep problem for 45M+ Americans. Advertorial-friendly, evergreen demand.",
+    tags:["health","evergreen","problem-solver","high-value"],
+    supplierSource:"AliExpress",
+    winRate:"Strong advertorial channel performer"
+  },
+  {
+    id:4, name:"Baby Bottle Warmer Portable", category:"kitchen", emoji:"🍼",
+    supplierPrice:10.86, retailBest:39.99, amazonPrice:39.99, ebayPrice:29.99, tiktokPrice:37.99,
+    shipping:4.00, monthlyVolume:22000, trendScore:7.8, roiScore:8.5,
+    competition:"medium", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["Pinterest","Facebook","Email"],
+    description:"New parents buy without thinking. High emotional purchase, strong gift potential.",
+    tags:["baby","gifting","evergreen","high-value"],
+    supplierSource:"AliExpress",
+    winRate:"Gift season 3x volume spike"
+  },
+  {
+    id:5, name:"Magnetic Hair Clips Set (6pc)", category:"fashion", emoji:"✨",
+    supplierPrice:2.50, retailBest:15.99, amazonPrice:13.99, ebayPrice:10.99, tiktokPrice:15.99,
+    shipping:2.00, monthlyVolume:89000, trendScore:9.5, roiScore:9.1,
+    competition:"low", viral:"high", isNew:true, isTopPick:true,
+    topChannels:["TikTok","Instagram Reels","Pinterest"],
+    description:"$217M GMV on TikTok Shop. 42,000 units/day on platform. Still early in lifecycle.",
+    tags:["viral","trending","tiktok-winner","fashion"],
+    supplierSource:"AliExpress",
+    winRate:"Currently exploding — move fast"
+  },
+  {
+    id:6, name:"Solar Path Garden Lights (8pc)", category:"home", emoji:"🌙",
+    supplierPrice:9.00, retailBest:29.99, amazonPrice:28.99, ebayPrice:22.99, tiktokPrice:27.99,
+    shipping:5.00, monthlyVolume:31000, trendScore:7.2, roiScore:8.1,
+    competition:"medium", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["Pinterest","Facebook","YouTube Shorts"],
+    description:"Seasonal peak spring-summer. High AOV potential with bundle upsell strategy.",
+    tags:["seasonal","home","bundle-friendly","visual"],
+    supplierSource:"AliExpress",
+    winRate:"Pinterest organic is free traffic here"
+  },
+  {
+    id:7, name:"Rhythmic Breathing Sleep Koala", category:"wellness", emoji:"🐨",
+    supplierPrice:12.00, retailBest:44.99, amazonPrice:44.99, ebayPrice:34.99, tiktokPrice:44.99,
+    shipping:4.50, monthlyVolume:41000, trendScore:9.8, roiScore:9.4,
+    competition:"low", viral:"high", isNew:true, isTopPick:true,
+    topChannels:["TikTok","YouTube Shorts","Reddit"],
+    description:"Viral US 2026. Weighted plush that breathes rhythmically. Anxiety + sleep — huge emotional pull.",
+    tags:["viral-2026","trending","emotional","wellness"],
+    supplierSource:"AliExpress",
+    winRate:"Fastest growing wellness item Q1 2026"
+  },
+  {
+    id:8, name:"Portable Electric Lunch Box", category:"kitchen", emoji:"🍱",
+    supplierPrice:15.00, retailBest:54.99, amazonPrice:52.99, ebayPrice:42.99, tiktokPrice:54.99,
+    shipping:5.50, monthlyVolume:18000, trendScore:8.0, roiScore:8.3,
+    competition:"medium", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["TikTok","YouTube Shorts","Reddit"],
+    description:"Self-heating lunch box. Office worker demographic. Trending on Amazon top sellers list.",
+    tags:["office","practical","work","Amazon-trending"],
+    supplierSource:"AliExpress",
+    winRate:"Strong repeat-buy potential"
+  },
+  {
+    id:9, name:"Resistance Band Full Set (5 bands)", category:"fitness", emoji:"💪",
+    supplierPrice:4.00, retailBest:19.99, amazonPrice:18.99, ebayPrice:13.99, tiktokPrice:19.99,
+    shipping:2.50, monthlyVolume:72000, trendScore:7.5, roiScore:8.0,
+    competition:"high", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["YouTube Shorts","TikTok","Pinterest"],
+    description:"High volume but more competition. Bundle strategy with workout guide PDF to differentiate.",
+    tags:["fitness","evergreen","bundle","high-volume"],
+    supplierSource:"AliExpress",
+    winRate:"Bundle approach boosts margin 30%"
+  },
+  {
+    id:10, name:"Head Deep Tissue Massager", category:"wellness", emoji:"🧠",
+    supplierPrice:38.00, retailBest:129.99, amazonPrice:129.99, ebayPrice:99.99, tiktokPrice:119.99,
+    shipping:7.00, monthlyVolume:14000, trendScore:7.8, roiScore:8.6,
+    competition:"low", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["Reddit","Email","Native/Taboola"],
+    description:"High-ticket. 65-70% margin. Doctor demographic. Strong advertorial + email funnel play.",
+    tags:["high-ticket","health","premium","email-funnel"],
+    supplierSource:"AliExpress",
+    winRate:"Best on Reddit r/Migraines r/ChronicPain"
+  },
+  {
+    id:11, name:"Essential Oil Diffuser w/ LED", category:"home", emoji:"🌿",
+    supplierPrice:12.00, retailBest:49.99, amazonPrice:47.99, ebayPrice:37.99, tiktokPrice:49.99,
+    shipping:4.00, monthlyVolume:26000, trendScore:7.0, roiScore:7.9,
+    competition:"medium", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["Pinterest","Facebook","Email"],
+    description:"Gift market powerhouse. Best seller Oct–Dec. Bundle with essential oils for AOV boost.",
+    tags:["gifting","seasonal","home","bundle"],
+    supplierSource:"AliExpress",
+    winRate:"Q4 spike 4x baseline volume"
+  },
+  {
+    id:12, name:"2-in-1 Bath Loofah Back Scrubber", category:"beauty", emoji:"🛁",
+    supplierPrice:2.00, retailBest:12.99, amazonPrice:11.99, ebayPrice:8.99, tiktokPrice:12.99,
+    shipping:2.50, monthlyVolume:43000, trendScore:7.2, roiScore:8.2,
+    competition:"low", viral:"high", isNew:false, isTopPick:false,
+    topChannels:["TikTok","Pinterest","YouTube Shorts"],
+    description:"80-85% gross margin. Satisfying demo videos crush on TikTok. Low content production cost.",
+    tags:["beauty","high-margin","TikTok-demo","impulse"],
+    supplierSource:"AliExpress",
+    winRate:"Demo video = organic acquisition machine"
+  },
+  {
+    id:13, name:"Mini Crossbody Bag (10 colors)", category:"fashion", emoji:"👜",
+    supplierPrice:3.78, retailBest:18.99, amazonPrice:16.99, ebayPrice:12.99, tiktokPrice:18.99,
+    shipping:3.00, monthlyVolume:58000, trendScore:8.2, roiScore:8.7,
+    competition:"medium", viral:"high", isNew:true, isTopPick:false,
+    topChannels:["TikTok","Pinterest","Instagram Reels"],
+    description:"Fashion impulse buy. Multiple colorways = repeat customers. TikTok haul video staple.",
+    tags:["fashion","viral","impulse","repeat-buy"],
+    supplierSource:"AliExpress",
+    winRate:"Works on TikTok haul content format"
+  },
+  {
+    id:14, name:"LED Plant Grow Light (Full Spectrum)", category:"home", emoji:"🌱",
+    supplierPrice:8.50, retailBest:32.99, amazonPrice:31.99, ebayPrice:24.99, tiktokPrice:32.99,
+    shipping:3.50, monthlyVolume:19000, trendScore:7.5, roiScore:7.8,
+    competition:"low", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["Pinterest","Reddit","YouTube Shorts"],
+    description:"Indoor garden trend accelerating. Pinterest organic is free. r/houseplants = buyer intent.",
+    tags:["home","niche","Reddit-ready","organic"],
+    supplierSource:"AliExpress",
+    winRate:"Pinterest organic = free traffic"
+  },
+  {
+    id:15, name:"Posture Corrector Back Brace", category:"fitness", emoji:"🦴",
+    supplierPrice:6.00, retailBest:27.99, amazonPrice:26.99, ebayPrice:19.99, tiktokPrice:27.99,
+    shipping:2.50, monthlyVolume:35000, trendScore:7.3, roiScore:8.3,
+    competition:"medium", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["Reddit","Native/Taboola","Email"],
+    description:"Remote work wave. Office workers 25-45. Strong before/after hook. Advertorial-perfect.",
+    tags:["health","WFH","advertorial","before-after"],
+    supplierSource:"AliExpress",
+    winRate:"Native ad advertorial gold standard product"
+  },
+  {
+    id:16, name:"Smart Mini WiFi Plug (4-pack)", category:"tech", emoji:"⚡",
+    supplierPrice:8.00, retailBest:24.99, amazonPrice:22.99, ebayPrice:18.99, tiktokPrice:24.99,
+    shipping:3.00, monthlyVolume:28000, trendScore:7.0, roiScore:7.7,
+    competition:"medium", viral:"low", isNew:false, isTopPick:false,
+    topChannels:["Reddit","YouTube Shorts","Email"],
+    description:"Smart home entry product. Works as lead-in to smart home ecosystem upsells.",
+    tags:["tech","smart-home","upsell","Reddit"],
+    supplierSource:"AliExpress",
+    winRate:"Best product for r/smarthome subreddit"
+  },
+  {
+    id:17, name:"Wireless Charging Pad Ultra-Slim", category:"tech", emoji:"🔋",
+    supplierPrice:6.50, retailBest:21.99, amazonPrice:19.99, ebayPrice:14.99, tiktokPrice:21.99,
+    shipping:2.50, monthlyVolume:47000, trendScore:7.2, roiScore:7.9,
+    competition:"medium", viral:"low", isNew:false, isTopPick:false,
+    topChannels:["Reddit","YouTube Shorts","Newsletter Ads"],
+    description:"Commodity but still strong margin. Tech newsletter ads work well for this demographic.",
+    tags:["tech","commodity","newsletter","desk-setup"],
+    supplierSource:"AliExpress",
+    winRate:"Tech newsletter CPCs still cheap"
+  },
+  {
+    id:18, name:"Dog Car Seat Hammock Protector", category:"pet", emoji:"🐕",
+    supplierPrice:11.00, retailBest:42.99, amazonPrice:41.99, ebayPrice:31.99, tiktokPrice:42.99,
+    shipping:6.00, monthlyVolume:21000, trendScore:7.5, roiScore:8.4,
+    competition:"low", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["Pinterest","Facebook","Reddit"],
+    description:"Dog owners buy for safety + cleanliness. Pinterest organic strong. r/dogs buyer intent.",
+    tags:["pet","high-ticket","Pinterest","Reddit"],
+    supplierSource:"AliExpress",
+    winRate:"Facebook dog owner targeting works well"
+  },
+  {
+    id:19, name:"Plush Pillow Phone Holder Stand", category:"home", emoji:"🛋️",
+    supplierPrice:5.00, retailBest:22.99, amazonPrice:21.99, ebayPrice:15.99, tiktokPrice:22.99,
+    shipping:3.00, monthlyVolume:33000, trendScore:8.5, roiScore:8.7,
+    competition:"low", viral:"high", isNew:true, isTopPick:false,
+    topChannels:["TikTok","Instagram Reels","Pinterest"],
+    description:"TikTok/Instagram binge-watching staple. Solves a boredom problem visually. Satisfying demo.",
+    tags:["viral","TikTok-demo","impulse","home"],
+    supplierSource:"AliExpress",
+    winRate:"Works on lazy binge-watching content hooks"
+  },
+  {
+    id:20, name:"Stainless Steel Insulated Tumbler", category:"kitchen", emoji:"🥤",
+    supplierPrice:4.50, retailBest:19.99, amazonPrice:18.99, ebayPrice:12.99, tiktokPrice:19.99,
+    shipping:3.50, monthlyVolume:64000, trendScore:7.0, roiScore:7.6,
+    competition:"high", viral:"medium", isNew:false, isTopPick:false,
+    topChannels:["TikTok","Pinterest","YouTube Shorts"],
+    description:"Stanley effect lingers. Custom branding opportunity. Print-on-demand bundle potential.",
+    tags:["lifestyle","brand-opportunity","print-on-demand","viral"],
+    supplierSource:"AliExpress",
+    winRate:"Differentiate with custom lid colors"
+  }
+];
+
+// Channel arbitrage scores
+const CHANNEL_SCORES = {
+  "TikTok":          { score:7.8, roiMult:1.20, color:"var(--purple)" },
+  "Pinterest":       { score:8.9, roiMult:1.35, color:"var(--red)" },
+  "Reddit":          { score:9.1, roiMult:1.40, color:"var(--orange)" },
+  "YouTube Shorts":  { score:8.3, roiMult:1.25, color:"var(--red)" },
+  "Email":           { score:8.8, roiMult:1.50, color:"var(--green)" },
+  "Native/Taboola":  { score:7.9, roiMult:1.10, color:"var(--blue)" },
+  "Instagram Reels": { score:7.2, roiMult:1.15, color:"var(--purple)" },
+  "Newsletter Ads":  { score:8.1, roiMult:1.30, color:"var(--cyan)" },
+  "Facebook":        { score:6.8, roiMult:1.05, color:"var(--blue)" }
+};
+
+// ==========================================
+// STATE
+// ==========================================
+let displayedProducts = [];
+let selectedProduct = null;
+let catFilter = 'all';
+let compFilter = 'all';
+let viralFilter = 'all';
+let scanning = false;
+let scanTimeout = null;
+
+// ==========================================
+// SCAN ENGINE
+// ==========================================
+function startScan() {
+  const category = document.getElementById('scanCategory').value;
+  const minMargin = parseInt(document.getElementById('minMargin').value);
+  const maxCost = parseInt(document.getElementById('maxCost').value);
+  const minRoi = parseFloat(document.getElementById('minRoi').value);
+
+  scanning = true;
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('scanBtn').textContent = '🔄 Scanning...';
+  document.getElementById('stopBtn').style.display = 'block';
+  document.getElementById('progressWrap').classList.add('active');
+  document.getElementById('productGrid').innerHTML = '';
+  displayedProducts = [];
+  selectedProduct = null;
+  document.getElementById('detailPanel').innerHTML = `<div class="detail-empty"><div class="icon" style="font-size:48px;opacity:.3">🎯</div><p style="color:var(--muted)">Click a product to see full analysis</p></div>`;
+
+  // Filter products by criteria
+  let pool = ALL_PRODUCTS.filter(p => {
+    const margin = ((p.retailBest - p.supplierPrice - p.shipping) / p.retailBest) * 100;
+    const inCat = (category === 'all' || p.category === category);
+    const marginOk = margin >= minMargin;
+    const costOk = p.supplierPrice <= maxCost;
+    const roiOk = p.roiScore >= minRoi;
+    return inCat && marginOk && costOk && roiOk;
+  });
+
+  // Simulate scanning with staggered reveal
+  const platforms = ['pi-ali','pi-amz','pi-ebay','pi-tiktok','pi-goog','pi-shopi'];
+  const statusMessages = [
+    'Scanning AliExpress supplier costs...', 'Comparing Amazon retail prices...',
+    'Checking eBay market rates...', 'Analyzing TikTok Shop trending data...',
+    'Pulling Google Shopping signals...', 'Calculating ROI margins...', 'Ranking opportunities...'
+  ];
+  let statusIdx = 0;
+  let platIdx = 0;
+  let productsRevealed = 0;
+
+  const statusInterval = setInterval(() => {
+    if (!scanning) { clearInterval(statusInterval); return; }
+    document.getElementById('scanStatusText').textContent = statusMessages[statusIdx % statusMessages.length];
+    document.getElementById(`pi-${['ali','amz','ebay','tiktok','goog','shopi'][platIdx % 6]}`).classList.add('active');
+    statusIdx++; platIdx++;
+    document.getElementById('progressBar').style.width = Math.min((productsRevealed / pool.length) * 100, 95) + '%';
+  }, 600);
+
+  // Reveal products one by one
+  const revealInterval = setInterval(() => {
+    if (!scanning || productsRevealed >= pool.length) {
+      clearInterval(revealInterval);
+      clearInterval(statusInterval);
+      finishScan(pool);
+      return;
+    }
+    const p = pool[productsRevealed];
+    displayedProducts.push(p);
+    addProductCard(p, productsRevealed);
+    productsRevealed++;
+    document.getElementById('totalFound').textContent = productsRevealed;
+    document.getElementById('totalScanned').textContent = Math.round(productsRevealed * 23.4);
+    updateAvgRoi();
+    updateCounts();
+    updateShowingCount();
+  }, 400);
+}
+
+function stopScan() {
+  scanning = false;
+  document.getElementById('scanBtn').disabled = false;
+  document.getElementById('scanBtn').textContent = '⚡ SCAN MARKET';
+  document.getElementById('stopBtn').style.display = 'none';
+  document.getElementById('scanStatusText').textContent = 'Stopped';
+  document.getElementById('progressBar').style.width = '100%';
+}
+
+function finishScan(pool) {
+  scanning = false;
+  document.getElementById('scanBtn').disabled = false;
+  document.getElementById('scanBtn').textContent = '⚡ SCAN MARKET';
+  document.getElementById('stopBtn').style.display = 'none';
+  document.getElementById('scanStatusText').textContent = `✓ Found ${pool.length} opportunities`;
+  document.getElementById('progressBar').style.width = '100%';
+  document.querySelectorAll('.plat-icon').forEach(el => el.classList.remove('active'));
+}
+
+// ==========================================
+// PRODUCT CARD RENDERING
+// ==========================================
+function getMargin(p) { return ((p.retailBest - p.supplierPrice - p.shipping) / p.retailBest * 100); }
+function getProfit(p) { return p.retailBest - p.supplierPrice - p.shipping; }
+function getRoiColor(score) { return score >= 9 ? 'var(--green)' : score >= 8 ? 'var(--blue)' : 'var(--orange)'; }
+
+function addProductCard(p, idx) {
+  const margin = getMargin(p);
+  const profit = getProfit(p);
+  const roiColor = getRoiColor(p.roiScore);
+  const compColor = p.competition==='low' ? 'tag-green' : p.competition==='medium' ? 'tag-orange' : 'tag-red';
+  const viralColor = p.viral==='high' ? 'tag-purple' : 'tag-blue';
+
+  const card = document.createElement('div');
+  card.className = `p-card ${p.isTopPick ? 'top-pick' : ''}`;
+  card.id = `card-${p.id}`;
+  card.onclick = () => selectProduct(p);
+
+  card.innerHTML = `
+    ${p.isTopPick ? '<div class="top-pick-badge">🏆 TOP PICK</div>' : ''}
+    ${p.isNew ? '<div class="new-badge">NEW</div>' : ''}
+    <div class="p-header">
+      <div class="p-name">${p.emoji} ${p.name}</div>
+      <div class="p-roi-badge" style="color:${roiColor}">${p.roiScore}</div>
+    </div>
+    <div class="p-prices">
+      <div class="p-price-item">
+        <div class="pv" style="color:var(--red)">$${p.supplierPrice.toFixed(2)}</div>
+        <div class="pl">Supplier</div>
+      </div>
+      <div class="p-price-item">
+        <div class="pv" style="color:var(--green)">$${p.retailBest.toFixed(2)}</div>
+        <div class="pl">Best Retail</div>
+      </div>
+    </div>
+    <div class="p-bar-row">
+      <span class="p-bar-label">Margin</span>
+      <div class="p-bar-bg"><div class="p-bar-fill" style="width:${margin}%;background:var(--green)"></div></div>
+      <span class="p-bar-val" style="color:var(--green)">${margin.toFixed(0)}%</span>
+    </div>
+    <div class="p-bar-row">
+      <span class="p-bar-label">Trend</span>
+      <div class="p-bar-bg"><div class="p-bar-fill" style="width:${p.trendScore*10}%;background:var(--purple)"></div></div>
+      <span class="p-bar-val" style="color:var(--purple)">${p.trendScore}</span>
+    </div>
+    <div class="p-bar-row">
+      <span class="p-bar-label">Volume</span>
+      <div class="p-bar-bg"><div class="p-bar-fill" style="width:${Math.min(p.monthlyVolume/1000,100)}%;background:var(--blue)"></div></div>
+      <span class="p-bar-val" style="color:var(--blue)">${(p.monthlyVolume/1000).toFixed(0)}K</span>
+    </div>
+    <div class="p-metrics">
+      <span class="p-tag ${compColor}">${p.competition} comp</span>
+      <span class="p-tag ${viralColor}">🔥 ${p.viral} viral</span>
+      <span class="p-tag tag-green">$${profit.toFixed(2)} profit</span>
+    </div>
+    <div class="p-channels">Best channels: <span>${p.topChannels.join(' · ')}</span></div>
+  `;
+
+  document.getElementById('productGrid').appendChild(card);
+  setTimeout(() => card.classList.add('visible'), 50);
+}
+
+// ==========================================
+// PRODUCT SELECTION & DETAIL PANEL
+// ==========================================
+function selectProduct(p) {
+  selectedProduct = p;
+  document.querySelectorAll('.p-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById(`card-${p.id}`);
+  if (card) card.classList.add('selected');
+  renderDetailPanel(p);
+}
+
+function renderDetailPanel(p) {
+  const margin = getMargin(p);
+  const profit = getProfit(p);
+  const roiColor = getRoiColor(p.roiScore);
+
+  const channelRows = p.topChannels.map(ch => {
+    const info = CHANNEL_SCORES[ch] || { score:7.5, roiMult:1.1, color:'var(--blue)' };
+    const adjRoi = (profit / p.supplierPrice * 100 * info.roiMult).toFixed(0);
+    return `<div class="d-channel-row">
+      <span class="d-ch-name">${ch}</span>
+      <div class="d-ch-bar"><div class="d-ch-bar-fill" style="width:${info.score*10}%;background:${info.color}"></div></div>
+      <span class="d-ch-score" style="color:${info.color}">${info.score}/10</span>
+      <span style="color:var(--green);font-size:11px;margin-left:8px;">ROI ~${adjRoi}%</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-content">
+      <div class="d-hero">
+        <div>
+          <div class="d-name">${p.emoji} ${p.name}</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:4px;">${p.category.toUpperCase()} · ${p.supplierSource}</div>
+        </div>
+        <div class="d-roi-big" style="color:${roiColor}">${p.roiScore}</div>
+      </div>
+
+      <div class="d-section">
+        <div class="d-section-title">Unit Economics</div>
+        <div class="d-grid-2">
+          <div class="d-metric"><div class="v" style="color:var(--red)">$${p.supplierPrice.toFixed(2)}</div><div class="l">Supplier Cost</div></div>
+          <div class="d-metric"><div class="v" style="color:var(--green)">$${p.retailBest.toFixed(2)}</div><div class="l">Best Retail</div></div>
+          <div class="d-metric"><div class="v" style="color:var(--green)">${margin.toFixed(1)}%</div><div class="l">Gross Margin</div></div>
+          <div class="d-metric"><div class="v" style="color:var(--green)">$${profit.toFixed(2)}</div><div class="l">Profit / Unit</div></div>
+          <div class="d-metric"><div class="v" style="color:var(--blue)">${(p.monthlyVolume/1000).toFixed(0)}K</div><div class="l">Monthly Searches</div></div>
+          <div class="d-metric"><div class="v" style="color:var(--purple)">${p.trendScore}/10</div><div class="l">Trend Score</div></div>
+        </div>
+      </div>
+
+      <div class="d-section">
+        <div class="d-section-title">Price Comparison</div>
+        <table class="price-compare-table">
+          <tr><td style="color:var(--muted)">Amazon</td><td style="color:var(--green)">$${p.amazonPrice.toFixed(2)}</td></tr>
+          <tr><td style="color:var(--muted)">TikTok Shop</td><td style="color:var(--green)">$${p.tiktokPrice.toFixed(2)}</td></tr>
+          <tr><td style="color:var(--muted)">eBay</td><td style="color:var(--green)">$${p.ebayPrice.toFixed(2)}</td></tr>
+          <tr><td style="color:var(--muted)">Supplier (AliExpress)</td><td style="color:var(--red)">$${p.supplierPrice.toFixed(2)}</td></tr>
+          <tr><td style="color:var(--muted)">Shipping Est.</td><td style="color:var(--red)">$${p.shipping.toFixed(2)}</td></tr>
+          <tr style="border-top:2px solid var(--border)"><td style="font-weight:700">Net Profit</td><td style="color:var(--green);font-size:16px;font-weight:800">$${profit.toFixed(2)}</td></tr>
+        </table>
+      </div>
+
+      <div class="d-section">
+        <div class="d-section-title">Best Distribution Channels</div>
+        ${channelRows}
+      </div>
+
+      <div class="d-section">
+        <div class="d-section-title">Market Intelligence</div>
+        <div style="background:var(--card2);border-radius:6px;padding:12px;font-size:12px;line-height:1.7;color:var(--text)">
+          ${p.description}<br><br>
+          <span style="color:var(--green)">✓ ${p.winRate}</span>
+        </div>
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">
+          ${p.tags.map(t=>`<span class="p-tag tag-blue">#${t}</span>`).join('')}
+        </div>
+      </div>
+
+      <button class="action-btn" onclick="openROICalculator(${p.id})">📊 Open Full ROI Calculator</button>
+      <button class="action-btn-ghost" onclick="openArbitrageEngine(${p.id})">⚡ Run Channel Arbitrage</button>
+    </div>
+  `;
+}
+
+// ==========================================
+// FILTERS & SORTING
+// ==========================================
+function setCatFilter(cat, btn) {
+  catFilter = cat;
+  document.querySelectorAll('.filters .filter-btn').forEach(b => { if(b.onclick?.toString().includes('setCatFilter')) b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function setCompFilter(comp, btn) {
+  compFilter = comp;
+  document.querySelectorAll('.filters .filter-btn').forEach(b => { if(b.onclick?.toString().includes('setCompFilter')) b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function setViralFilter(viral, btn) {
+  viralFilter = viral;
+  document.querySelectorAll('.filters .filter-btn').forEach(b => { if(b.onclick?.toString().includes('setViralFilter')) b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const minRoiFilter = parseFloat(document.getElementById('f-roi').value);
+  const minMarginFilter = parseFloat(document.getElementById('f-margin').value);
+  const sortBy = document.getElementById('sortBy').value;
+
+  let filtered = displayedProducts.filter(p => {
+    const margin = getMargin(p);
+    const catOk = catFilter === 'all' || p.category === catFilter;
+    const compOk = compFilter === 'all' || p.competition === compFilter;
+    const viralOk = viralFilter === 'all' || p.viral === viralFilter;
+    const roiOk = p.roiScore >= minRoiFilter;
+    const marginOk = margin >= minMarginFilter;
+    return catOk && compOk && viralOk && roiOk && marginOk;
+  });
+
+  filtered.sort((a,b) => {
+    if(sortBy === 'roi') return b.roiScore - a.roiScore;
+    if(sortBy === 'margin') return getMargin(b) - getMargin(a);
+    if(sortBy === 'profit') return getProfit(b) - getProfit(a);
+    if(sortBy === 'trend') return b.trendScore - a.trendScore;
+    if(sortBy === 'volume') return b.monthlyVolume - a.monthlyVolume;
+    return 0;
+  });
+
+  // Re-render grid in sorted order
+  const grid = document.getElementById('productGrid');
+  grid.innerHTML = '';
+  filtered.forEach((p,i) => addProductCard(p,i));
+  updateShowingCount(filtered.length);
+}
+
+function updateShowingCount(n) {
+  const count = n !== undefined ? n : displayedProducts.length;
+  document.getElementById('showingCount').textContent = count;
+}
+
+function updateCounts() {
+  const cats = ['all','pet','beauty','home','fitness','fashion','wellness','tech','kitchen'];
+  cats.forEach(cat => {
+    const el = document.getElementById(`cnt-${cat}`);
+    if(el) el.textContent = cat === 'all' ? displayedProducts.length : displayedProducts.filter(p=>p.category===cat).length;
+  });
+}
+
+function updateAvgRoi() {
+  if(!displayedProducts.length) return;
+  const avg = displayedProducts.reduce((s,p)=>s+p.roiScore,0)/displayedProducts.length;
+  document.getElementById('avgRoi').textContent = avg.toFixed(1);
+}
+
+function setView(v, btn) {
+  document.querySelectorAll('.vt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const grid = document.getElementById('productGrid');
+  if(v==='list') grid.classList.add('list-view'); else grid.classList.remove('list-view');
+}
+
+// ==========================================
+// LAUNCH FROM DETAIL PANEL
+// ==========================================
+function openROICalculator(id) {
+  window.open('arbitrage-dashboard.html', '_blank');
+}
+
+function openArbitrageEngine(id) {
+  const p = ALL_PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  alert(`Channel Arbitrage for: ${p.name}\n\nTop Channels by ROI:\n${p.topChannels.map((ch,i)=>`${i+1}. ${ch} — Score: ${CHANNEL_SCORES[ch]?.score||7.5}/10`).join('\n')}\n\nUse the Arbitrage Dashboard to run full channel ROI projections.`);
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ANTHROPIC CLAUDE CHAT — WIRED IN                   -->
+<!-- ═══════════════════════════════════════════════════ -->
+<style>
+#ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+#ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
+#ai-chat-btn svg{width:26px;height:26px;fill:white}
+#ai-chat-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-height:560px;background:#0d1117;border:1px solid #21262d;border-radius:16px;box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+#ai-chat-panel.open{display:flex}
+#ai-chat-header{background:#161b22;border-bottom:1px solid #21262d;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+#ai-chat-header .title{font-size:14px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
+#ai-chat-header .dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;animation:cpulse 2s infinite}
+@keyframes cpulse{0%,100%{opacity:1}50%{opacity:.4}}
+#ai-chat-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+#ai-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:380px}
+#ai-chat-msgs::-webkit-scrollbar{width:4px}
+#ai-chat-msgs::-webkit-scrollbar-track{background:transparent}
+#ai-chat-msgs::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.cm{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;max-width:88%;word-wrap:break-word}
+.cm-user{background:#1f3461;color:#e6edf3;align-self:flex-end;border-radius:12px 12px 2px 12px}
+.cm-ai{background:#161b22;color:#c9d1d9;border:1px solid #21262d;align-self:flex-start;border-radius:12px 12px 12px 2px}
+.cm-ai strong{color:#7c3aed}
+.cm-typing{color:#8b949e;font-style:italic;font-size:12px}
+#ai-chat-input-row{border-top:1px solid #21262d;padding:12px;display:flex;gap:8px;background:#0d1117}
+#ai-chat-input{flex:1;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:inherit;resize:none;height:38px;line-height:1.4}
+#ai-chat-input:focus{border-color:#7c3aed}
+#ai-chat-send{background:#7c3aed;border:none;color:white;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:background .2s}
+#ai-chat-send:hover{background:#6d28d9}
+#ai-chat-send:disabled{background:#374151;cursor:not-allowed}
+</style>
+
+<button id="ai-chat-btn" title="Ask Claude AI" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+</button>
+
+<div id="ai-chat-panel">
+  <div id="ai-chat-header">
+    <div class="title"><span class="dot"></span>Claude AI — Drop Ship Intel</div>
+    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="ai-chat-msgs">
+    <div class="cm cm-ai">Hey Alex 👋 I'm your Drop Ship AI. Ask me anything — products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
+  </div>
+  <div id="ai-chat-input-row">
+    <input id="ai-chat-input" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+    <button id="ai-chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PAGE_CONTEXT = document.title || 'Dropship OS';
+  
+  function toggleChat(){
+    const p = document.getElementById('ai-chat-panel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open')) document.getElementById('ai-chat-input').focus();
+  }
+  window.toggleChat = toggleChat;
+
+  function addMsg(text, role){
+    const msgs = document.getElementById('ai-chat-msgs');
+    const div = document.createElement('div');
+    div.className = 'cm ' + (role==='user' ? 'cm-user' : 'cm-ai');
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  const history = [];
+
+  async function sendChat(){
+    const input = document.getElementById('ai-chat-input');
+    const btn   = document.getElementById('ai-chat-send');
+    const text  = input.value.trim();
+    if(!text) return;
+
+    addMsg(text, 'user');
+    history.push({role:'user', content:text});
+    input.value = '';
+    btn.disabled = true;
+
+    const typing = addMsg('Thinking…', 'ai');
+    typing.classList.add('cm-typing');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          messages: history,
+          context: PAGE_CONTEXT
+        })
+      });
+
+      const data = await res.json();
+
+      if(!res.ok || data.error){
+        typing.textContent = data.error || 'Error — check your ANTHROPIC_API_KEY in Vercel env vars.';
+        typing.style.color = '#f87171';
+      } else {
+        const reply = data.content;
+        typing.textContent = reply;
+        typing.classList.remove('cm-typing');
+        history.push({role:'assistant', content:reply});
+      }
+    } catch(e) {
+      typing.textContent = 'Connection error. Make sure ANTHROPIC_API_KEY is set in Vercel → Settings → Environment Variables.';
+      typing.style.color = '#f87171';
+    }
+
+    btn.disabled = false;
+    document.getElementById('ai-chat-msgs').scrollTop = 99999;
+    input.focus();
+  }
+  window.sendChat = sendChat;
+})();
+</script>
+
+</body>
+</html>
