@@ -386,10 +386,49 @@ class BridgeHandler(BaseHTTPRequestHandler):
                 self._json(stats)
             except Exception as e:
                 self._json({"error": str(e)}, 500)
+        elif self.path.startswith("/prometheus/"):
+            # Proxy to local Prometheus Engine (port 8766)
+            self._proxy_prometheus(self.path[len("/prometheus"):], "GET", None)
+        elif self.path == "/prometheus/status":
+            self._proxy_prometheus("/status", "GET", None)
         else:
             self._json({"error": "Not found"}, 404)
 
+    def _proxy_prometheus(self, subpath: str, method: str, body: bytes):
+        """Forward request to local Prometheus Engine on port 8766."""
+        import urllib.request
+        import urllib.error
+        PROMETHEUS_PORT = int(os.environ.get("PROMETHEUS_PORT", "8766"))
+        url = f"http://127.0.0.1:{PROMETHEUS_PORT}{subpath}"
+        try:
+            req = urllib.request.Request(url, data=body, method=method)
+            if body:
+                req.add_header("Content-Type", "application/json")
+            with urllib.request.urlopen(req, timeout=120) as r:
+                resp_data = r.read()
+                self._json(json.loads(resp_data))
+        except urllib.error.URLError as e:
+            self._json({
+                "error": "Prometheus Engine offline",
+                "message": "Run: python prometheus_engine.py --api-mode",
+                "detail": str(e)
+            }, 503)
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
     def do_POST(self):
+        if self.path.startswith("/prometheus/"):
+            # Prometheus proxy — auth check first
+            if BRIDGE_SECRET:
+                auth = self.headers.get("Authorization", "")
+                if auth != f"Bearer {BRIDGE_SECRET}":
+                    self._json({"error": "Unauthorized"}, 401)
+                    return
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length) if length else None
+            self._proxy_prometheus(self.path[len("/prometheus"):], "POST", body)
+            return
+
         if self.path != "/chat":
             self._json({"error": "POST to /chat"}, 404)
             return
@@ -421,4 +460,43 @@ class BridgeHandler(BaseHTTPRequestHandler):
             return
 
         page_context = data.get("context", "")
-        history = m
+        history = messages_arr
+
+        try:
+            loop = asyncio.new_event_loop()
+            result = loop.run_until_complete(handle_chat(message, history, page_context))
+            loop.close()
+            self._json(result)
+        except Exception as e:
+            logger.error(traceback.format_exc())
+            self._json({"error": str(e)}, 500)
+
+# ── Entry point ───────────────────────────────────────────────────────────────
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--port", type=int, default=8765)
+    ap.add_argument("--host", default="0.0.0.0")
+    args = ap.parse_args()
+
+    Thread(target=get_embedder, daemon=True).start()
+
+    server = HTTPServer((args.host, args.port), BridgeHandler)
+    logger.info("=" * 58)
+    logger.info("  Quinn Web Bridge")
+    logger.info(f"  http://localhost:{args.port}/health")
+    logger.info(f"  POST http://localhost:{args.port}/chat")
+    logger.info(f"  Qdrant:    {QDRANT_URL}")
+    logger.info(f"  Ollama:    {OLLAMA_URL} [{OLLAMA_MODEL}]")
+    logger.info(f"  Anthropic: {'SET' if ANTHROPIC_KEY else 'MISSING'}")
+    logger.info("=" * 58)
+    logger.info("  Run ngrok: ngrok http 8765")
+    logger.info("  Then in Vercel → Env Vars: QUINN_ENDPOINT=<ngrok url>")
+    logger.info("=" * 58)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
+
+if __name__ == "__main__":
+    main()

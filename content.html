@@ -726,21 +726,82 @@ function buildClipGrid(container) {
   });
 }
 
-function runPipeline() {
+// ── Current product context (set by Pillar Builder) ─────────
+let _pipelineProduct = null;
+let _pipelineScript  = null;
+let _pipelineJobId   = null;
+
+async function runPipeline() {
   document.getElementById('runPipelineBtn').disabled = true;
   document.getElementById('runPipelineBtn').textContent = '⚡ Running…';
-  document.getElementById('pipeline-status').textContent = 'Pipeline running — cutting clips…';
 
+  // Grab product name + script from Pillar Builder
+  const prodNameEl  = document.getElementById('prodName');
+  const scriptBoxEl = document.getElementById('scriptBox');
+  _pipelineProduct  = prodNameEl  ? prodNameEl.textContent.trim()  : 'Dropship Product';
+  _pipelineScript   = scriptBoxEl ? scriptBoxEl.value.trim()        : '';
+
+  // Get selected platforms from checkboxes
+  const platformMap = { tiktok:'tiktok', instagram:'instagram', youtube:'youtube', pinterest:'pinterest', facebook:'facebook', twitter:'twitter' };
+  const selectedPlatforms = Array.from(document.querySelectorAll('.platform-check:checked'))
+    .map(el => platformMap[el.value] || el.value)
+    .filter(Boolean);
+  const platforms = selectedPlatforms.length > 0 ? selectedPlatforms : Object.keys(platformMap);
+
+  // ── Try live Prometheus Engine ────────────────────────────
+  let useRealEngine = false;
+  try {
+    const statusRes = await fetch('/api/prometheus?action=status', { signal: AbortSignal.timeout(3000) });
+    if (statusRes.ok) {
+      const s = await statusRes.json();
+      useRealEngine = s.prometheus_local?.online === true;
+    }
+  } catch(e) {}
+
+  if (useRealEngine) {
+    document.getElementById('pipeline-status').textContent = '🔥 Prometheus Engine LIVE — generating clips…';
+    try {
+      const res = await fetch('/api/prometheus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product: _pipelineProduct,
+          niche: document.getElementById('prodMeta')?.textContent || 'general',
+          script: _pipelineScript,
+          platforms,
+          music: false,
+          voiceover: false,
+        }),
+        signal: AbortSignal.timeout(120000),
+      });
+      const result = await res.json();
+      _pipelineJobId = result.job_id;
+      if (_pipelineJobId) {
+        // Poll for completion
+        document.getElementById('pipeline-status').textContent = `Job ${_pipelineJobId} — processing…`;
+        _pollJob(_pipelineJobId);
+        return;
+      }
+      if (result.clips && result.clips.length > 0) {
+        // Sync result — mark all done immediately
+        _markAllDone(result.clips);
+        return;
+      }
+    } catch(e) {
+      console.warn('Live engine error:', e);
+    }
+  }
+
+  // ── Simulation fallback ───────────────────────────────────
+  document.getElementById('pipeline-status').textContent = 'Pipeline running — simulating cuts (start prometheus_engine.py for real video)…';
   buildClipGrid(document.getElementById('clipGrid'));
 
   PLATFORMS.forEach((p, i) => {
     setTimeout(async () => {
-      // Start
       clipStates[i].status = 'running';
       document.getElementById(`clip-status-${i}`).className = 'clip-status status-running';
       document.getElementById(`clip-status-${i}`).textContent = 'Processing…';
 
-      // Progress bar animation
       let pct = 0;
       const barInterval = setInterval(() => {
         pct += 3;
@@ -754,7 +815,6 @@ function runPipeline() {
       const bar = document.getElementById(`clip-bar-${i}`);
       if (bar) bar.style.width = '100%';
 
-      // Done
       clipStates[i].status = 'done';
       const card = document.getElementById(`clip-${i}`);
       if (card) {
@@ -769,16 +829,72 @@ function runPipeline() {
           </div>`;
       }
 
-      // Check if all done
       if (clipStates.every(c => c.status === 'done')) {
         document.getElementById('runPipelineBtn').disabled = false;
         document.getElementById('runPipelineBtn').textContent = '🔄 Re-Run';
-        document.getElementById('pipeline-status').textContent = '6 clips ready — go to Approve & Edit →';
-        // Copy to approve grid
+        document.getElementById('pipeline-status').textContent = '6 clips ready (simulated) — go to Approve & Edit →';
         buildClipGrid(document.getElementById('approveGrid'));
       }
     }, i * 800);
   });
+}
+
+function _markAllDone(clips) {
+  buildClipGrid(document.getElementById('clipGrid'));
+  clips.forEach((clip, i) => {
+    if (i >= clipStates.length) return;
+    clipStates[i].status = 'done';
+    clipStates[i].outputPath = clip.path || null;
+    const statusEl = document.getElementById(`clip-status-${i}`);
+    if (statusEl) { statusEl.className = 'clip-status status-done'; statusEl.textContent = '✓ Ready'; }
+    const barEl = document.getElementById(`clip-bar-${i}`);
+    if (barEl) barEl.style.width = '100%';
+    const card = document.getElementById(`clip-${i}`);
+    if (card) {
+      const body = card.querySelector('.clip-body');
+      const pathNote = clip.path ? `<div style="font-size:10px;color:var(--muted);margin-bottom:6px;word-break:break-all">${clip.path.split(/[\\/]/).pop()}</div>` : '';
+      if (body) body.innerHTML += `${pathNote}<div class="clip-actions">
+        <button class="clip-btn btn-approve" id="clip-approve-${i}" onclick="approveClip(${i})">✓ Approve</button>
+        <button class="clip-btn btn-edit" onclick="editClip(${i})">✎ Edit</button>
+        <button class="clip-btn btn-reject" onclick="rejectClip(${i})">✗</button>
+      </div>`;
+    }
+  });
+  document.getElementById('runPipelineBtn').disabled = false;
+  document.getElementById('runPipelineBtn').textContent = '🔄 Re-Run';
+  document.getElementById('pipeline-status').textContent = `${clips.length} clips ready — go to Approve & Edit →`;
+  buildClipGrid(document.getElementById('approveGrid'));
+}
+
+async function _pollJob(jobId) {
+  const maxPolls = 30;
+  let polls = 0;
+  const interval = setInterval(async () => {
+    polls++;
+    if (polls > maxPolls) {
+      clearInterval(interval);
+      document.getElementById('pipeline-status').textContent = 'Job timeout — check prometheus_engine.py logs';
+      document.getElementById('runPipelineBtn').disabled = false;
+      document.getElementById('runPipelineBtn').textContent = '🔄 Re-Run';
+      return;
+    }
+    try {
+      const res = await fetch(`/api/prometheus?action=job&id=${jobId}`, { signal: AbortSignal.timeout(5000) });
+      const data = await res.json();
+      const status = data.status || 'unknown';
+      document.getElementById('pipeline-status').textContent = `Job ${jobId}: ${status}…`;
+      if (status === 'complete' || status === 'completed') {
+        clearInterval(interval);
+        const clips = data.result?.clips || [];
+        if (clips.length > 0) _markAllDone(clips);
+        else {
+          document.getElementById('pipeline-status').textContent = 'Pipeline complete — check prometheus_output/ for clips';
+          document.getElementById('runPipelineBtn').disabled = false;
+          document.getElementById('runPipelineBtn').textContent = '🔄 Re-Run';
+        }
+      }
+    } catch(e) {}
+  }, 5000);
 }
 
 // ============================================================
@@ -918,6 +1034,41 @@ function pushToCalendar() {
     btn.disabled=false;document.getElementById('ai-chat-msgs').scrollTop=99999;input.focus();
   }
   window.sendChat=sendChat;
+})();
+
+// ── Queued product loader (from supplier wizard on index.html) ──
+(function loadQueuedProduct(){
+  try{
+    const raw = sessionStorage.getItem('prometheus_queued_product');
+    if(!raw) return;
+    const payload = JSON.parse(raw);
+    sessionStorage.removeItem('prometheus_queued_product'); // consume it
+
+    // Pre-fill the URL input with the product name as a search term
+    const urlInput = document.getElementById('productUrl');
+    if(urlInput) urlInput.value = 'https://zendrop.com/products?search=' + encodeURIComponent(payload.product||'');
+
+    // Show a banner at the top of stage-0 announcing the queued product
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(34,211,160,.08);border:1px solid rgba(34,211,160,.25);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;font-size:12px;';
+    banner.innerHTML = `<span style="font-size:20px">🚀</span>
+      <div style="flex:1">
+        <div style="font-weight:700;color:#22d3a0;margin-bottom:2px">Product queued from Supplier Wizard</div>
+        <div style="color:var(--muted)">${payload.product||'Unknown'} · ${payload.niche||''} · Est. margin ${payload.margin||'—'}%
+        ${payload.bestCombo?` · Decision Engine: ${payload.bestCombo.channel_label||payload.bestCombo.channel} Score ${payload.bestCombo.score}`:''}
+        </div>
+      </div>
+      <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;">✕</button>`;
+
+    // Insert at top of stage-0 right panel
+    const stage0 = document.getElementById('stage-0');
+    if(stage0) stage0.insertBefore(banner, stage0.firstChild);
+
+    // Update the pipeline status bar
+    const statusEl = document.getElementById('pipeline-status');
+    if(statusEl) statusEl.textContent = `📦 ${payload.product} queued — click "Build" to generate script`;
+
+  }catch(e){}
 })();
 </script>
 

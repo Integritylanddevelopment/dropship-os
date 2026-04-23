@@ -999,4 +999,123 @@ function openArbitrageEngine(id) {
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ANTHROPIC CLAUDE CHAT — WIRED IN                   -->
-<!-- ══�
+<!-- ═══════════════════════════════════════════════════ -->
+<style>
+#ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+#ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
+#ai-chat-btn svg{width:26px;height:26px;fill:white}
+#ai-chat-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-height:560px;background:#0d1117;border:1px solid #21262d;border-radius:16px;box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+#ai-chat-panel.open{display:flex}
+#ai-chat-header{background:#161b22;border-bottom:1px solid #21262d;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+#ai-chat-header .title{font-size:14px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
+#ai-chat-header .dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;animation:cpulse 2s infinite}
+@keyframes cpulse{0%,100%{opacity:1}50%{opacity:.4}}
+#ai-chat-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+#ai-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:380px}
+#ai-chat-msgs::-webkit-scrollbar{width:4px}
+#ai-chat-msgs::-webkit-scrollbar-track{background:transparent}
+#ai-chat-msgs::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.cm{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;max-width:88%;word-wrap:break-word}
+.cm-user{background:#1f3461;color:#e6edf3;align-self:flex-end;border-radius:12px 12px 2px 12px}
+.cm-ai{background:#161b22;color:#c9d1d9;border:1px solid #21262d;align-self:flex-start;border-radius:12px 12px 12px 2px}
+.cm-ai strong{color:#7c3aed}
+.cm-typing{color:#8b949e;font-style:italic;font-size:12px}
+#ai-chat-input-row{border-top:1px solid #21262d;padding:12px;display:flex;gap:8px;background:#0d1117}
+#ai-chat-input{flex:1;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:inherit;resize:none;height:38px;line-height:1.4}
+#ai-chat-input:focus{border-color:#7c3aed}
+#ai-chat-send{background:#7c3aed;border:none;color:white;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:background .2s}
+#ai-chat-send:hover{background:#6d28d9}
+#ai-chat-send:disabled{background:#374151;cursor:not-allowed}
+</style>
+
+<button id="ai-chat-btn" title="Ask Claude AI" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+</button>
+
+<div id="ai-chat-panel">
+  <div id="ai-chat-header">
+    <div class="title"><span class="dot"></span>Claude AI — Drop Ship Intel</div>
+    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="ai-chat-msgs">
+    <div class="cm cm-ai">Hey Alex 👋 I'm your Drop Ship AI. Ask me anything — products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
+  </div>
+  <div id="ai-chat-input-row">
+    <input id="ai-chat-input" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+    <button id="ai-chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PAGE_CONTEXT = document.title || 'Dropship OS';
+  
+  function toggleChat(){
+    const p = document.getElementById('ai-chat-panel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open')) document.getElementById('ai-chat-input').focus();
+  }
+  window.toggleChat = toggleChat;
+
+  function addMsg(text, role){
+    const msgs = document.getElementById('ai-chat-msgs');
+    const div = document.createElement('div');
+    div.className = 'cm ' + (role==='user' ? 'cm-user' : 'cm-ai');
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return div;
+  }
+
+  const history = [];
+
+  async function sendChat(){
+    const input = document.getElementById('ai-chat-input');
+    const btn   = document.getElementById('ai-chat-send');
+    const text  = input.value.trim();
+    if(!text) return;
+
+    addMsg(text, 'user');
+    history.push({role:'user', content:text});
+    input.value = '';
+    btn.disabled = true;
+
+    const typing = addMsg('Thinking…', 'ai');
+    typing.classList.add('cm-typing');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          messages: history,
+          context: PAGE_CONTEXT
+        })
+      });
+
+      const data = await res.json();
+
+      if(!res.ok || data.error){
+        typing.textContent = data.error || 'Error — check your ANTHROPIC_API_KEY in Vercel env vars.';
+        typing.style.color = '#f87171';
+      } else {
+        const reply = data.content;
+        typing.textContent = reply;
+        typing.classList.remove('cm-typing');
+        history.push({role:'assistant', content:reply});
+      }
+    } catch(e) {
+      typing.textContent = 'Connection error. Make sure ANTHROPIC_API_KEY is set in Vercel → Settings → Environment Variables.';
+      typing.style.color = '#f87171';
+    }
+
+    btn.disabled = false;
+    document.getElementById('ai-chat-msgs').scrollTop = 99999;
+    input.focus();
+  }
+  window.sendChat = sendChat;
+})();
+</script>
+
+</body>
+</html>

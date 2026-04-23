@@ -124,4 +124,29 @@ export default async function handler(req) {
 
     if (!res.ok) {
       const err = await res.text();
-      return json({ error: `Anthropic error ${res.status}: ${err}`, source: 'error' }, 500
+      return json({ error: `Anthropic error ${res.status}: ${err}`, source: 'error' }, 500);
+    }
+
+    const data = await res.json();
+    const content = data.content?.[0]?.text || '';
+
+    return json({
+      content,
+      source: 'anthropic_direct',
+      context_injected: false,
+      routed_via: 'direct',
+    });
+  } catch (e) {
+    return json({ error: `Anthropic unreachable: ${e.message}`, source: 'error' }, 500);
+  }
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
+}

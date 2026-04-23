@@ -145,6 +145,49 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .mb-18{margin-bottom:18px}.mb-24{margin-bottom:24px}
 .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;margin-right:5px}
 .stale-note{font-size:11px;color:var(--gold);margin-top:4px}
+
+/* ── Supplier Wizard Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--navy2);border:1px solid var(--border);border-radius:16px;width:min(540px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:15px;font-weight:800}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:0}
+.modal-body{padding:20px}
+.supplier-tab{padding:7px 14px;background:var(--navy3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.supplier-tab.active{background:rgba(26,108,246,.15);border-color:rgba(26,108,246,.4);color:var(--blue)}
+.supplier-card{display:none}
+.supplier-card.active{display:block}
+.supplier-stat-box{background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.supplier-stat-val{font-size:16px;font-weight:800;margin-bottom:3px}
+.supplier-stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.link-box{display:flex;gap:8px;margin-bottom:10px}
+.link-input{flex:1;background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;outline:none;font-family:monospace}
+.btn-copy{background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
+.btn-copy:hover{border-color:var(--blue);color:var(--blue)}
+.btn-open-supplier{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-bottom:8px}
+.btn-open-supplier:hover{opacity:.85}
+.btn-push-prod{width:100%;padding:11px;background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-push-prod:hover{background:rgba(34,197,94,.25);border-color:var(--green)}
+.push-confirm{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:14px;margin-top:10px;display:none}
+.push-confirm.shown{display:block}
+/* ── Enhanced product card ── */
+.prod-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:border-color .2s}
+.prod-card:hover{border-color:rgba(26,108,246,.4)}
+.prod-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.prod-card-emoji{font-size:28px;width:40px;text-align:center}
+.prod-card-info{flex:1}
+.prod-card-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.prod-card-meta{font-size:11px;color:var(--muted)}
+.prod-card-margin{font-size:20px;font-weight:900}
+.prod-card-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn-supplier{padding:7px 14px;background:rgba(26,108,246,.12);color:var(--blue);border:1px solid rgba(26,108,246,.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-supplier:hover{background:rgba(26,108,246,.22);border-color:var(--blue)}
+.btn-push{padding:7px 14px;background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.25);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-push:hover{background:rgba(34,197,94,.2);border-color:var(--green)}
+.btn-prometheus{padding:7px 14px;background:rgba(245,158,11,.1);color:var(--gold);border:1px solid rgba(245,158,11,.25);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-prometheus:hover{background:rgba(245,158,11,.2);border-color:var(--gold)}
+.prod-channel-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(0,201,167,.12);color:var(--teal)}
 </style>
 </head>
 <body>
@@ -180,6 +223,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   <button class="nav-tab" onclick="showPage('agents',this)">🤖 Agents</button>
   <button class="nav-tab" onclick="showPage('memory',this)">🧠 Memory Search</button>
   <button class="nav-tab" onclick="showPage('dashboards',this)">🖥️ Dashboards</button>
+  <button class="nav-tab" onclick="showPage('revenue',this)">💰 Revenue</button>
   <button class="nav-tab" onclick="showPage('buildplan',this)">🏗️ Build Plan</button>
 </div>
 
@@ -613,37 +657,135 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   </div>
 </div>
 
+
+<!-- ═══════════ REVENUE & ROI ═══════════ -->
+<div class="page" id="page-revenue">
+  <div class="sec-header">
+    <div class="sec-title">💰 Revenue & ROI Intelligence</div>
+    <div class="sec-sub">Live Stripe revenue, ROAS by channel, CPM benchmarks, margin by product. Connect APIs below to activate.</div>
+  </div>
+  <div class="kpi-grid" style="margin-bottom:18px">
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Revenue Today</div><div class="kpi-value" id="rev-today">—</div><div class="kpi-change up" id="rev-today-sub">Stripe live</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Revenue This Month</div><div class="kpi-value" id="rev-month">—</div><div class="kpi-change" id="rev-month-sub">Stripe live</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Total Orders</div><div class="kpi-value" id="rev-orders">—</div><div class="kpi-change up" id="rev-orders-sub">All time</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-label">Avg Order Value</div><div class="kpi-value" id="rev-aov">—</div><div class="kpi-change up" id="rev-aov-sub">per order</div></div>
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Best ROAS Channel</div><div class="kpi-value" id="rev-best-roas">—</div><div class="kpi-change up" id="rev-best-roas-sub">Decision engine</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Best Margin Product</div><div class="kpi-value" id="rev-best-margin">—</div><div class="kpi-change up" id="rev-best-margin-sub">highest %</div></div>
+  </div>
+  <div class="grid-2-1" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-title"><div class="icon icon-teal">📡</div>ROAS by Channel — Live Ranking</div>
+      <div id="roas-channel-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Loading channel data…</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon icon-gold">📦</div>Margin by Product</div>
+      <div id="revenue-product-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Loading product data…</div></div>
+    </div>
+  </div>
+  <div class="card mb-18">
+    <div class="card-title"><div class="icon icon-blue">💸</div>CPM Benchmark — Attention Cost by Channel</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">
+          <th style="text-align:left;padding:8px 12px">Channel</th>
+          <th style="text-align:right;padding:8px 12px">CPM</th>
+          <th style="text-align:right;padding:8px 12px">Viral Coeff</th>
+          <th style="text-align:right;padding:8px 12px">Score</th>
+          <th style="text-align:right;padding:8px 12px">Status</th>
+          <th style="text-align:right;padding:8px 12px">Action</th>
+        </tr></thead>
+        <tbody id="cpm-table-body"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon icon-purple">🔌</div>API Connection Wizard</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:4px">
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="font-size:22px">💳</div>
+          <div><div style="font-size:13px;font-weight:700">Stripe</div><div style="font-size:11px;color:var(--muted)">Revenue + orders</div></div>
+          <div id="api-dot-stripe" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">STRIPE_SECRET_KEY</code> in .env</div>
+        <div id="api-status-stripe" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="font-size:22px">📌</div>
+          <div><div style="font-size:13px;font-weight:700">Pinterest API</div><div style="font-size:11px;color:var(--muted)">Auto-post pins · $0.28 CPM</div></div>
+          <div id="api-dot-pinterest" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">PINTEREST_ACCESS_TOKEN</code> in .env</div>
+        <div id="api-status-pinterest" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="font-size:22px">🎵</div>
+          <div><div style="font-size:13px;font-weight:700">TikTok API</div><div style="font-size:11px;color:var(--muted)">Auto-post · $0 CPM viral</div></div>
+          <div id="api-dot-tiktok" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">TIKTOK_ACCESS_TOKEN</code> in .env · ~2 wk approval</div>
+        <div id="api-status-tiktok" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="font-size:22px">📦</div>
+          <div><div style="font-size:13px;font-weight:700">Zendrop</div><div style="font-size:11px;color:var(--muted)">Auto-fulfillment</div></div>
+          <div id="api-dot-zendrop" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">ZENDROP_API_KEY</code> in .env</div>
+        <div id="api-status-zendrop" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="font-size:22px">🔥</div>
+          <div><div style="font-size:13px;font-weight:700">Prometheus Engine</div><div style="font-size:11px;color:var(--muted)">AI video pipeline · port 8766</div></div>
+          <div id="api-dot-prometheus" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Run <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">START_PROMETHEUS.bat</code> to activate</div>
+        <div id="api-status-prometheus" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+      </div>
+    </div>
+    <div style="margin-top:18px;background:var(--navy3);border:1px solid rgba(26,108,246,.2);border-radius:10px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px">⚡ Setup Order (highest ROI first)</div>
+      <div style="display:grid;gap:7px;font-size:12px">
+        <div>1. 💳 <strong>Stripe</strong> → stripe.com → Developers → API Keys → copy Secret Key → add to .env</div>
+        <div>2. 📌 <strong>Pinterest</strong> → developers.pinterest.com → Create App → Generate token → add to .env</div>
+        <div>3. 📦 <strong>Zendrop</strong> → zendrop.com → Account → API → add to .env</div>
+        <div>4. 🎵 <strong>TikTok</strong> → developers.tiktok.com → Apply Content Posting API (~2 wk wait)</div>
+        <div>5. 🔥 <strong>Prometheus</strong> → START_PROMETHEUS.bat + add ATLAS_API_KEY + ELEVENLABS_API_KEY + SUNO_API_KEY</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ BUILD PLAN ═══════════ -->
 <div class="page" id="page-buildplan">
   <div class="sec-header">
     <div class="sec-title">🏗️ Build Plan</div>
-    <div class="sec-sub">Full recommended build order — 10 phases, 10 agents. See BUILD_PLAN.md for full spec.</div>
+    <div class="sec-sub">All 10 phases complete. Full system built and ready to activate.</div>
   </div>
   <div class="card mb-18">
-    <div class="card-title"><div class="icon icon-teal">✅</div>Completed</div>
+    <div class="card-title"><div class="icon icon-teal">✅</div>Completed — Phases 1–4 (Foundation)</div>
     <div class="build-list">
       <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Vercel Deployment — 6 pages live</div><div class="build-desc">dropship-os-togetherwe-hobby.vercel.app — GitHub: Integritylanddevelopment/dropship-os</div></div><span class="badge badge-green">Done</span></div>
       <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Decision Engine + 8 Channels</div><div class="build-desc">decision_engine.py — Pinterest, TikTok, YT Shorts, Reddit, IG, X, Meta, Google</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 1 — Live Metrics Infrastructure</div><div class="build-desc">/api/metrics.js + /stats Quinn route + metrics.json schema + decision engine writes live data</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 1 — Live Metrics Infrastructure</div><div class="build-desc">/api/metrics.js + /stats Quinn route + metrics.json schema</div></div><span class="badge badge-green">Done</span></div>
       <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 2 — Strip Fake Data</div><div class="build-desc">All hardcoded numbers replaced with live JS fetch from /api/metrics</div></div><span class="badge badge-green">Done</span></div>
-    </div>
-  </div>
-  <div class="card mb-18">
-    <div class="card-title"><div class="icon icon-gold">⚡</div>In Progress</div>
-    <div class="build-list">
-      <div class="build-item b-scaffold"><div class="b-icon">3</div><div><div class="build-label">Phase 3 — Product Cards: Supplier Wizard + Push to Production</div><div class="build-desc">Each product card: Get Supplier Link wizard + channel selector + Push to Production button</div></div><span class="badge badge-gold">Building</span></div>
-      <div class="build-item b-scaffold"><div class="b-icon">4</div><div><div class="build-label">Phase 4 — Prometheus Creation Studio /content page</div><div class="build-desc">Step 0 Pillar Builder → Step 1 Upload → Step 2 Pipeline → Step 3 Approve → Step 4 Calendar</div></div><span class="badge badge-gold">Building</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 3 — Supplier Wizard + Push to Production</div><div class="build-desc">Product cards: Zendrop/AutoDS/AliExpress/CJ wizard + sessionStorage handoff to Prometheus</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 4 — Prometheus Creation Studio /content</div><div class="build-desc">5-step pipeline: Pillar Builder → Upload → Run Pipeline → Approve → Calendar</div></div><span class="badge badge-green">Done</span></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-title"><div class="icon icon-blue">🔮</div>Queued — Phases 5–10</div>
+    <div class="card-title"><div class="icon icon-green">🚀</div>Completed — Phases 5–10 (Automation)</div>
     <div class="build-list">
-      <div class="build-item b-todo"><div class="b-icon">5</div><div><div class="build-label">Prometheus Engine — FFmpeg + Whisper + Seedance 2.0</div><div class="build-desc">Replace Opus Clip. Local video cutting pipeline. $0/month vs $5,000+/month at 800 videos/day.</div></div><span class="badge badge-muted">Queued</span></div>
-      <div class="build-item b-todo"><div class="b-icon">6</div><div><div class="build-label">Content Calendar + Auto-Scheduler</div><div class="build-desc">Calendar view, schedule posts, auto-fire to platform APIs at publish time</div></div><span class="badge badge-muted">Queued</span></div>
-      <div class="build-item b-todo"><div class="b-icon">7</div><div><div class="build-label">Social Distribution — Auto-Posting to All 7 Channels</div><div class="build-desc">Pinterest, TikTok, IG, YouTube Shorts, X, Reddit, Email — auto-post from calendar</div></div><span class="badge badge-muted">Queued</span></div>
-      <div class="build-item b-todo"><div class="b-icon">8</div><div><div class="build-label">Decision Engine Live — Daily Auto-Run</div><div class="build-desc">Windows Task Scheduler 6am daily run → metrics.json auto-committed → dashboard auto-updates</div></div><span class="badge badge-muted">Queued</span></div>
-      <div class="build-item b-todo"><div class="b-icon">9</div><div><div class="build-label">Revenue & ROI Live Dashboard</div><div class="build-desc">Stripe ROAS by channel, CPM live (Pinterest/Meta/TikTok APIs), margin by product</div></div><span class="badge badge-muted">Queued</span></div>
-      <div class="build-item b-todo"><div class="b-icon">10</div><div><div class="build-label">Full Automation Loop</div><div class="build-desc">run_dropship_os.py: daily cycle — research → decide → create → post → fulfill → report</div></div><span class="badge badge-muted">Queued</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 5 — Prometheus Engine (AI Video Pipeline)</div><div class="build-desc">prometheus_engine.py — FFmpeg+Whisper+Seedance 2.0+ElevenLabs+Suno. Start: START_PROMETHEUS.bat</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 6 — Content Calendar + Auto-Scheduler</div><div class="build-desc">Calendar view in Prometheus Studio. post_scheduler.py queues posts by time/channel.</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 7 — Social Distribution (Pinterest + TikTok)</div><div class="build-desc">pinterest_poster.py + tiktok_poster.py — auto-post from decisions.json. Run: python run_dropship_os.py --pinterest</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 8 — Decision Engine Daily Auto-Run</div><div class="build-desc">SCHEDULE_DAILY.ps1 — Windows Task Scheduler 6am daily. metrics.json auto-committed → Vercel deploys.</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 9 — Revenue & ROI Live Dashboard</div><div class="build-desc">💰 Revenue tab: Stripe ROAS by channel, CPM benchmarks, margin by product, API wizard.</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 10 — Full Automation Loop</div><div class="build-desc">run_dropship_os.py --full: research → decide → Prometheus → Pinterest → post → pages → monitor</div></div><span class="badge badge-green">Done</span></div>
     </div>
   </div>
 </div>
@@ -819,6 +961,8 @@ function populateProducts(m){
   const products=(m.products||[]).sort((a,b)=>b.margin_pct-a.margin_pct);
   const scale=m.scale||[];
   const kill=m.kill||[];
+  _allProducts=products;
+  _allCombos=(scale||[]).concat(m.test||[]);
 
   if(products.length>0){
     const tp=products[0];
@@ -831,18 +975,27 @@ function populateProducts(m){
 
   const list=document.getElementById('product-list');
   if(!products.length) return;
-  const emojis={'pet':'🐾','fitness':'💪','home':'🏠','beauty':'🧴','tech':'📱','outdoor':'⛺','kitchen':'🍳','desk':'📚','led':'🌿','general':'📦'};
-  list.innerHTML = products.slice(0,8).map(p=>{
-    const key=Object.keys(emojis).find(k=>p.niche&&p.niche.toLowerCase().includes(k))||'general';
-    const em=emojis[key];
+  list.innerHTML = products.slice(0,8).map((p,i)=>{
+    const em=nicheEmoji(p.niche||'');
     const col=p.margin_pct>=60?'var(--teal)':(p.margin_pct<40?'var(--red)':'var(--gold)');
-    return `<div class="product-row">
-      <div class="product-emoji">${em}</div>
-      <div class="product-info">
-        <div class="product-name">${p.name}</div>
-        <div class="product-meta">${p.supplier?'Supplier: '+p.supplier:''}${p.trending?' · 🔥 Trending':''}</div>
+    const bestCombo=_allCombos.find(c=>c.product===p.name);
+    const chLabel=bestCombo?(bestCombo.channel_label||bestCombo.channel):'—';
+    return `<div class="prod-card">
+      <div class="prod-card-top">
+        <div class="prod-card-emoji">${em}</div>
+        <div class="prod-card-info">
+          <div class="prod-card-name">${p.name}</div>
+          <div class="prod-card-meta">${p.niche||''}${p.trending?' · 🔥 Trending':''}${chLabel!=='—'?' · Best: '+chLabel:''}</div>
+        </div>
+        <div class="prod-card-margin" style="color:${col}">${p.margin_pct}%</div>
       </div>
-      <div class="product-margin" style="color:${col}">${p.margin_pct}%</div>
+      <div class="prod-card-btns">
+        <button class="btn-supplier" onclick="openSupplierWizard(${i})">🏗️ Get Supplier</button>
+        <button class="btn-push" onclick="openSupplierWizard(${i},true)">🚀 Push to Production</button>
+        <a class="btn-prometheus" href="/content">🔥 Prometheus Studio</a>
+        ${p.trending?'<span class="prod-channel-badge">🔥 Trending</span>':''}
+        ${bestCombo&&bestCombo.score>=70?'<span class="prod-channel-badge" style="background:rgba(34,197,94,.12);color:var(--green)">SCALE</span>':''}
+      </div>
     </div>`;
   }).join('');
 }
@@ -890,6 +1043,7 @@ async function loadMetrics(){
     populateChannels(m);
     populateProducts(m);
     populateMemory(m);
+    populateRevenue(m);
     setStatusPill(m.sources||{});
   } catch(e){
     console.warn('Metrics load failed:',e.message);
@@ -923,6 +1077,129 @@ async function runSearch(){
   }
 }
 document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch()});
+
+// ── Supplier Wizard ─────────────────────────────────────────────
+let _wizardProduct = null;
+const SUPPLIER_URLS = {
+  zendrop:'https://zendrop.com/products?search=',
+  autods:'https://app.autods.com/products?search=',
+  ali:'https://www.aliexpress.com/wholesale?SearchText=',
+  cj:'https://cjdropshipping.com/search?q=',
+};
+function openSupplierWizard(productIndex,scrollToPush){
+  const p=_allProducts[productIndex];
+  if(!p){alert('Product data not loaded — run decision_engine.py first');return;}
+  _wizardProduct=p;
+  document.getElementById('modal-product-name').textContent=p.name;
+  document.getElementById('modal-product-name2').textContent=p.name;
+  document.getElementById('modal-product-niche').textContent=p.niche||'general';
+  document.getElementById('modal-product-emoji').textContent=nicheEmoji(p.niche||'');
+  document.getElementById('modal-margin').textContent=p.margin_pct+'%';
+  const bestCombo=_allCombos.find(c=>c.product===p.name);
+  document.getElementById('modal-channel-label').textContent=bestCombo
+    ?`${bestCombo.channel_label||bestCombo.channel} · Score ${bestCombo.score} · ${bestCombo.action}`
+    :'Run decision_engine.py for channel recommendation';
+  const q=encodeURIComponent(p.name);
+  document.getElementById('link-zendrop').value=SUPPLIER_URLS.zendrop+q;
+  document.getElementById('link-autods').value=SUPPLIER_URLS.autods+q;
+  document.getElementById('link-ali').value=SUPPLIER_URLS.ali+q;
+  document.getElementById('link-cj').value=SUPPLIER_URLS.cj+q;
+  ['zendrop','autods','ali','cj'].forEach(s=>{const pc=document.getElementById('pc-'+s);if(pc)pc.classList.remove('shown');});
+  switchSupplier('zendrop',document.querySelector('.supplier-tab'));
+  document.getElementById('supplier-modal').classList.add('open');
+  if(scrollToPush){setTimeout(()=>{const btn=document.querySelector('#sc-zendrop .btn-push-prod');if(btn){btn.scrollIntoView({behavior:'smooth',block:'center'});btn.focus();}},200);}
+}
+function closeSupplierModal(e){if(e.target===document.getElementById('supplier-modal'))document.getElementById('supplier-modal').classList.remove('open');}
+function switchSupplier(key,btn){
+  document.querySelectorAll('.supplier-tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.supplier-card').forEach(c=>c.classList.remove('active'));
+  const card=document.getElementById('sc-'+key);if(card)card.classList.add('active');
+}
+function copyLink(inputId){
+  const el=document.getElementById(inputId);if(!el)return;
+  navigator.clipboard.writeText(el.value).then(()=>{const btn=el.nextElementSibling;if(btn){const orig=btn.textContent;btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent=orig,1800);}}).catch(()=>{el.select();document.execCommand('copy');});
+}
+function openSupplier(key){if(!_wizardProduct)return;window.open(SUPPLIER_URLS[key]+encodeURIComponent(_wizardProduct.name),'_blank');}
+function pushToProduction(supplierKey){
+  if(!_wizardProduct)return;
+  const pc=document.getElementById('pc-'+supplierKey);if(pc)pc.classList.add('shown');
+  try{sessionStorage.setItem('prometheus_queued_product',JSON.stringify({product:_wizardProduct.name,niche:_wizardProduct.niche,margin:_wizardProduct.margin_pct,supplier:supplierKey,timestamp:new Date().toISOString(),bestCombo:_allCombos.find(c=>c.product===_wizardProduct.name)||null}));}catch(e){}
+}
+
+// ── Populate revenue tab ────────────────────────────────────────
+function populateRevenue(m){
+  const rev=m.revenue||{};
+  const channels=(m.channels||[]).sort((a,b)=>a.cpm-b.cpm);
+  const products=(m.products||[]).sort((a,b)=>b.margin_pct-a.margin_pct);
+  const tc=m.top_combos||[];
+  document.getElementById('rev-today').textContent=fmtUSD(rev.today_usd);
+  document.getElementById('rev-month').textContent=fmtUSD(rev.month_usd||null);
+  document.getElementById('rev-orders').textContent=fmtNum(rev.total_orders);
+  const aov=rev.total_orders>0&&rev.month_usd>0?(rev.month_usd/rev.total_orders):null;
+  document.getElementById('rev-aov').textContent=fmtUSD(aov);
+  document.getElementById('rev-today-sub').textContent=rev.today_usd!==null?'▲ Stripe live':'Add STRIPE_SECRET_KEY';
+  document.getElementById('rev-month-sub').textContent=rev.month_usd!==null?'▲ Stripe live':'Add STRIPE_SECRET_KEY';
+  document.getElementById('rev-orders-sub').textContent=rev.total_orders!==null?'Stripe live':'Add STRIPE_SECRET_KEY';
+  if(tc.length>0){document.getElementById('rev-best-roas').textContent=tc[0].channel_label||tc[0].channel||'—';document.getElementById('rev-best-roas-sub').textContent='Score '+tc[0].score+' · '+tc[0].action;}
+  if(products.length>0){document.getElementById('rev-best-margin').textContent=products[0].margin_pct+'%';document.getElementById('rev-best-margin-sub').textContent=products[0].name||'—';}
+  const roasList=document.getElementById('roas-channel-list');
+  if(channels.length>0){
+    const maxS=Math.max(...channels.map(c=>c.score||0));
+    roasList.innerHTML=channels.map(c=>{
+      const col=c.cpm===0?'var(--teal)':(c.cpm<5?'var(--blue)':(c.cpm<15?'var(--gold)':'var(--red)'));
+      const pct=maxS>0?Math.round((c.score/maxS)*100):0;
+      const action=c.score>=70?'SCALE':(c.score>=40?'TEST':'HOLD');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="width:22px">${CH_EMOJI[c.key]||'📡'}</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:3px">${c.label}</div>
+          <div style="height:5px;background:var(--navy3);border-radius:3px"><div style="height:5px;width:${pct}%;background:${col};border-radius:3px"></div></div></div>
+        <div style="text-align:right;min-width:80px"><div style="font-size:13px;font-weight:800;color:${col}">${c.cpm===0?'FREE':'$'+c.cpm.toFixed(2)}</div>
+          <div style="font-size:10px;font-weight:700;color:${c.score>=70?'var(--green)':(c.score>=40?'var(--gold)':'var(--muted)')}">${action}</div></div>
+        <div style="font-size:16px;font-weight:900;color:${col};min-width:36px;text-align:right">${c.score}</div></div>`;
+    }).join('');
+  }else{roasList.innerHTML='<div style="color:var(--muted);font-size:13px;padding:12px 0">Run decision_engine.py to populate</div>';}
+  const prodList=document.getElementById('revenue-product-list');
+  if(products.length>0){
+    prodList.innerHTML=products.slice(0,6).map(p=>{
+      const col=p.margin_pct>=60?'var(--teal)':(p.margin_pct<40?'var(--red)':'var(--gold)');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:18px">${nicheEmoji(p.niche||'')}</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:3px">${p.name}</div>
+          <div style="height:4px;background:var(--navy3);border-radius:2px"><div style="height:4px;width:${p.margin_pct}%;background:${col};border-radius:2px"></div></div></div>
+        <div style="font-size:16px;font-weight:900;color:${col};min-width:44px;text-align:right">${p.margin_pct}%</div></div>`;
+    }).join('');
+  }else{prodList.innerHTML='<div style="color:var(--muted);font-size:13px;padding:12px 0">Run decision_engine.py to populate</div>';}
+  const tbody=document.getElementById('cpm-table-body');
+  if(channels.length>0){
+    tbody.innerHTML=[...channels].sort((a,b)=>a.cpm-b.cpm).map(c=>{
+      const col=c.cpm===0?'var(--teal)':(c.cpm<5?'var(--blue)':(c.cpm<15?'var(--gold)':'var(--red)'));
+      const action=c.score>=70?'SCALE':(c.score>=40?'TEST':(c.score>=20?'HOLD':'KILL'));
+      const bc=c.score>=70?'badge-green':(c.score>=40?'badge-gold':(c.score>=20?'badge-muted':'badge-red'));
+      return `<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:9px 12px">${CH_EMOJI[c.key]||'📡'} ${c.label}</td>
+        <td style="text-align:right;padding:9px 12px;font-weight:800;color:${col}">${c.cpm===0?'FREE':'$'+c.cpm.toFixed(2)}</td>
+        <td style="text-align:right;padding:9px 12px;color:var(--muted)">${c.viral_coeff||'—'}</td>
+        <td style="text-align:right;padding:9px 12px;font-weight:800;color:${col}">${c.score}</td>
+        <td style="text-align:right;padding:9px 12px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.score>=40?'var(--green)':'var(--muted)'};margin-right:6px"></span>${c.score>=40?'Active':'Monitor'}</td>
+        <td style="text-align:right;padding:9px 12px"><span class="badge ${bc}">${action}</span></td></tr>`;
+    }).join('');
+  }
+  const src2=m.sources||{};
+  function setApiDot(key,connected){
+    const dot=document.getElementById('api-dot-'+key);const status=document.getElementById('api-status-'+key);
+    if(!dot||!status)return;
+    dot.style.background=connected?'var(--green)':'var(--muted)';
+    status.textContent='Status: '+(connected?'✅ Connected':'⚠️ Not connected — add key to .env');
+    status.style.color=connected?'var(--green)':'var(--muted)';
+  }
+  setApiDot('stripe',src2.stripe==='live');
+  setApiDot('pinterest',!!m.pinterest_connected);
+  setApiDot('tiktok',!!m.tiktok_connected);
+  setApiDot('zendrop',!!m.zendrop_connected);
+  fetch('/api/prometheus?action=status',{signal:AbortSignal.timeout(3000)}).then(r=>r.ok?r.json():{}).then(s=>setApiDot('prometheus',s.prometheus_local?.online===true)).catch(()=>setApiDot('prometheus',false));
+}
+
 </script>
 
 <!-- ═══════════════ CHAT WIDGET ═══════════════ -->
@@ -970,9 +1247,139 @@ document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key=
 <script>
 (function(){
   const PAGE_CONTEXT = document.title||'Dropship OS Command Center';
-  function toggleChat(){const p=document.getElementById('ai-chat-panel');p.classList.toggle('open');if(p.classList.contains('open'))document.getElementById('ai-chat-input').focus();}
+  function toggleChat(){
+    const p=document.getElementById('ai-chat-panel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open'))document.getElementById('ai-chat-input').focus();
+  }
   window.toggleChat=toggleChat;
-  function addMsg(text,role){const msgs=document.getElementById('ai-chat-msgs');const div=document.createElement('div');div.className='cm '+(role==='user'?'cm-user':'cm-ai');div.textContent=text;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div;}
+  function addMsg(text,role){
+    const msgs=document.getElementById('ai-chat-msgs');
+    const div=document.createElement('div');
+    div.className='cm '+(role==='user'?'cm-user':'cm-ai');
+    div.textContent=text;
+    msgs.appendChild(div);
+    msgs.scrollTop=msgs.scrollHeight;
+    return div;
+  }
   const history=[];
   async function sendChat(){
-    const input=document.getElementById('ai-chat-input');const btn=document
+    const input=document.getElementById('ai-chat-input');
+    const btn=document.getElementById('ai-chat-send');
+    const userText=input.value.trim();
+    if(!userText)return;
+    input.value='';input.disabled=true;btn.disabled=true;
+    addMsg(userText,'user');
+    history.push({role:'user',content:userText});
+    const thinking=addMsg('…','ai');
+    thinking.className='cm cm-ai cm-typing';
+    try{
+      const res=await fetch('/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:history,context:PAGE_CONTEXT}),
+        signal:AbortSignal.timeout(30000)
+      });
+      const data=await res.json();
+      const reply=data.content||data.reply||data.message||'No response';
+      thinking.className='cm cm-ai';
+      thinking.textContent=reply;
+      history.push({role:'assistant',content:reply});
+    }catch(e){
+      thinking.className='cm cm-ai';
+      thinking.textContent='Quinn is offline. Start the bridge: START_QUINN_BRIDGE.bat then run ngrok http 8765';
+    }finally{
+      input.disabled=false;btn.disabled=false;input.focus();
+    }
+  }
+  window.sendChat=sendChat;
+  document.getElementById('ai-chat-input').addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}
+  });
+})();
+</script>
+
+<!-- ═══════════════ SUPPLIER WIZARD MODAL ═══════════════ -->
+<div class="modal-overlay" id="supplier-modal" onclick="closeSupplierModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">🏗️ Supplier Wizard — <span id="modal-product-name">Product</span></div>
+      <button class="modal-close" onclick="document.getElementById('supplier-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:14px">
+        <div style="font-size:28px" id="modal-product-emoji">📦</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700" id="modal-product-name2">—</div>
+          <div style="font-size:12px;color:var(--muted)" id="modal-product-niche">—</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:900;color:var(--teal)" id="modal-margin">—</div>
+          <div style="font-size:10px;color:var(--muted)">est. margin</div>
+        </div>
+      </div>
+      <div style="background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:12px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:16px">⚡</span>
+        <span style="color:var(--teal);font-weight:700">Decision Engine Rec:</span>
+        <span id="modal-channel-label" style="color:var(--text)">Loading…</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button class="supplier-tab active" onclick="switchSupplier('zendrop',this)">Zendrop</button>
+        <button class="supplier-tab" onclick="switchSupplier('autods',this)">AutoDS</button>
+        <button class="supplier-tab" onclick="switchSupplier('ali',this)">AliExpress</button>
+        <button class="supplier-tab" onclick="switchSupplier('cj',this)">CJ Drop</button>
+      </div>
+      <div id="sc-zendrop" class="supplier-card active">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--teal)">Zendrop — US Warehouse · Fast Ship · Best Quality</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+          <div class="supplier-stat-box"><div class="supplier-stat-val">3–7d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">High</div><div class="supplier-stat-lbl">Quality</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">Auto</div><div class="supplier-stat-lbl">Fulfillment</div></div>
+        </div>
+        <div class="link-box"><input class="link-input" id="link-zendrop" readonly/><button class="btn-copy" onclick="copyLink('link-zendrop')">Copy</button></div>
+        <button class="btn-open-supplier" onclick="openSupplier('zendrop')">🔍 Search Zendrop for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('zendrop')">🚀 Push to Production with Zendrop</button>
+        <div class="push-confirm" id="pc-zendrop">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+      </div>
+      <div id="sc-autods" class="supplier-card">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--blue)">AutoDS — Automation-First · AI Pricing · 25+ Suppliers</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+          <div class="supplier-stat-box"><div class="supplier-stat-val">5–12d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">Auto</div><div class="supplier-stat-lbl">Price Watch</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">Bulk</div><div class="supplier-stat-lbl">Import</div></div>
+        </div>
+        <div class="link-box"><input class="link-input" id="link-autods" readonly/><button class="btn-copy" onclick="copyLink('link-autods')">Copy</button></div>
+        <button class="btn-open-supplier" onclick="openSupplier('autods')">🔍 Search AutoDS for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('autods')">🚀 Push to Production with AutoDS</button>
+        <div class="push-confirm" id="pc-autods">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+      </div>
+      <div id="sc-ali" class="supplier-card">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--gold)">AliExpress — Lowest Cost · Huge Selection · ePacket</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+          <div class="supplier-stat-box"><div class="supplier-stat-val">10–20d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">Lowest</div><div class="supplier-stat-lbl">Cost</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">Huge</div><div class="supplier-stat-lbl">Selection</div></div>
+        </div>
+        <div class="link-box"><input class="link-input" id="link-ali" readonly/><button class="btn-copy" onclick="copyLink('link-ali')">Copy</button></div>
+        <button class="btn-open-supplier" onclick="openSupplier('ali')">🔍 Search AliExpress for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('ali')">🚀 Push to Production with AliExpress</button>
+        <div class="push-confirm" id="pc-ali">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+      </div>
+      <div id="sc-cj" class="supplier-card">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--purple)">CJ Dropshipping — US+CN Warehouses · Print on Demand</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+          <div class="supplier-stat-box"><div class="supplier-stat-val">5–10d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">POD</div><div class="supplier-stat-lbl">Print On Demand</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">Free</div><div class="supplier-stat-lbl">Sourcing</div></div>
+        </div>
+        <div class="link-box"><input class="link-input" id="link-cj" readonly/><button class="btn-copy" onclick="copyLink('link-cj')">Copy</button></div>
+        <button class="btn-open-supplier" onclick="openSupplier('cj')">🔍 Search CJ for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('cj')">🚀 Push to Production with CJ</button>
+        <div class="push-confirm" id="pc-cj">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
