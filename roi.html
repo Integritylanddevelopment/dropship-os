@@ -165,8 +165,10 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-bottom:8px;}
     <div class="logo-sub">ARBITRAGE INTELLIGENCE ENGINE</div>
   </div>
   <div class="hdr-right">
-    <div class="hdr-stat">Products Scanned: <span id="totalScanned">0</span></div>
-    <div class="hdr-stat">Opportunities Found: <span id="totalFound">0</span></div>
+    <div class="hdr-stat">Data: <span id="dataSourceBadge" style="color:var(--orange)">📦 RESEARCH</span></div>
+    <div class="hdr-stat">Revenue: <span id="liveRevBadge" style="color:var(--muted)">—</span></div>
+    <div class="hdr-stat">Scanned: <span id="totalScanned">0</span></div>
+    <div class="hdr-stat">Found: <span id="totalFound">0</span></div>
     <div class="hdr-stat">Avg ROI: <span id="avgRoi" style="color:var(--green)">—</span></div>
   </div>
 </div>
@@ -217,6 +219,13 @@ input[type=range]{width:100%;accent-color:var(--blue);margin-bottom:8px;}
     <span id="scanStatusText" style="color:var(--muted)">Ready</span>
   </div>
   <div class="progress-bar-bg" style="margin-top:6px;"><div class="progress-bar-fill" id="progressBar"></div></div>
+</div>
+
+<!-- DATA SOURCE BANNER -->
+<div id="dataBanner" style="background:rgba(245,158,11,.08);border-bottom:1px solid rgba(245,158,11,.25);padding:6px 24px;font-size:11px;color:var(--orange);display:flex;align-items:center;gap:12px;">
+  <span>📦 Product library: research data — 20 products cached from market analysis.</span>
+  <span id="bannerLive" style="display:none;color:var(--green)">⚡ Decision engine products loaded from /api/metrics</span>
+  <span style="margin-left:auto;color:var(--muted)">Connect AliExpress API → live scan · Connect Stripe → live revenue</span>
 </div>
 
 <!-- LAYOUT -->
@@ -533,18 +542,102 @@ const ALL_PRODUCTS = [
   }
 ];
 
-// Channel arbitrage scores
+// Channel arbitrage scores (CPM-based — lower CPM = higher score)
 const CHANNEL_SCORES = {
-  "TikTok":          { score:7.8, roiMult:1.20, color:"var(--purple)" },
-  "Pinterest":       { score:8.9, roiMult:1.35, color:"var(--red)" },
-  "Reddit":          { score:9.1, roiMult:1.40, color:"var(--orange)" },
-  "YouTube Shorts":  { score:8.3, roiMult:1.25, color:"var(--red)" },
-  "Email":           { score:8.8, roiMult:1.50, color:"var(--green)" },
-  "Native/Taboola":  { score:7.9, roiMult:1.10, color:"var(--blue)" },
-  "Instagram Reels": { score:7.2, roiMult:1.15, color:"var(--purple)" },
-  "Newsletter Ads":  { score:8.1, roiMult:1.30, color:"var(--cyan)" },
-  "Facebook":        { score:6.8, roiMult:1.05, color:"var(--blue)" }
+  "TikTok Organic":  { score:10.0, roiMult:1.60, color:"var(--purple)", cpm:0.00 },
+  "TikTok":          { score:10.0, roiMult:1.60, color:"var(--purple)", cpm:0.00 },
+  "Pinterest":       { score:9.4,  roiMult:1.40, color:"var(--red)",    cpm:0.28 },
+  "Pinterest Organic":{ score:9.4, roiMult:1.40, color:"var(--red)",    cpm:0.28 },
+  "YouTube Shorts":  { score:9.0,  roiMult:1.25, color:"var(--orange)", cpm:0.41 },
+  "Reddit":          { score:8.7,  roiMult:1.20, color:"var(--orange)", cpm:0.75 },
+  "Reddit Organic":  { score:8.7,  roiMult:1.20, color:"var(--orange)", cpm:0.75 },
+  "Instagram Reels": { score:7.2,  roiMult:1.15, color:"var(--purple)", cpm:3.20 },
+  "Email":           { score:8.8,  roiMult:1.50, color:"var(--green)",  cpm:0.00 },
+  "Native/Taboola":  { score:7.9,  roiMult:1.10, color:"var(--blue)",   cpm:5.00 },
+  "Newsletter Ads":  { score:8.1,  roiMult:1.30, color:"var(--cyan)",   cpm:1.50 },
+  "Facebook":        { score:6.8,  roiMult:1.05, color:"var(--blue)",   cpm:14.20 },
+  "Meta Paid":       { score:6.8,  roiMult:1.05, color:"var(--blue)",   cpm:14.20 },
+  "Google Paid":     { score:5.0,  roiMult:0.90, color:"var(--muted)",  cpm:22.80 },
 };
+
+// ==========================================
+// LIVE METRICS INTEGRATION
+// ==========================================
+let METRICS_DATA = null;
+let dataSource = 'research'; // 'research' | 'live' | 'mixed'
+
+async function loadMetricsProducts() {
+  try {
+    const res = await fetch('/api/metrics', { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return;
+    METRICS_DATA = await res.json();
+
+    // Pull live products from decision engine
+    const liveProds = (METRICS_DATA.products || []).filter(p => p.name && p.margin_pct);
+    if (liveProds.length > 0) {
+      // Convert to roi.html format and prepend to ALL_PRODUCTS
+      const converted = liveProds.map((p, i) => ({
+        id: 1000 + i,
+        name: p.name,
+        category: nicheToCategory(p.niche || 'general'),
+        emoji: nicheToEmoji(p.niche || 'general'),
+        supplierPrice: p.profit_per_unit > 0 ? parseFloat((p.profit_per_unit / (p.margin_pct / 100) * (1 - p.margin_pct / 100)).toFixed(2)) : 0,
+        retailBest: p.profit_per_unit > 0 ? parseFloat((p.profit_per_unit / (p.margin_pct / 100)).toFixed(2)) : 0,
+        amazonPrice: 0,
+        ebayPrice: 0,
+        tiktokPrice: 0,
+        shipping: 3.00,
+        monthlyVolume: p.trending ? 45000 : 18000,
+        trendScore: p.trending ? 9.0 : 7.5,
+        roiScore: parseFloat(Math.min((p.margin_pct / 10).toFixed(1), 9.9)),
+        competition: 'medium',
+        viral: p.trending ? 'high' : 'medium',
+        isNew: p.trending,
+        isTopPick: p.margin_pct >= 65,
+        topChannels: ['TikTok Organic', 'Pinterest Organic', 'YouTube Shorts'],
+        description: `Decision engine selected — ${p.niche || 'general'} niche. Margin: ${p.margin_pct}%.`,
+        tags: ['live-data', p.niche || 'general', p.trending ? 'trending' : 'stable'],
+        supplierSource: p.supplier || 'AliExpress',
+        winRate: `Margin: ${p.margin_pct}% · Profit/unit: $${p.profit_per_unit}`,
+        isLive: true,
+      }));
+      ALL_PRODUCTS.unshift(...converted);
+      dataSource = 'mixed';
+    }
+
+    // Update header stats from metrics
+    if (METRICS_DATA.revenue && METRICS_DATA.revenue.today_usd !== null) {
+      document.getElementById('liveRevBadge').textContent = `$${METRICS_DATA.revenue.today_usd} today`;
+      document.getElementById('liveRevBadge').style.color = 'var(--green)';
+    }
+    if (METRICS_DATA.sources) {
+      const src = METRICS_DATA.sources;
+      const allLive = src.stripe === 'live' && src.decisions !== 'unavailable';
+      document.getElementById('dataSourceBadge').textContent = allLive ? '⚡ LIVE' : '📦 CACHED';
+      document.getElementById('dataSourceBadge').style.color = allLive ? 'var(--green)' : 'var(--orange)';
+    }
+  } catch(e) {
+    // Metrics unavailable — use research data only
+    document.getElementById('dataSourceBadge').textContent = '📦 RESEARCH';
+  }
+}
+
+function nicheToCategory(niche) {
+  const map = {
+    'pet accessories':'pet', 'beauty skincare':'beauty', 'home kitchen':'kitchen',
+    'fitness tools':'fitness', 'desk organizers':'home', 'led grow lights':'home',
+    'outdoor camping':'fitness', 'general':'home'
+  };
+  return map[niche] || 'home';
+}
+function nicheToEmoji(niche) {
+  const map = {
+    'pet accessories':'🐾', 'beauty skincare':'💄', 'home kitchen':'🍳',
+    'fitness tools':'💪', 'desk organizers':'🖥️', 'led grow lights':'🌱',
+    'outdoor camping':'🏕️', 'general':'📦'
+  };
+  return map[niche] || '📦';
+}
 
 // ==========================================
 // STATE
@@ -665,7 +758,7 @@ function addProductCard(p, idx) {
 
   card.innerHTML = `
     ${p.isTopPick ? '<div class="top-pick-badge">🏆 TOP PICK</div>' : ''}
-    ${p.isNew ? '<div class="new-badge">NEW</div>' : ''}
+    ${p.isLive ? '<div class="new-badge" style="background:var(--green);color:#060b14">⚡ LIVE</div>' : (p.isNew ? '<div class="new-badge">NEW</div>' : '')}
     <div class="p-header">
       <div class="p-name">${p.emoji} ${p.name}</div>
       <div class="p-roi-badge" style="color:${roiColor}">${p.roiScore}</div>
@@ -875,135 +968,35 @@ function setView(v, btn) {
 // LAUNCH FROM DETAIL PANEL
 // ==========================================
 function openROICalculator(id) {
-  window.open('arbitrage-dashboard.html', '_blank');
+  window.open('/roi', '_self');
 }
 
 function openArbitrageEngine(id) {
   const p = ALL_PRODUCTS.find(x=>x.id===id);
   if(!p) return;
-  alert(`Channel Arbitrage for: ${p.name}\n\nTop Channels by ROI:\n${p.topChannels.map((ch,i)=>`${i+1}. ${ch} — Score: ${CHANNEL_SCORES[ch]?.score||7.5}/10`).join('\n')}\n\nUse the Arbitrage Dashboard to run full channel ROI projections.`);
+  alert(`Channel Arbitrage for: ${p.name}\n\nTop Channels by ROI:\n${p.topChannels.map((ch,i)=>`${i+1}. ${ch} — Score: ${CHANNEL_SCORES[ch]?.score||7.5}/10`).join('\n')}\n\nUse the Command Center to run full channel analysis.`);
 }
+
+// ==========================================
+// STARTUP — load metrics then ready UI
+// ==========================================
+(async () => {
+  await loadMetricsProducts();
+  // Update banner if live products loaded
+  const liveProdCount = ALL_PRODUCTS.filter(p => p.isLive).length;
+  if (liveProdCount > 0) {
+    document.getElementById('bannerLive').style.display = 'inline';
+    document.getElementById('bannerLive').textContent = `⚡ ${liveProdCount} live products from decision engine · `;
+    document.getElementById('dataBanner').style.background = 'rgba(34,211,160,.06)';
+    document.getElementById('dataBanner').style.borderBottomColor = 'rgba(34,211,160,.25)';
+    document.querySelector('#dataBanner span:first-child').textContent = `Research library: ${ALL_PRODUCTS.filter(p=>!p.isLive).length} cached + `;
+    document.querySelector('#dataBanner span:first-child').style.color = 'var(--muted)';
+  }
+  // Update total product count in filters
+  document.getElementById('cnt-all').textContent = '0';
+})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ANTHROPIC CLAUDE CHAT — WIRED IN                   -->
-<!-- ═══════════════════════════════════════════════════ -->
-<style>
-#ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
-#ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
-#ai-chat-btn svg{width:26px;height:26px;fill:white}
-#ai-chat-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-height:560px;background:#0d1117;border:1px solid #21262d;border-radius:16px;box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
-#ai-chat-panel.open{display:flex}
-#ai-chat-header{background:#161b22;border-bottom:1px solid #21262d;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
-#ai-chat-header .title{font-size:14px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
-#ai-chat-header .dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;animation:cpulse 2s infinite}
-@keyframes cpulse{0%,100%{opacity:1}50%{opacity:.4}}
-#ai-chat-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
-#ai-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:380px}
-#ai-chat-msgs::-webkit-scrollbar{width:4px}
-#ai-chat-msgs::-webkit-scrollbar-track{background:transparent}
-#ai-chat-msgs::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
-.cm{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;max-width:88%;word-wrap:break-word}
-.cm-user{background:#1f3461;color:#e6edf3;align-self:flex-end;border-radius:12px 12px 2px 12px}
-.cm-ai{background:#161b22;color:#c9d1d9;border:1px solid #21262d;align-self:flex-start;border-radius:12px 12px 12px 2px}
-.cm-ai strong{color:#7c3aed}
-.cm-typing{color:#8b949e;font-style:italic;font-size:12px}
-#ai-chat-input-row{border-top:1px solid #21262d;padding:12px;display:flex;gap:8px;background:#0d1117}
-#ai-chat-input{flex:1;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:inherit;resize:none;height:38px;line-height:1.4}
-#ai-chat-input:focus{border-color:#7c3aed}
-#ai-chat-send{background:#7c3aed;border:none;color:white;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:background .2s}
-#ai-chat-send:hover{background:#6d28d9}
-#ai-chat-send:disabled{background:#374151;cursor:not-allowed}
-</style>
-
-<button id="ai-chat-btn" title="Ask Claude AI" onclick="toggleChat()">
-  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
-</button>
-
-<div id="ai-chat-panel">
-  <div id="ai-chat-header">
-    <div class="title"><span class="dot"></span>Claude AI — Drop Ship Intel</div>
-    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
-  </div>
-  <div id="ai-chat-msgs">
-    <div class="cm cm-ai">Hey Alex 👋 I'm your Drop Ship AI. Ask me anything — products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
-  </div>
-  <div id="ai-chat-input-row">
-    <input id="ai-chat-input" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
-    <button id="ai-chat-send" onclick="sendChat()">Send</button>
-  </div>
-</div>
-
-<script>
-(function(){
-  const PAGE_CONTEXT = document.title || 'Dropship OS';
-  
-  function toggleChat(){
-    const p = document.getElementById('ai-chat-panel');
-    p.classList.toggle('open');
-    if(p.classList.contains('open')) document.getElementById('ai-chat-input').focus();
-  }
-  window.toggleChat = toggleChat;
-
-  function addMsg(text, role){
-    const msgs = document.getElementById('ai-chat-msgs');
-    const div = document.createElement('div');
-    div.className = 'cm ' + (role==='user' ? 'cm-user' : 'cm-ai');
-    div.textContent = text;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-    return div;
-  }
-
-  const history = [];
-
-  async function sendChat(){
-    const input = document.getElementById('ai-chat-input');
-    const btn   = document.getElementById('ai-chat-send');
-    const text  = input.value.trim();
-    if(!text) return;
-
-    addMsg(text, 'user');
-    history.push({role:'user', content:text});
-    input.value = '';
-    btn.disabled = true;
-
-    const typing = addMsg('Thinking…', 'ai');
-    typing.classList.add('cm-typing');
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          messages: history,
-          context: PAGE_CONTEXT
-        })
-      });
-
-      const data = await res.json();
-
-      if(!res.ok || data.error){
-        typing.textContent = data.error || 'Error — check your ANTHROPIC_API_KEY in Vercel env vars.';
-        typing.style.color = '#f87171';
-      } else {
-        const reply = data.content;
-        typing.textContent = reply;
-        typing.classList.remove('cm-typing');
-        history.push({role:'assistant', content:reply});
-      }
-    } catch(e) {
-      typing.textContent = 'Connection error. Make sure ANTHROPIC_API_KEY is set in Vercel → Settings → Environment Variables.';
-      typing.style.color = '#f87171';
-    }
-
-    btn.disabled = false;
-    document.getElementById('ai-chat-msgs').scrollTop = 99999;
-    input.focus();
-  }
-  window.sendChat = sendChat;
-})();
-</script>
-
-</body>
-</html>
+<!-- ══�

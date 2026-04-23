@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prometheus Creation Studio — Dropship OS</title>
+<style>
+:root{
+  --bg:#07090f;--card:#0e1420;--card2:#131c2b;--border:#1a2d47;
+  --blue:#38bdf8;--green:#22d3a0;--orange:#f59e0b;--red:#f43f5e;
+  --purple:#a78bfa;--gold:#f5c842;--fire:#ff6b35;
+  --text:#e2f0ff;--muted:#5d7fa8;--input:#080f1c;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;overflow-x:hidden;}
+
+/* HEADER */
+.hdr{background:linear-gradient(90deg,#07090f 0%,#0d1525 40%,#1a0a2e 100%);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:42px;height:42px;background:linear-gradient(135deg,#ff6b35,#7c3aed);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(255,107,53,.4);}
+.logo-text{font-size:17px;font-weight:900;letter-spacing:1px;background:linear-gradient(90deg,#ff6b35,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:2px;}
+.hdr-nav{display:flex;gap:6px;}
+.nav-link{padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);text-decoration:none;transition:all .2s;}
+.nav-link:hover{background:var(--card);color:var(--text);}
+.nav-link.active{background:rgba(255,107,53,.15);color:var(--fire);border:1px solid rgba(255,107,53,.3);}
+
+/* PIPELINE STEPS */
+.pipeline{background:var(--card);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:stretch;overflow-x:auto;}
+.step{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:all .2s;position:relative;}
+.step:hover{background:var(--card2);}
+.step.active{border-bottom-color:var(--fire);}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.step.active .step-num{background:var(--fire);color:#fff;}
+.step.done .step-num{background:var(--green);color:#060b14;}
+.step-label{font-size:12px;font-weight:600;color:var(--muted);}
+.step.active .step-label{color:var(--text);}
+.step.done .step-label{color:var(--green);}
+.step-arrow{color:var(--border);font-size:18px;padding:0 4px;}
+
+/* MAIN LAYOUT */
+.main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 60px - 54px);gap:0;}
+
+/* LEFT PANEL */
+.left-panel{background:var(--card);border-right:1px solid var(--border);overflow-y:auto;}
+.panel-section{padding:18px;border-bottom:1px solid var(--border);}
+.panel-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--fire);margin-bottom:12px;}
+
+/* PRODUCT INPUT */
+.url-input-wrap{display:flex;gap:8px;}
+.url-input{flex:1;background:var(--input);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;outline:none;}
+.url-input:focus{border-color:var(--blue);}
+.url-input::placeholder{color:var(--muted);}
+.scrape-btn{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.scrape-btn:hover{opacity:.85;}
+.scrape-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* PRODUCT CARD */
+.product-preview{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:12px;display:none;}
+.product-preview.visible{display:block;}
+.prod-name{font-size:15px;font-weight:700;margin-bottom:6px;}
+.prod-price{font-size:22px;font-weight:900;color:var(--green);margin-bottom:8px;}
+.prod-meta{font-size:11px;color:var(--muted);line-height:1.7;}
+.prod-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:var(--blue);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;margin:2px;}
+
+/* IMAGE SEARCH */
+.img-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px;}
+.img-item{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;aspect-ratio:1;}
+.img-item img{width:100%;height:100%;object-fit:cover;}
+.img-item .img-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);padding:4px 6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.img-item.selected{border-color:var(--fire);box-shadow:0 0 0 1px var(--fire);}
+.img-item .rank-badge{position:absolute;top:6px;left:6px;background:var(--fire);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;}
+.img-rank-1 .rank-badge{background:#f5c842;color:#000;}
+.img-rank-2 .rank-badge{background:#f43f5e;}
+.img-rank-3 .rank-badge{background:#7c3aed;}
+.img-rank-4 .rank-badge{background:#5d7fa8;}
+
+/* SCRIPT PANEL */
+.script-box{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:12px;min-height:120px;font-size:12px;line-height:1.7;color:var(--text);outline:none;resize:vertical;width:100%;font-family:inherit;}
+.script-box:focus{border-color:var(--purple);}
+
+/* RIGHT PANEL - STAGE CONTENT */
+.stage{display:none;padding:24px 28px;}
+.stage.active{display:block;}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:16px;padding:60px 40px;text-align:center;cursor:pointer;transition:all .3s;background:var(--card2);}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--fire);background:rgba(255,107,53,.05);}
+.upload-icon{font-size:56px;margin-bottom:16px;opacity:.5;}
+.upload-title{font-size:18px;font-weight:700;margin-bottom:6px;}
+.upload-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.upload-btn{background:linear-gradient(135deg,var(--fire),var(--purple));border:none;color:#fff;padding:12px 28px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;}
+
+/* VIDEO PREVIEW */
+.video-preview{display:none;margin-top:20px;}
+.video-preview video{width:100%;border-radius:12px;border:1px solid var(--border);}
+.video-info{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;}
+.video-chip{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:11px;color:var(--muted);}
+.video-chip span{color:var(--text);font-weight:700;}
+
+/* PIPELINE GRID */
+.clip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px;}
+.clip-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.clip-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);}
+.clip-platform{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;}
+.clip-platform .plat-icon{font-size:18px;}
+.clip-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;}
+.status-waiting{background:rgba(93,127,168,.15);color:var(--muted);}
+.status-running{background:rgba(56,189,248,.15);color:var(--blue);animation:blink 1.5s infinite;}
+.status-done{background:rgba(34,211,160,.15);color:var(--green);}
+.status-error{background:rgba(244,63,94,.15);color:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.clip-body{padding:12px 14px;}
+.clip-format{font-size:11px;color:var(--muted);margin-bottom:6px;}
+.clip-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.clip-bar-fill{height:100%;background:linear-gradient(90deg,var(--fire),var(--purple));border-radius:2px;width:0%;transition:width .5s;}
+.clip-preview-thumb{width:100%;aspect-ratio:9/16;background:var(--card2);border-radius:8px;margin-top:10px;display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--muted);display:none;}
+.clip-actions{display:flex;gap:6px;margin-top:10px;}
+.clip-btn{flex:1;padding:7px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;text-align:center;}
+.btn-approve{background:rgba(34,211,160,.15);color:var(--green);border:1px solid rgba(34,211,160,.3);}
+.btn-approve:hover{background:rgba(34,211,160,.25);}
+.btn-edit{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+.btn-edit:hover{color:var(--text);}
+.btn-reject{background:rgba(244,63,94,.1);color:var(--red);border:1px solid rgba(244,63,94,.2);}
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:16px;}
+.cal-day-hdr{text-align:center;font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;padding:6px;}
+.cal-day{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 8px;min-height:80px;cursor:pointer;transition:border-color .2s;}
+.cal-day:hover{border-color:var(--blue);}
+.cal-day.today{border-color:var(--fire);}
+.cal-date{font-size:11px;font-weight:700;margin-bottom:6px;}
+.cal-post{background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:2px 5px;font-size:9px;font-weight:600;color:var(--fire);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cal-post.approved{background:rgba(34,211,160,.12);border-color:rgba(34,211,160,.3);color:var(--green);}
+
+/* RUN BTN */
+.run-btn{background:linear-gradient(135deg,var(--fire),var(--purple));border:none;color:#fff;padding:14px 32px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;letter-spacing:.5px;display:flex;align-items:center;gap:10px;transition:opacity .2s;box-shadow:0 4px 20px rgba(255,107,53,.3);}
+.run-btn:hover{opacity:.9;}
+.run-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* METRICS ROW */
+.metrics-row{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap;}
+.metric-pill{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 18px;display:flex;flex-direction:column;gap:4px;}
+.metric-pill-val{font-size:24px;font-weight:800;}
+.metric-pill-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+
+/* API STATUS */
+.api-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:12px;}
+.api-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.api-name{font-size:12px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.api-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.api-dot.live{background:var(--green);}
+.api-dot.pending{background:var(--orange);}
+.api-dot.offline{background:var(--muted);}
+.api-cost{font-size:10px;color:var(--muted);}
+.api-key-required{font-size:9px;color:var(--orange);margin-top:2px;}
+
+/* TABS */
+.stage-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.stage-tab{padding:10px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;}
+.stage-tab:hover{color:var(--text);}
+.stage-tab.active{color:var(--fire);border-bottom-color:var(--fire);}
+
+/* SECTION HEADING */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-title{font-size:18px;font-weight:800;}
+.sec-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+@media(max-width:900px){.main{grid-template-columns:1fr;}.left-panel{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-icon">🔥</div>
+    <div>
+      <div class="logo-text">PROMETHEUS</div>
+      <div class="logo-sub">CREATION STUDIO</div>
+    </div>
+  </div>
+  <div class="hdr-nav">
+    <a class="nav-link" href="/">⚡ Command</a>
+    <a class="nav-link" href="/roi">📊 ROI Finder</a>
+    <a class="nav-link" href="/playbook">📋 Playbook</a>
+    <a class="nav-link active" href="/content">🔥 Prometheus</a>
+    <a class="nav-link" href="/hormozi">💰 Hormozi</a>
+  </div>
+</div>
+
+<!-- PIPELINE STEPS -->
+<div class="pipeline">
+  <div class="step active" id="step-0" onclick="goStep(0)">
+    <div class="step-num">0</div>
+    <div class="step-label">Pillar Builder</div>
+  </div>
+  <div class="step-arrow">›</div>
+  <div class="step" id="step-1" onclick="goStep(1)">
+    <div class="step-num">1</div>
+    <div class="step-label">Upload Pillar Video</div>
+  </div>
+  <div class="step-arrow">›</div>
+  <div class="step" id="step-2" onclick="goStep(2)">
+    <div class="step-num">2</div>
+    <div class="step-label">Run Pipeline</div>
+  </div>
+  <div class="step-arrow">›</div>
+  <div class="step" id="step-3" onclick="goStep(3)">
+    <div class="step-num">3</div>
+    <div class="step-label">Approve & Edit</div>
+  </div>
+  <div class="step-arrow">›</div>
+  <div class="step" id="step-4" onclick="goStep(4)">
+    <div class="step-num">4</div>
+    <div class="step-label">Push to Calendar</div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:16px;padding:0 8px;">
+    <div id="pipeline-status" style="font-size:11px;color:var(--muted)">Ready — paste product URL or upload video to begin</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+
+  <!-- STEP 0: PILLAR BUILDER -->
+  <div class="panel-section" id="left-step-0">
+    <div class="panel-title">🔗 Product URL → Pillar Script</div>
+    <div class="url-input-wrap">
+      <input class="url-input" id="productUrl" type="url" placeholder="Paste AliExpress / Shopify / Amazon URL…">
+      <button class="scrape-btn" id="scrapeBtn" onclick="scrapeProduct()">⚡ Build</button>
+    </div>
+
+    <div class="product-preview" id="productPreview">
+      <div class="prod-name" id="prodName">—</div>
+      <div class="prod-price" id="prodPrice">$—</div>
+      <div class="prod-meta" id="prodMeta">—</div>
+      <div id="prodPills" style="margin-top:8px;"></div>
+    </div>
+
+    <div id="imgSearchSection" style="display:none;margin-top:14px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">
+        🖼 Select Hero Image — <span style="color:var(--fire)">Rank by: Funny &gt; Emotional &gt; Amazing &gt; Practical</span>
+      </div>
+      <div class="img-grid" id="imgGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <div id="scriptSection" style="display:none;margin-top:14px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">
+        📝 AI-Generated Script (Ollama qwen2.5:7b)
+      </div>
+      <textarea class="script-box" id="scriptBox" placeholder="Script will appear here after scraping…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="regenerateScript()" style="flex:1;padding:8px;background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🔄 Regenerate</button>
+        <button onclick="goStep(1)" style="flex:1;padding:8px;background:linear-gradient(135deg,var(--fire),var(--purple));border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Next → Upload ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1: VIDEO UPLOAD META -->
+  <div class="panel-section" id="left-step-1" style="display:none;">
+    <div class="panel-title">📹 Pillar Video Details</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.6;">
+      Upload your pillar video on the right →<br>
+      The pipeline will auto-detect duration and extract clips at the highest-energy moments.
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">Target Platforms</div>
+      <div id="platformCheckboxes">
+        <label style="display:block;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--fire);margin-right:8px;"> TikTok (9:16 · 30–60s)</label>
+        <label style="display:block;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--fire);margin-right:8px;"> Instagram Reels (9:16 · 15–30s)</label>
+        <label style="display:block;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--fire);margin-right:8px;"> YouTube Shorts (9:16 · 60s)</label>
+        <label style="display:block;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--fire);margin-right:8px;"> Pinterest (2:3 · 30s)</label>
+        <label style="display:block;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--fire);margin-right:8px;"> Facebook Reels (9:16 · 30s)</label>
+        <label style="display:block;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--fire);margin-right:8px;"> X / Twitter (16:9 · 45s)</label>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">Hook Type</div>
+      <select style="width:100%;background:var(--input);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:12px;outline:none;" id="hookType">
+        <option value="pain">😤 Pain Hook — "Why you're suffering"</option>
+        <option value="before-after">✨ Before/After — Visual transformation</option>
+        <option value="contrarian">🔥 Contrarian — "Everyone does this wrong"</option>
+        <option value="curiosity">👀 Curiosity — "You won't believe..."</option>
+        <option value="identity">🎯 Identity — "If you [are X] watch this"</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- STEP 2: PIPELINE SETTINGS -->
+  <div class="panel-section" id="left-step-2" style="display:none;">
+    <div class="panel-title">⚙️ Pipeline Settings</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+      <div>🎙️ Voice: <span style="color:var(--text);" id="voiceStatus">ElevenLabs (pending API key)</span></div>
+      <div>🎵 Music: <span style="color:var(--text);" id="musicStatus">Suno AI (pending API key)</span></div>
+      <div>🎬 B-Roll: <span style="color:var(--text);" id="brollStatus">Seedance 2.0 (pending Atlas key)</span></div>
+      <div>✂️ Cuts: <span style="color:var(--green);">FFmpeg (local)</span></div>
+      <div>📝 Captions: <span style="color:var(--green);">Whisper (local)</span></div>
+    </div>
+    <div style="margin-top:12px;padding:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:11px;color:var(--orange);">
+      ⚠️ Add API keys in Vercel env vars to unlock AI generation. Without them, pipeline runs cuts + captions only.
+    </div>
+  </div>
+
+  <!-- STEP 3: APPROVE PANEL -->
+  <div class="panel-section" id="left-step-3" style="display:none;">
+    <div class="panel-title">✅ Approval Queue</div>
+    <div id="approvalStats" style="font-size:12px;color:var(--muted);line-height:1.8;">
+      <div>Approved: <span id="approvedCount" style="color:var(--green);font-weight:700;">0</span></div>
+      <div>Pending: <span id="pendingCount" style="color:var(--orange);font-weight:700;">0</span></div>
+      <div>Rejected: <span id="rejectedCount" style="color:var(--red);font-weight:700;">0</span></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button onclick="approveAll()" style="width:100%;padding:10px;background:rgba(34,211,160,.15);border:1px solid rgba(34,211,160,.3);color:var(--green);border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">✅ Approve All</button>
+    </div>
+    <div style="margin-top:6px;">
+      <button onclick="goStep(4)" style="width:100%;padding:10px;background:linear-gradient(135deg,var(--fire),var(--purple));border:none;color:#fff;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;">📅 Push to Calendar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: CALENDAR PANEL -->
+  <div class="panel-section" id="left-step-4" style="display:none;">
+    <div class="panel-title">📅 Calendar Settings</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+      <div>Schedule: <span style="color:var(--text);">Auto (best times)</span></div>
+      <div>Spread: <span style="color:var(--text);">6 posts over 3 days</span></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button onclick="pushToCalendar()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--fire),var(--purple));border:none;color:#fff;border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;letter-spacing:.5px;">🚀 SCHEDULE ALL APPROVED</button>
+    </div>
+  </div>
+
+</div>
+<!-- END LEFT PANEL -->
+
+<!-- RIGHT STAGES -->
+<div style="overflow-y:auto;">
+
+  <!-- STAGE 0: PILLAR BUILDER -->
+  <div class="stage active" id="stage-0">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">🔥 Prometheus Pillar Builder</div>
+        <div class="sec-sub">Paste a product listing URL → Prometheus scrapes, finds the best image, writes your script with Ollama</div>
+      </div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric-pill"><div class="metric-pill-val" id="metricVideos">0</div><div class="metric-pill-lbl">Videos Created</div></div>
+      <div class="metric-pill"><div class="metric-pill-val" id="metricPosts">0</div><div class="metric-pill-lbl">Posts Scheduled</div></div>
+      <div class="metric-pill"><div class="metric-pill-val" id="metricApproved">0</div><div class="metric-pill-lbl">Approved</div></div>
+      <div class="metric-pill"><div class="metric-pill-val" style="color:var(--green)">$0</div><div class="metric-pill-lbl">Rev This Week</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--fire);">Step 0 — How It Works</div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:18px;">
+          <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--fire);flex-shrink:0;">1</div>
+            <div><div style="font-size:12px;font-weight:700;">Paste product URL</div><div style="font-size:11px;color:var(--muted);">AliExpress, Amazon, Shopify, CJ — any listing</div></div>
+          </div>
+          <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--fire);flex-shrink:0;">2</div>
+            <div><div style="font-size:12px;font-weight:700;">Image search ranks by virality</div><div style="font-size:11px;color:var(--muted);">#1 Funny · #2 Emotional · #3 Amazing · #4 Practical</div></div>
+          </div>
+          <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="width:28px;height:28px;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--fire);flex-shrink:0;">3</div>
+            <div><div style="font-size:12px;font-weight:700;">Ollama generates script</div><div style="font-size:11px;color:var(--muted);">qwen2.5:7b writes hook + body + CTA using Gary Vee framework</div></div>
+          </div>
+          <div style="display:flex;gap:12px;padding:10px 0;">
+            <div style="width:28px;height:28px;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--fire);flex-shrink:0;">4</div>
+            <div><div style="font-size:12px;font-weight:700;">Record or upload your pillar video →</div><div style="font-size:11px;color:var(--muted);">Step 1 cuts it into 6 platform clips automatically</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--purple);">AI Stack Status</div>
+        <div class="api-grid">
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot live"></div>Ollama (local)</div>
+            <div class="api-cost">Free · qwen2.5:7b</div>
+            <div style="font-size:9px;color:var(--green);margin-top:2px;">Script generation ✓</div>
+          </div>
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot live"></div>Whisper (local)</div>
+            <div class="api-cost">Free · faster-whisper</div>
+            <div style="font-size:9px;color:var(--green);margin-top:2px;">Captions + timestamps ✓</div>
+          </div>
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot live"></div>FFmpeg (local)</div>
+            <div class="api-cost">Free · video cuts</div>
+            <div style="font-size:9px;color:var(--green);margin-top:2px;">Clip extraction ✓</div>
+          </div>
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot pending"></div>ElevenLabs</div>
+            <div class="api-cost">~$5/mo · AI voiceover</div>
+            <div class="api-key-required">⚠ Add ELEVENLABS_API_KEY</div>
+          </div>
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot pending"></div>Suno AI</div>
+            <div class="api-cost">$30/mo · background music</div>
+            <div class="api-key-required">⚠ Add SUNO_API_KEY</div>
+          </div>
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot pending"></div>Seedance 2.0</div>
+            <div class="api-cost">~$0.02–0.05/video</div>
+            <div class="api-key-required">⚠ Add ATLAS_CLOUD_KEY</div>
+          </div>
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot offline"></div>HeyGen Avatar</div>
+            <div class="api-cost">$29/mo · AI presenter</div>
+            <div class="api-key-required">⚠ Add HEYGEN_API_KEY</div>
+          </div>
+          <div class="api-card">
+            <div class="api-name"><div class="api-dot offline"></div>Pexels / Unsplash</div>
+            <div class="api-cost">Free tier · stock images</div>
+            <div class="api-key-required">⚠ Add PEXELS_API_KEY</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 1: UPLOAD -->
+  <div class="stage" id="stage-1">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">📹 Upload Your Pillar Video</div>
+        <div class="sec-sub">Record your main video in IG or wherever you feel natural, then upload it here — Prometheus cuts it into 6 platform clips</div>
+      </div>
+      <button class="run-btn" onclick="goStep(2)" style="white-space:nowrap;">Run Pipeline →</button>
+    </div>
+
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+      <div class="upload-icon">🎬</div>
+      <div class="upload-title">Drop your pillar video here</div>
+      <div class="upload-sub">MP4, MOV, AVI — any length · Prometheus finds the best moments</div>
+      <button class="upload-btn">📁 Browse Files</button>
+    </div>
+    <input type="file" id="fileInput" accept="video/*" style="display:none" onchange="handleFileSelect(event)">
+
+    <div class="video-preview" id="videoPreview">
+      <video id="previewVideo" controls></video>
+      <div class="video-info">
+        <div class="video-chip">Duration: <span id="vidDuration">—</span></div>
+        <div class="video-chip">Size: <span id="vidSize">—</span></div>
+        <div class="video-chip">Format: <span id="vidFormat">—</span></div>
+        <div class="video-chip" style="margin-left:auto;">
+          <button onclick="goStep(2)" style="background:linear-gradient(135deg,var(--fire),var(--purple));border:none;color:#fff;padding:6px 14px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;">⚡ Run Pipeline →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 2: PIPELINE -->
+  <div class="stage" id="stage-2">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">⚡ Prometheus Pipeline</div>
+        <div class="sec-sub">Cutting 6 clips · Adding captions · Generating voiceover + music</div>
+      </div>
+      <button class="run-btn" id="runPipelineBtn" onclick="runPipeline()">🔥 RUN PIPELINE</button>
+    </div>
+
+    <div class="clip-grid" id="clipGrid">
+      <!-- Built by JS -->
+    </div>
+  </div>
+
+  <!-- STAGE 3: APPROVE -->
+  <div class="stage" id="stage-3">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">✅ Approve & Edit</div>
+        <div class="sec-sub">Review each clip before it goes to your calendar — approve, edit, or reject</div>
+      </div>
+    </div>
+    <div id="approveGrid" class="clip-grid">
+      <!-- Built by JS after pipeline runs -->
+    </div>
+  </div>
+
+  <!-- STAGE 4: CALENDAR -->
+  <div class="stage" id="stage-4">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">📅 Content Calendar</div>
+        <div class="sec-sub">Approved posts scheduled for optimal posting times — <span style="color:var(--fire)">0</span> posts queued</div>
+      </div>
+      <button class="run-btn" onclick="alert('Connect social APIs to enable auto-posting. See API keys in .env')">🚀 Post All Now</button>
+    </div>
+
+    <!-- Calendar week -->
+    <div class="cal-grid">
+      <div class="cal-day-hdr">SUN</div>
+      <div class="cal-day-hdr">MON</div>
+      <div class="cal-day-hdr">TUE</div>
+      <div class="cal-day-hdr">WED</div>
+      <div class="cal-day-hdr">THU</div>
+      <div class="cal-day-hdr">FRI</div>
+      <div class="cal-day-hdr">SAT</div>
+    </div>
+    <div class="cal-grid" id="calDays" style="margin-top:4px;">
+      <!-- Built by JS -->
+    </div>
+
+    <div style="margin-top:24px;padding:20px;background:var(--card2);border:1px solid var(--border);border-radius:12px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--muted);">Connect to Enable Auto-Posting</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+        <div class="api-card"><div class="api-name"><div class="api-dot offline"></div>TikTok API</div><div class="api-key-required">⚠ Add TIKTOK_ACCESS_TOKEN</div></div>
+        <div class="api-card"><div class="api-name"><div class="api-dot offline"></div>Instagram / Meta</div><div class="api-key-required">⚠ Add META_ACCESS_TOKEN</div></div>
+        <div class="api-card"><div class="api-name"><div class="api-dot offline"></div>YouTube</div><div class="api-key-required">⚠ Add YOUTUBE_REFRESH_TOKEN</div></div>
+        <div class="api-card"><div class="api-name"><div class="api-dot offline"></div>Pinterest</div><div class="api-key-required">⚠ Add PINTEREST_ACCESS_TOKEN</div></div>
+        <div class="api-card"><div class="api-name"><div class="api-dot offline"></div>Reddit</div><div class="api-key-required">⚠ Add REDDIT_CLIENT_SECRET</div></div>
+        <div class="api-card"><div class="api-name"><div class="api-dot offline"></div>X / Twitter</div><div class="api-key-required">⚠ Add X_ACCESS_TOKEN</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end right stages -->
+</div><!-- end main -->
+
+<script>
+// ============================================================
+// STEP NAVIGATION
+// ============================================================
+let currentStep = 0;
+const STEPS = 5;
+
+function goStep(n) {
+  currentStep = n;
+  for (let i = 0; i < STEPS; i++) {
+    const s = document.getElementById(`step-${i}`);
+    const st = document.getElementById(`stage-${i}`);
+    const ls = document.getElementById(`left-step-${i}`);
+    if (s) s.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    if (st) st.className = 'stage' + (i === n ? ' active' : '');
+    if (ls) ls.style.display = i === n ? 'block' : 'none';
+  }
+}
+
+// Init left panel visibility
+for (let i = 0; i < STEPS; i++) {
+  const ls = document.getElementById(`left-step-${i}`);
+  if (ls) ls.style.display = i === 0 ? 'block' : 'none';
+}
+
+// ============================================================
+// PILLAR BUILDER — Step 0
+// ============================================================
+const DEMO_PRODUCTS = {
+  default: {
+    name: "Silicone Pet Deshedding Glove",
+    price: "$12.99",
+    meta: "Supplier: $1.20 · Margin: 73% · Category: Pet · Trend: 🔥 High\nMonthly volume: 49,000 · Competition: Low · Platform fit: TikTok, Pinterest, Reddit",
+    pills: ["impulse buy","pet owners","viral demo","proven seller"],
+    images: [
+      { label: "😂 Funny #1", url: "https://via.placeholder.com/200x200/ff6b35/fff?text=😂+Funny", rank: 1 },
+      { label: "💕 Emotional #2", url: "https://via.placeholder.com/200x200/f43f5e/fff?text=💕+Emotional", rank: 2 },
+      { label: "🤩 Amazing #3", url: "https://via.placeholder.com/200x200/7c3aed/fff?text=🤩+Amazing", rank: 3 },
+      { label: "🔧 Practical #4", url: "https://via.placeholder.com/200x200/5d7fa8/fff?text=🔧+Practical", rank: 4 },
+    ],
+    script: `HOOK (0–3s):
+"My dog was shedding EVERYWHERE until I found this."
+
+BODY (3–20s):
+This silicone deshedding glove removes pet hair while petting your dog. It feels like a normal petting session for them — you're just also collecting all that fur in one glove.
+
+No more fur on your couch. No more fur on your clothes. And your dog actually LIKES it.
+
+PROOF (20–30s):
+Look at how much fur came off in one session. That was all going on my furniture. Not anymore.
+
+CTA (30–35s):
+Link in bio — it's only $12 and ships free. Save this for later — your carpet will thank you.
+
+HASHTAGS: #petcare #doglife #doghacks #petproducts #tiktokmademebuyit #dogmom`
+  }
+};
+
+async function scrapeProduct() {
+  const url = document.getElementById('productUrl').value.trim();
+  const btn = document.getElementById('scrapeBtn');
+
+  if (!url) {
+    alert('Please paste a product URL first.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Scraping…';
+  document.getElementById('pipeline-status').textContent = 'Scraping product data…';
+
+  // In production: POST to /api/scrape with the URL
+  // For now: simulate with demo data
+  await new Promise(r => setTimeout(r, 1800));
+
+  const prod = DEMO_PRODUCTS.default;
+  document.getElementById('prodName').textContent = prod.name;
+  document.getElementById('prodPrice').textContent = prod.price;
+  document.getElementById('prodMeta').textContent = prod.meta;
+
+  const pillsEl = document.getElementById('prodPills');
+  pillsEl.innerHTML = prod.pills.map(p => `<span class="prod-pill">${p}</span>`).join('');
+
+  document.getElementById('productPreview').classList.add('visible');
+
+  // Simulate image search with virality ranking
+  document.getElementById('imgSearchSection').style.display = 'block';
+  const grid = document.getElementById('imgGrid');
+  grid.innerHTML = '';
+  prod.images.forEach((img, i) => {
+    const div = document.createElement('div');
+    div.className = `img-item img-rank-${img.rank}`;
+    div.onclick = () => {
+      document.querySelectorAll('.img-item').forEach(el => el.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    div.innerHTML = `
+      <div style="width:100%;aspect-ratio:1;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:36px;border-radius:6px;">${img.label.split(' ')[0]}</div>
+      <div class="img-label" style="color:#fff;">${img.label}</div>
+      <div class="rank-badge">#${img.rank}</div>`;
+    if (i === 0) div.classList.add('selected'); // Auto-select #1 Funny
+    grid.appendChild(div);
+  });
+
+  // Generate script
+  await new Promise(r => setTimeout(r, 1200));
+  document.getElementById('scriptSection').style.display = 'block';
+  document.getElementById('scriptBox').value = '';
+  // Typewriter effect
+  const script = prod.script;
+  let si = 0;
+  const typeInterval = setInterval(() => {
+    if (si >= script.length) { clearInterval(typeInterval); return; }
+    document.getElementById('scriptBox').value += script[si];
+    si += 3;
+    document.getElementById('scriptBox').scrollTop = 9999;
+  }, 20);
+
+  btn.disabled = false;
+  btn.textContent = '⚡ Build';
+  document.getElementById('pipeline-status').textContent = 'Product scraped · Script ready · Select image and record your video';
+}
+
+async function regenerateScript() {
+  const box = document.getElementById('scriptBox');
+  box.value = 'Regenerating with Ollama qwen2.5:7b…';
+  await new Promise(r => setTimeout(r, 1500));
+  box.value = DEMO_PRODUCTS.default.script;
+  document.getElementById('pipeline-status').textContent = 'Script regenerated';
+}
+
+// ============================================================
+// UPLOAD — Step 1
+// ============================================================
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  showVideoPreview(file);
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('video/')) showVideoPreview(file);
+}
+function showVideoPreview(file) {
+  const preview = document.getElementById('videoPreview');
+  const video = document.getElementById('previewVideo');
+  const url = URL.createObjectURL(file);
+  video.src = url;
+  preview.style.display = 'block';
+  document.getElementById('vidSize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+  document.getElementById('vidFormat').textContent = file.type.replace('video/', '').toUpperCase();
+  video.onloadedmetadata = () => {
+    const d = Math.floor(video.duration);
+    document.getElementById('vidDuration').textContent = `${Math.floor(d/60)}:${(d%60).toString().padStart(2,'0')}`;
+  };
+  document.getElementById('pipeline-status').textContent = 'Video loaded — click "Run Pipeline →"';
+}
+
+// ============================================================
+// PIPELINE — Step 2
+// ============================================================
+const PLATFORMS = [
+  { name: 'TikTok',          icon: '🎵', format: '9:16 · 30–45s', color: '#38bdf8' },
+  { name: 'Instagram Reels', icon: '📸', format: '9:16 · 15–30s', color: '#a78bfa' },
+  { name: 'YouTube Shorts',  icon: '▶️', format: '9:16 · 60s',    color: '#f59e0b' },
+  { name: 'Pinterest',       icon: '📌', format: '2:3 · 30s',     color: '#f43f5e' },
+  { name: 'Facebook',        icon: '👍', format: '9:16 · 30s',    color: '#60a5fa' },
+  { name: 'X / Twitter',     icon: '𝕏',  format: '16:9 · 45s',   color: '#e2f0ff' },
+];
+
+let clipStates = PLATFORMS.map(() => ({ status: 'waiting', approved: false }));
+
+function buildClipGrid(container) {
+  container.innerHTML = '';
+  PLATFORMS.forEach((p, i) => {
+    const state = clipStates[i];
+    const card = document.createElement('div');
+    card.className = 'clip-card';
+    card.id = `clip-${i}`;
+    card.innerHTML = `
+      <div class="clip-header">
+        <div class="clip-platform"><span class="plat-icon">${p.icon}</span>${p.name}</div>
+        <span class="clip-status status-${state.status}" id="clip-status-${i}">${state.status === 'waiting' ? 'Waiting' : state.status === 'running' ? 'Processing…' : state.status === 'done' ? '✓ Ready' : 'Error'}</span>
+      </div>
+      <div class="clip-body">
+        <div class="clip-format" style="color:${p.color}">${p.format}</div>
+        <div class="clip-bar" style="margin-top:8px;"><div class="clip-bar-fill" id="clip-bar-${i}"></div></div>
+        ${state.status === 'done' ? `
+          <div class="clip-actions">
+            <button class="clip-btn btn-approve" onclick="approveClip(${i})">${clipStates[i].approved ? '✅ Approved' : '✓ Approve'}</button>
+            <button class="clip-btn btn-edit" onclick="editClip(${i})">✎ Edit</button>
+            <button class="clip-btn btn-reject" onclick="rejectClip(${i})">✗</button>
+          </div>` : ''}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function runPipeline() {
+  document.getElementById('runPipelineBtn').disabled = true;
+  document.getElementById('runPipelineBtn').textContent = '⚡ Running…';
+  document.getElementById('pipeline-status').textContent = 'Pipeline running — cutting clips…';
+
+  buildClipGrid(document.getElementById('clipGrid'));
+
+  PLATFORMS.forEach((p, i) => {
+    setTimeout(async () => {
+      // Start
+      clipStates[i].status = 'running';
+      document.getElementById(`clip-status-${i}`).className = 'clip-status status-running';
+      document.getElementById(`clip-status-${i}`).textContent = 'Processing…';
+
+      // Progress bar animation
+      let pct = 0;
+      const barInterval = setInterval(() => {
+        pct += 3;
+        const bar = document.getElementById(`clip-bar-${i}`);
+        if (bar) bar.style.width = Math.min(pct, 95) + '%';
+        if (pct >= 95) clearInterval(barInterval);
+      }, 80);
+
+      await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
+      clearInterval(barInterval);
+      const bar = document.getElementById(`clip-bar-${i}`);
+      if (bar) bar.style.width = '100%';
+
+      // Done
+      clipStates[i].status = 'done';
+      const card = document.getElementById(`clip-${i}`);
+      if (card) {
+        const statusEl = document.getElementById(`clip-status-${i}`);
+        if (statusEl) { statusEl.className = 'clip-status status-done'; statusEl.textContent = '✓ Ready'; }
+        const body = card.querySelector('.clip-body');
+        if (body) body.innerHTML += `
+          <div class="clip-actions">
+            <button class="clip-btn btn-approve" id="clip-approve-${i}" onclick="approveClip(${i})">✓ Approve</button>
+            <button class="clip-btn btn-edit" onclick="editClip(${i})">✎ Edit</button>
+            <button class="clip-btn btn-reject" onclick="rejectClip(${i})">✗</button>
+          </div>`;
+      }
+
+      // Check if all done
+      if (clipStates.every(c => c.status === 'done')) {
+        document.getElementById('runPipelineBtn').disabled = false;
+        document.getElementById('runPipelineBtn').textContent = '🔄 Re-Run';
+        document.getElementById('pipeline-status').textContent = '6 clips ready — go to Approve & Edit →';
+        // Copy to approve grid
+        buildClipGrid(document.getElementById('approveGrid'));
+      }
+    }, i * 800);
+  });
+}
+
+// ============================================================
+// APPROVE — Step 3
+// ============================================================
+let approvedClips = [], rejectedClips = [];
+
+function approveClip(i) {
+  clipStates[i].approved = true;
+  const btn = document.getElementById(`clip-approve-${i}`);
+  if (btn) { btn.textContent = '✅ Approved'; btn.style.fontWeight = '800'; }
+  if (!approvedClips.includes(i)) approvedClips.push(i);
+  rejectedClips = rejectedClips.filter(x => x !== i);
+  updateApprovalStats();
+}
+function rejectClip(i) {
+  clipStates[i].approved = false;
+  if (!rejectedClips.includes(i)) rejectedClips.push(i);
+  approvedClips = approvedClips.filter(x => x !== i);
+  updateApprovalStats();
+}
+function editClip(i) {
+  alert(`Edit clip for ${PLATFORMS[i].name}\n\nIn full build: opens video editor with caption editor, music selector, and trim controls.\nFor now: clips are stored locally and can be edited in any video app.`);
+}
+function approveAll() {
+  PLATFORMS.forEach((_, i) => { if (clipStates[i].status === 'done') approveClip(i); });
+}
+function updateApprovalStats() {
+  const done = clipStates.filter(c => c.status === 'done').length;
+  document.getElementById('approvedCount').textContent = approvedClips.length;
+  document.getElementById('pendingCount').textContent = done - approvedClips.length - rejectedClips.length;
+  document.getElementById('rejectedCount').textContent = rejectedClips.length;
+}
+
+// ============================================================
+// CALENDAR — Step 4
+// ============================================================
+function buildCalendar() {
+  const cal = document.getElementById('calDays');
+  cal.innerHTML = '';
+  const today = new Date();
+  const todayDate = today.getDate();
+
+  for (let d = 0; d < 7; d++) {
+    const dt = new Date(today);
+    dt.setDate(today.getDate() + d);
+    const day = document.createElement('div');
+    day.className = 'cal-day' + (d === 0 ? ' today' : '');
+    day.innerHTML = `<div class="cal-date">${dt.getDate()}</div>`;
+    cal.appendChild(day);
+  }
+}
+buildCalendar();
+
+function pushToCalendar() {
+  if (approvedClips.length === 0) {
+    alert('No approved clips to schedule. Go to Step 3 and approve at least one clip.');
+    return;
+  }
+  const days = document.querySelectorAll('#calDays .cal-day');
+  let dayIdx = 0;
+  approvedClips.forEach((clipIdx, i) => {
+    const p = PLATFORMS[clipIdx];
+    if (days[dayIdx % 7]) {
+      const post = document.createElement('div');
+      post.className = 'cal-post approved';
+      post.textContent = `${p.icon} ${p.name}`;
+      days[dayIdx % 7].appendChild(post);
+      dayIdx++;
+    }
+  });
+  document.getElementById('pipeline-status').textContent = `${approvedClips.length} posts scheduled to calendar`;
+  document.querySelector('#stage-4 .sec-sub span').textContent = approvedClips.length;
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ANTHROPIC CLAUDE CHAT — WIRED IN                   -->
+<!-- ═══════════════════════════════════════════════════ -->
+<style>
+#ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#ff6b35,#7c3aed);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(255,107,53,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+#ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(255,107,53,.7)}
+#ai-chat-btn svg{width:26px;height:26px;fill:white}
+#ai-chat-panel{position:fixed;bottom:92px;right:24px;z-index:9999;width:380px;max-height:560px;background:#0d1117;border:1px solid #21262d;border-radius:16px;box-shadow:0 16px 64px rgba(0,0,0,.6);display:none;flex-direction:column;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+#ai-chat-panel.open{display:flex}
+#ai-chat-header{background:#161b22;border-bottom:1px solid #21262d;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+#ai-chat-header .title{font-size:14px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:8px}
+#ai-chat-header .dot{width:8px;height:8px;border-radius:50%;background:#ff6b35;animation:cpulse 2s infinite}
+@keyframes cpulse{0%,100%{opacity:1}50%{opacity:.4}}
+#ai-chat-close{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+#ai-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:380px}
+.cm{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;max-width:88%;word-wrap:break-word}
+.cm-user{background:#1f3461;color:#e6edf3;align-self:flex-end;border-radius:12px 12px 2px 12px}
+.cm-ai{background:#161b22;color:#c9d1d9;border:1px solid #21262d;align-self:flex-start;border-radius:12px 12px 12px 2px}
+.cm-typing{color:#8b949e;font-style:italic;font-size:12px}
+#ai-chat-input-row{border-top:1px solid #21262d;padding:12px;display:flex;gap:8px;background:#0d1117}
+#ai-chat-input{flex:1;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:inherit;resize:none;height:38px;line-height:1.4}
+#ai-chat-input:focus{border-color:#ff6b35}
+#ai-chat-send{background:#ff6b35;border:none;color:white;border-radius:8px;padding:0 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:background .2s}
+#ai-chat-send:hover{background:#e85c2a}
+#ai-chat-send:disabled{background:#374151;cursor:not-allowed}
+</style>
+
+<button id="ai-chat-btn" title="Ask Prometheus AI" onclick="toggleChat()">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+</button>
+<div id="ai-chat-panel">
+  <div id="ai-chat-header">
+    <div class="title"><span class="dot"></span>🔥 Prometheus — Content AI</div>
+    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="ai-chat-msgs">
+    <div class="cm cm-ai">🔥 Prometheus here. I write scripts, find the best angles, and help you build your content pipeline. Ask me to write a hook, suggest a product angle, or help plan your calendar.</div>
+  </div>
+  <div id="ai-chat-input-row">
+    <input id="ai-chat-input" type="text" placeholder="Write me a hook for [product]…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
+    <button id="ai-chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+<script>
+(function(){
+  const PAGE_CONTEXT = 'Prometheus Creation Studio — content pipeline, video scripts, hook writing, channel strategy';
+  function toggleChat(){const p=document.getElementById('ai-chat-panel');p.classList.toggle('open');if(p.classList.contains('open'))document.getElementById('ai-chat-input').focus();}
+  window.toggleChat=toggleChat;
+  function addMsg(text,role){const msgs=document.getElementById('ai-chat-msgs');const div=document.createElement('div');div.className='cm '+(role==='user'?'cm-user':'cm-ai');div.textContent=text;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return div;}
+  const history=[];
+  async function sendChat(){
+    const input=document.getElementById('ai-chat-input');const btn=document.getElementById('ai-chat-send');const text=input.value.trim();if(!text)return;
+    addMsg(text,'user');history.push({role:'user',content:text});input.value='';btn.disabled=true;
+    const typing=addMsg('Thinking…','ai');typing.classList.add('cm-typing');
+    try{
+      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history,context:PAGE_CONTEXT})});
+      const data=await res.json();
+      if(!res.ok||data.error){typing.textContent=data.error||'Error — check ANTHROPIC_API_KEY';typing.style.color='#f87171';}
+      else{typing.textContent=data.content;typing.classList.remove('cm-typing');history.push({role:'assistant',content:data.content});}
+    }catch(e){typing.textContent='Connection error — check ANTHROPIC_API_KEY in Vercel env vars';typing.style.color='#f87171';}
+    btn.disabled=false;document.getElementById('ai-chat-msgs').scrollTop=99999;input.focus();
+  }
+  window.sendChat=sendChat;
+})();
+</script>
+
+</body>
+</html>

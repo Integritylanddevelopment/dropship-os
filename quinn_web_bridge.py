@@ -313,6 +313,37 @@ async def handle_chat(message: str, history: list, page_context: str = "") -> di
     except Exception as e:
         return {"error": f"Anthropic error: {e}", "source": "error"}
 
+# ── Qdrant stats (for /stats endpoint) ───────────────────────────────────────
+
+TRACKED_COLLECTIONS = [
+    "dropship_intel",
+    "strategy_books",
+    "general_knowledge",
+    "commandcore_memory",
+]
+
+async def fetch_qdrant_stats() -> dict:
+    """Return vector counts for all tracked Qdrant collections."""
+    result = {c: 0 for c in TRACKED_COLLECTIONS}
+    result["total_vectors"] = 0
+
+    async with httpx.AsyncClient() as client:
+        for collection in TRACKED_COLLECTIONS:
+            try:
+                resp = await client.get(
+                    f"{QDRANT_URL}/collections/{collection}",
+                    timeout=5.0,
+                )
+                if resp.status_code == 200:
+                    count = resp.json().get("result", {}).get("vectors_count", 0)
+                    result[collection] = count
+                    result["total_vectors"] += count
+            except Exception as e:
+                logger.debug(f"Stats {collection}: {e}")
+
+    result["ts"] = datetime.now(timezone.utc).isoformat()
+    return result
+
 # ── HTTP handler ──────────────────────────────────────────────────────────────
 
 class BridgeHandler(BaseHTTPRequestHandler):
@@ -346,6 +377,15 @@ class BridgeHandler(BaseHTTPRequestHandler):
                 "anthropic_key": "set" if ANTHROPIC_KEY else "MISSING",
                 "ts": datetime.now(timezone.utc).isoformat(),
             })
+        elif self.path == "/stats":
+            # Live Qdrant collection counts — called by /api/metrics.js
+            try:
+                loop = asyncio.new_event_loop()
+                stats = loop.run_until_complete(fetch_qdrant_stats())
+                loop.close()
+                self._json(stats)
+            except Exception as e:
+                self._json({"error": str(e)}, 500)
         else:
             self._json({"error": "Not found"}, 404)
 
@@ -381,43 +421,4 @@ class BridgeHandler(BaseHTTPRequestHandler):
             return
 
         page_context = data.get("context", "")
-        history = messages_arr
-
-        try:
-            loop = asyncio.new_event_loop()
-            result = loop.run_until_complete(handle_chat(message, history, page_context))
-            loop.close()
-            self._json(result)
-        except Exception as e:
-            logger.error(traceback.format_exc())
-            self._json({"error": str(e)}, 500)
-
-# ── Entry point ───────────────────────────────────────────────────────────────
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--port", type=int, default=8765)
-    ap.add_argument("--host", default="0.0.0.0")
-    args = ap.parse_args()
-
-    Thread(target=get_embedder, daemon=True).start()
-
-    server = HTTPServer((args.host, args.port), BridgeHandler)
-    logger.info("=" * 58)
-    logger.info("  Quinn Web Bridge")
-    logger.info(f"  http://localhost:{args.port}/health")
-    logger.info(f"  POST http://localhost:{args.port}/chat")
-    logger.info(f"  Qdrant:    {QDRANT_URL}")
-    logger.info(f"  Ollama:    {OLLAMA_URL} [{OLLAMA_MODEL}]")
-    logger.info(f"  Anthropic: {'SET' if ANTHROPIC_KEY else 'MISSING'}")
-    logger.info("=" * 58)
-    logger.info("  Run ngrok: ngrok http 8765")
-    logger.info("  Then in Vercel → Env Vars: QUINN_ENDPOINT=<ngrok url>")
-    logger.info("=" * 58)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        server.shutdown()
-
-if __name__ == "__main__":
-    main()
+        history = m
