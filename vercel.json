@@ -5,6 +5,7 @@
     { "source": "/ecom-king", "destination": "/ecom-king.html" },
     { "source": "/pinterest", "destination": "/pinterest.html" },
     { "source": "/roi",       "destination": "/roi.html" },
-    { "source": "/content",   "destination": "/content.html" }
+    { "source": "/content",   "destination": "/content.html" },
+    { "source": "/privacy",   "destination": "/privacy.html" }
   ]
 }
