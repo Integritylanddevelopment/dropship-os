@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ShipStack AI — Command Center</title>
+<title>ShipStack AI â Command Center</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
@@ -39,36 +39,36 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .date-badge{font-size:12px;color:var(--muted);background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:5px 12px}
 .nav-tabs{background:var(--navy2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:2px;overflow-x:auto}
-.nav-tab{padding:13px 20px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.nav-tab{padding:14px 22px;font-size:14px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
 .nav-tab:hover{color:var(--text)}.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .main{padding:24px 28px;max-width:1700px;margin:0 auto}
 .page{display:none}.page.active{display:block}
 .sec-header{margin-bottom:20px}
-.sec-title{font-size:21px;font-weight:800;margin-bottom:4px}
-.sec-sub{font-size:13px;color:var(--muted)}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:24px}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s}
+.sec-title{font-size:24px;font-weight:800;margin-bottom:4px}
+.sec-sub{font-size:14px;color:var(--muted)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s}
 .kpi-card:hover{border-color:var(--blue);transform:translateY(-2px)}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .kpi-blue::before{background:var(--blue)}.kpi-teal::before{background:var(--teal)}
 .kpi-gold::before{background:var(--gold)}.kpi-red::before{background:var(--red)}
 .kpi-purple::before{background:var(--purple)}
-.kpi-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.kpi-value{font-size:30px;font-weight:800;line-height:1;margin-bottom:6px}
-.kpi-change{font-size:12px;color:var(--muted)}.kpi-change.up{color:var(--teal)}.kpi-change.down{color:var(--red)}
+.kpi-label{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.kpi-value{font-size:36px;font-weight:800;line-height:1;margin-bottom:8px}
+.kpi-change{font-size:13px;color:var(--muted)}.kpi-change.up{color:var(--teal)}.kpi-change.down{color:var(--red)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
 .grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
 @media(max-width:900px){.grid-2,.grid-3,.grid-2-1{grid-template-columns:1fr}}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
-.card-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .icon-blue{background:rgba(26,108,246,.2);color:var(--blue)}.icon-teal{background:rgba(0,201,167,.2);color:var(--teal)}
 .icon-gold{background:rgba(245,166,35,.2);color:var(--gold)}.icon-red{background:rgba(232,65,62,.2);color:var(--red)}
 .icon-purple{background:rgba(139,92,246,.2);color:var(--purple)}.icon-green{background:rgba(34,197,94,.2);color:var(--green)}
-.winner-table{width:100%;border-collapse:collapse;font-size:13px}
-.winner-table th{text-align:left;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--border)}
-.winner-table td{padding:10px 10px;border-bottom:1px solid rgba(37,52,71,.5)}
+.winner-table{width:100%;border-collapse:collapse;font-size:14px}
+.winner-table th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding:10px 12px;border-bottom:1px solid var(--border)}
+.winner-table td{padding:12px 12px;border-bottom:1px solid rgba(37,52,71,.5)}
 .winner-table tr:last-child td{border-bottom:none}
 .winner-table tr:hover td{background:rgba(26,108,246,.06)}
 .badge{display:inline-block;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700}
@@ -81,12 +81,12 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .launcher-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s;text-decoration:none;display:block}
 .launcher-card:hover{border-color:var(--blue);transform:translateY(-3px);background:var(--card2)}
 .launcher-icon{font-size:32px;margin-bottom:10px}
-.launcher-title{font-size:15px;font-weight:700;margin-bottom:4px}
-.launcher-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.launcher-title{font-size:17px;font-weight:700;margin-bottom:4px}
+.launcher-desc{font-size:14px;color:var(--muted);line-height:1.6}
 .launcher-status{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700}
 .ls-live{color:var(--teal)}.ls-scaffold{color:var(--gold)}.ls-todo{color:var(--red)}
 .channel-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.channel-name{font-size:13px;font-weight:600;min-width:150px}
+.channel-name{font-size:15px;font-weight:600;min-width:160px}
 .bar-track{flex:1;height:8px;background:rgba(37,52,71,.8);border-radius:4px;overflow:hidden}
 .bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
 .channel-cpm{font-size:12px;color:var(--muted);min-width:55px;text-align:right}
@@ -95,9 +95,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .product-row:last-child{border-bottom:none}
 .product-emoji{font-size:24px;width:36px;text-align:center}
 .product-info{flex:1}
-.product-name{font-size:13px;font-weight:700}
-.product-meta{font-size:11px;color:var(--muted);margin-top:2px}
-.product-margin{font-size:16px;font-weight:800;color:var(--teal)}
+.product-name{font-size:15px;font-weight:700}
+.product-meta{font-size:13px;color:var(--muted);margin-top:3px}
+.product-margin{font-size:18px;font-weight:800;color:var(--teal)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
 .cal-day-header{text-align:center;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:4px 0}
 .cal-cell{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:8px;min-height:64px;font-size:10px;cursor:pointer;transition:border-color .2s}
@@ -116,15 +116,15 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .result-text{font-size:13px;line-height:1.6;color:var(--text)}
 .result-score{font-size:11px;color:var(--muted);margin-top:6px}
 .build-list{display:flex;flex-direction:column;gap:8px}
-.build-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--navy3);border:1px solid var(--border);border-radius:10px;font-size:13px}
+.build-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--navy3);border:1px solid var(--border);border-radius:10px;font-size:14px}
 .build-num{font-size:11px;font-weight:800;color:var(--muted);min-width:20px}
 .build-label{flex:1;font-weight:600}.build-desc{font-size:11px;color:var(--muted);margin-top:2px}
 .b-done{border-left:3px solid var(--teal)}.b-scaffold{border-left:3px solid var(--gold)}.b-todo{border-left:3px solid var(--border)}
 .b-icon{font-size:16px;min-width:20px;text-align:center}
 .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
 .agent-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:16px}
-.agent-name{font-size:13px;font-weight:700;margin-bottom:4px}
-.agent-type{font-size:11px;color:var(--muted);margin-bottom:10px}
+.agent-name{font-size:15px;font-weight:700;margin-bottom:5px}
+.agent-type{font-size:13px;color:var(--muted);margin-bottom:12px}
 .agent-status{font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px}
 .as-live{color:var(--teal)}.as-scaffold{color:var(--gold)}.as-todo{color:var(--red)}
 .agent-actions{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
@@ -135,8 +135,8 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .ln-1{background:var(--blue)}.ln-2{background:var(--purple)}.ln-3{background:var(--gold)}
 .ln-4{background:var(--teal)}.ln-5{background:var(--red)}.ln-6{background:var(--green)}
 .layer-content{flex:1}
-.layer-title{font-size:14px;font-weight:800;margin-bottom:4px}
-.layer-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.layer-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.layer-desc{font-size:14px;color:var(--muted);line-height:1.6}
 .layer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--navy)}
@@ -146,7 +146,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;margin-right:5px}
 .stale-note{font-size:11px;color:var(--gold);margin-top:4px}
 
-/* ── Supplier Wizard Modal ── */
+/* ââ Supplier Wizard Modal ââ */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--navy2);border:1px solid var(--border);border-radius:16px;width:min(540px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
@@ -171,15 +171,15 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .btn-push-prod:hover{background:rgba(34,197,94,.25);border-color:var(--green)}
 .push-confirm{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:14px;margin-top:10px;display:none}
 .push-confirm.shown{display:block}
-/* ── Enhanced product card ── */
+/* ââ Enhanced product card ââ */
 .prod-card{background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:border-color .2s}
 .prod-card:hover{border-color:rgba(26,108,246,.4)}
 .prod-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .prod-card-emoji{font-size:28px;width:40px;text-align:center}
 .prod-card-info{flex:1}
-.prod-card-name{font-size:14px;font-weight:700;margin-bottom:2px}
-.prod-card-meta{font-size:11px;color:var(--muted)}
-.prod-card-margin{font-size:20px;font-weight:900}
+.prod-card-name{font-size:16px;font-weight:700;margin-bottom:4px}
+.prod-card-meta{font-size:13px;color:var(--muted)}
+.prod-card-margin{font-size:24px;font-weight:900}
 .prod-card-btns{display:flex;gap:8px;flex-wrap:wrap}
 .btn-supplier{padding:7px 14px;background:rgba(26,108,246,.12);color:var(--blue);border:1px solid rgba(26,108,246,.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
 .btn-supplier:hover{background:rgba(26,108,246,.22);border-color:var(--blue)}
@@ -192,91 +192,101 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 </head>
 <body>
 
-<!-- TICKER BAR — populated by JS from /api/metrics -->
+<!-- TICKER BAR â populated by JS from /api/metrics -->
 <div class="ticker-bar"><div class="ticker-inner" id="ticker-inner">
-  <span class="tick-item"><span class="tick-label">LOADING</span><span class="tick-neutral">fetching live data…</span></span>
+  <span class="tick-item"><span class="tick-label">LOADING</span><span class="tick-neutral">fetching live dataâ¦</span></span>
 </div></div>
 
 <!-- HEADER -->
 <div class="header">
   <div class="logo-block">
-    <div class="logo">⚡</div>
+    <div class="logo">â¡</div>
     <div>
-      <div class="header-title">ShipStack AI — Command Center</div>
-      <div class="header-sub">Gary Vee × Hormozi × Kamil Sattar Intelligence Stack</div>
+      <div class="header-title">ShipStack AI â Command Center</div>
+      <div class="header-sub">Gary Vee Ã Hormozi Ã Kamil Sattar Intelligence Stack</div>
     </div>
   </div>
   <div class="header-right">
-    <div class="status-pill pill-gold" id="metrics-status-pill"><div class="dot dot-gold"></div>Loading…</div>
+    <div class="status-pill pill-gold" id="metrics-status-pill"><div class="dot dot-gold"></div>Loadingâ¦</div>
     <div class="status-pill pill-gold"><div class="dot dot-gold"></div>Agents: Scaffolded</div>
-    <div class="date-badge" id="date-badge">—</div>
+    <div class="date-badge" id="date-badge">â</div>
   </div>
 </div>
 
 <!-- NAV TABS -->
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showPage('overview',this)">📊 Overview</button>
-  <button class="nav-tab" onclick="showPage('decision',this)">🎯 Decision Engine</button>
-  <button class="nav-tab" onclick="showPage('channels',this)">📡 Channels</button>
-  <button class="nav-tab" onclick="showPage('products',this)">📦 Products</button>
-  <button class="nav-tab" onclick="showPage('content',this)">🎬 Content</button>
-  <button class="nav-tab" onclick="showPage('agents',this)">🤖 Agents</button>
-  <button class="nav-tab" onclick="showPage('memory',this)">🧠 Memory Search</button>
-  <button class="nav-tab" onclick="showPage('dashboards',this)">🖥️ Dashboards</button>
-  <button class="nav-tab" onclick="showPage('revenue',this)">💰 Revenue</button>
-  <button class="nav-tab" onclick="showPage('buildplan',this)">🏗️ Build Plan</button>
+  <button class="nav-tab active" onclick="showPage('overview',this)">ð Overview</button>
+  <button class="nav-tab" onclick="showPage('decision',this)">ð¯ Decision Engine</button>
+  <button class="nav-tab" onclick="showPage('channels',this)">ð¡ Channels</button>
+  <button class="nav-tab" onclick="showPage('products',this)">ð¦ Products</button>
+  <button class="nav-tab" onclick="showPage('content',this)">ð¬ Content</button>
+  <button class="nav-tab" onclick="showPage('agents',this)">ð¤ Agents</button>
+  <button class="nav-tab" onclick="showPage('memory',this)">ð§  Memory Search</button>
+  <button class="nav-tab" onclick="showPage('dashboards',this)">ð¥ï¸ Dashboards</button>
+  <button class="nav-tab" onclick="showPage('revenue',this)">ð° Revenue</button>
+  <button class="nav-tab" onclick="showPage('buildplan',this)">ðï¸ Build Plan</button>
 </div>
 
 <div class="main">
 
-<!-- ═══════════ OVERVIEW ═══════════ -->
+<!-- âââââââââââ OVERVIEW âââââââââââ -->
 <div class="page active" id="page-overview">
   <div class="sec-header">
     <div class="sec-title">Command Center Overview</div>
-    <div class="sec-sub">Live intelligence — cheapest attention × highest margin → execute. Data from Stripe + Qdrant + Decision Engine.</div>
+    <div class="sec-sub">Live intelligence â cheapest attention Ã highest margin â execute. Data from Stripe + Qdrant + Decision Engine.</div>
+  </div>
+
+  
+  <!-- LAUNCH BANNER -->
+  <div class="launch-banner">
+    <div class="launch-banner-text">
+      <div class="launch-banner-title">⚡ Launch ShipStack AI</div>
+      <div class="launch-banner-sub">Start Quinn Bridge + ngrok tunnel to activate live chat. Takes ~30 seconds.</div>
+    </div>
+    <button class="btn-launch" onclick="openLaunchModal()">🚀 Launch Stack</button>
   </div>
 
   <div class="kpi-grid">
     <div class="kpi-card kpi-teal">
       <div class="kpi-label">Today's Revenue</div>
-      <div class="kpi-value" id="kpi-revenue">—</div>
+      <div class="kpi-value" id="kpi-revenue">â</div>
       <div class="kpi-change up" id="kpi-revenue-sub">Stripe live</div>
     </div>
     <div class="kpi-card kpi-gold">
       <div class="kpi-label">Orders Today</div>
-      <div class="kpi-value" id="kpi-orders">—</div>
+      <div class="kpi-value" id="kpi-orders">â</div>
       <div class="kpi-change" id="kpi-orders-sub">Stripe live</div>
     </div>
     <div class="kpi-card kpi-blue">
       <div class="kpi-label">Top Channel CPM</div>
-      <div class="kpi-value" id="kpi-top-cpm">—</div>
+      <div class="kpi-value" id="kpi-top-cpm">â</div>
       <div class="kpi-change up" id="kpi-top-cpm-sub">Cheapest attention</div>
     </div>
     <div class="kpi-card kpi-teal">
       <div class="kpi-label">Top Product Margin</div>
-      <div class="kpi-value" id="kpi-top-margin">—</div>
+      <div class="kpi-value" id="kpi-top-margin">â</div>
       <div class="kpi-change up" id="kpi-top-margin-sub">Decision engine</div>
     </div>
     <div class="kpi-card kpi-purple">
       <div class="kpi-label">Decision Score #1</div>
-      <div class="kpi-value" id="kpi-top-score">—</div>
+      <div class="kpi-value" id="kpi-top-score">â</div>
       <div class="kpi-change up" id="kpi-top-score-sub">Run engine to update</div>
     </div>
     <div class="kpi-card kpi-blue">
       <div class="kpi-label">Memory Sessions</div>
-      <div class="kpi-value" id="kpi-sessions">—</div>
+      <div class="kpi-value" id="kpi-sessions">â</div>
       <div class="kpi-change up">Qdrant live</div>
     </div>
   </div>
 
   <div class="grid-2-1">
     <div class="card">
-      <div class="card-title"><div class="icon icon-blue">⚡</div>Operating System — 6-Layer Framework</div>
+      <div class="card-title"><div class="icon icon-blue">â¡</div>Operating System â 6-Layer Framework</div>
       <div class="layer-row">
         <div class="layer-num ln-1">1</div>
         <div class="layer-content">
           <div class="layer-title">Research Engine</div>
-          <div class="layer-desc">Cheapest attention tracker · Highest margin product scanner · Viral content tracker · Competitor copy log</div>
+          <div class="layer-desc">Cheapest attention tracker Â· Highest margin product scanner Â· Viral content tracker Â· Competitor copy log</div>
         </div>
         <div class="layer-right"><span class="badge badge-gold">Scaffolded</span></div>
       </div>
@@ -284,7 +294,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
         <div class="layer-num ln-2">2</div>
         <div class="layer-content">
           <div class="layer-title">Decision Layer</div>
-          <div class="layer-desc">Match product × channel · Score and rank · Weekly reallocation · Kill/scale signals</div>
+          <div class="layer-desc">Match product Ã channel Â· Score and rank Â· Weekly reallocation Â· Kill/scale signals</div>
         </div>
         <div class="layer-right"><span class="badge badge-green">Live</span></div>
       </div>
@@ -292,7 +302,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
         <div class="layer-num ln-3">3</div>
         <div class="layer-content">
           <div class="layer-title">Prometheus Creation Studio</div>
-          <div class="layer-desc">AI video generation · Pillar Builder · 6-channel repurposing pipeline · Auto-approve calendar</div>
+          <div class="layer-desc">AI video generation Â· Pillar Builder Â· 6-channel repurposing pipeline Â· Auto-approve calendar</div>
         </div>
         <div class="layer-right"><span class="badge badge-red">Building</span></div>
       </div>
@@ -300,7 +310,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
         <div class="layer-num ln-4">4</div>
         <div class="layer-content">
           <div class="layer-title">Content Machine</div>
-          <div class="layer-desc">Gary V pillar content → TikTok / Reels / Shorts / Pinterest / Reddit / X micro-repurposing</div>
+          <div class="layer-desc">Gary V pillar content â TikTok / Reels / Shorts / Pinterest / Reddit / X micro-repurposing</div>
         </div>
         <div class="layer-right"><span class="badge badge-gold">Scaffolded</span></div>
       </div>
@@ -308,7 +318,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
         <div class="layer-num ln-5">5</div>
         <div class="layer-content">
           <div class="layer-title">Automation Pipeline</div>
-          <div class="layer-desc">Auto site spin-up · Auto posting · Auto data pull · Auto fulfillment</div>
+          <div class="layer-desc">Auto site spin-up Â· Auto posting Â· Auto data pull Â· Auto fulfillment</div>
         </div>
         <div class="layer-right"><span class="badge badge-red">Building</span></div>
       </div>
@@ -316,32 +326,32 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
         <div class="layer-num ln-6">6</div>
         <div class="layer-content">
           <div class="layer-title">Metrics Dashboard</div>
-          <div class="layer-desc">CPM/CPC/CTR by channel · Margin by product · ROAS by combo · Stripe revenue live</div>
+          <div class="layer-desc">CPM/CPC/CTR by channel Â· Margin by product Â· ROAS by combo Â· Stripe revenue live</div>
         </div>
         <div class="layer-right"><span class="badge badge-green">This File</span></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title"><div class="icon icon-gold">👥</div>Intelligence Sources</div>
+      <div class="card-title"><div class="icon icon-gold">ð¥</div>Intelligence Sources</div>
       <div style="margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div style="width:36px;height:36px;background:rgba(26,108,246,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">📣</div>
-          <div><div style="font-size:13px;font-weight:700">Gary Vee</div><div style="font-size:11px;color:var(--muted)">Cheapest attention · Channel arbitrage</div></div>
+          <div style="width:36px;height:36px;background:rgba(26,108,246,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">ð£</div>
+          <div><div style="font-size:13px;font-weight:700">Gary Vee</div><div style="font-size:11px;color:var(--muted)">Cheapest attention Â· Channel arbitrage</div></div>
         </div>
         <div style="font-size:12px;color:var(--teal);padding:8px 12px;background:rgba(0,201,167,.08);border-radius:8px;border-left:3px solid var(--teal)">"Chase the cheapest CPM. Volume beats perfection. Post everywhere, double down on what works."</div>
       </div>
       <div style="margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div style="width:36px;height:36px;background:rgba(245,166,35,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💰</div>
-          <div><div style="font-size:13px;font-weight:700">Alex Hormozi</div><div style="font-size:11px;color:var(--muted)">Offer construction · $100M Offers</div></div>
+          <div style="width:36px;height:36px;background:rgba(245,166,35,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">ð°</div>
+          <div><div style="font-size:13px;font-weight:700">Alex Hormozi</div><div style="font-size:11px;color:var(--muted)">Offer construction Â· $100M Offers</div></div>
         </div>
         <div style="font-size:12px;color:var(--gold);padding:8px 12px;background:rgba(245,166,35,.08);border-radius:8px;border-left:3px solid var(--gold)">"Stack value until yes is the only logical answer. Price on value, never cost."</div>
       </div>
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div style="width:36px;height:36px;background:rgba(139,92,246,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🤖</div>
-          <div><div style="font-size:13px;font-weight:700">Kamil Sattar (Ecom King)</div><div style="font-size:11px;color:var(--muted)">AI execution · Zendrop / AutoDS</div></div>
+          <div style="width:36px;height:36px;background:rgba(139,92,246,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">ð¤</div>
+          <div><div style="font-size:13px;font-weight:700">Kamil Sattar (Ecom King)</div><div style="font-size:11px;color:var(--muted)">AI execution Â· Zendrop / AutoDS</div></div>
         </div>
         <div style="font-size:12px;color:var(--purple);padding:8px 12px;background:rgba(139,92,246,.08);border-radius:8px;border-left:3px solid var(--purple)">"Move fast with AI tools. Zendrop builds the store, AutoDS imports products. Ship in hours."</div>
       </div>
@@ -349,22 +359,22 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   </div>
 </div>
 
-<!-- ═══════════ DECISION ENGINE ═══════════ -->
+<!-- âââââââââââ DECISION ENGINE âââââââââââ -->
 <div class="page" id="page-decision">
   <div class="sec-header">
-    <div class="sec-title">🎯 Decision Engine</div>
-    <div class="sec-sub" id="decision-sub">Score = Margin% × (1/CPM) × Viral Coefficient. Run decision_engine.py daily to refresh.</div>
+    <div class="sec-title">ð¯ Decision Engine</div>
+    <div class="sec-sub" id="decision-sub">Score = Margin% Ã (1/CPM) Ã Viral Coefficient. Run decision_engine.py daily to refresh.</div>
   </div>
 
   <div class="kpi-grid" id="decision-kpi-grid">
-    <div class="kpi-card kpi-teal"><div class="kpi-label">Rank #1 Combo</div><div class="kpi-value" id="de-rank1-combo" style="font-size:18px">—</div><div class="kpi-change up" id="de-rank1-score">Run engine</div></div>
-    <div class="kpi-card kpi-blue"><div class="kpi-label">Rank #2 Combo</div><div class="kpi-value" id="de-rank2-combo" style="font-size:18px">—</div><div class="kpi-change up" id="de-rank2-score">Run engine</div></div>
-    <div class="kpi-card kpi-gold"><div class="kpi-label">Rank #3 Combo</div><div class="kpi-value" id="de-rank3-combo" style="font-size:18px">—</div><div class="kpi-change" id="de-rank3-score">Run engine</div></div>
-    <div class="kpi-card kpi-red"><div class="kpi-label">Kill Signal</div><div class="kpi-value" id="de-kill-combo" style="font-size:18px">—</div><div class="kpi-change down" id="de-kill-score">Run engine</div></div>
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Rank #1 Combo</div><div class="kpi-value" id="de-rank1-combo" style="font-size:18px">â</div><div class="kpi-change up" id="de-rank1-score">Run engine</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Rank #2 Combo</div><div class="kpi-value" id="de-rank2-combo" style="font-size:18px">â</div><div class="kpi-change up" id="de-rank2-score">Run engine</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Rank #3 Combo</div><div class="kpi-value" id="de-rank3-combo" style="font-size:18px">â</div><div class="kpi-change" id="de-rank3-score">Run engine</div></div>
+    <div class="kpi-card kpi-red"><div class="kpi-label">Kill Signal</div><div class="kpi-value" id="de-kill-combo" style="font-size:18px">â</div><div class="kpi-change down" id="de-kill-score">Run engine</div></div>
   </div>
 
   <div class="card mb-18">
-    <div class="card-title"><div class="icon icon-teal">🏆</div>Weekly Decision Table — Product × Channel Combos <span id="de-table-updated" style="font-size:11px;color:var(--muted);margin-left:auto"></span></div>
+    <div class="card-title"><div class="icon icon-teal">ð</div>Weekly Decision Table â Product Ã Channel Combos <span id="de-table-updated" style="font-size:11px;color:var(--muted);margin-left:auto"></span></div>
     <table class="winner-table">
       <thead><tr><th>Rank</th><th>Product</th><th>Channel</th><th>Margin</th><th>CPM</th><th>Score</th><th>Status</th><th>Action</th></tr></thead>
       <tbody id="decision-table-body">
@@ -375,9 +385,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title"><div class="icon icon-blue">⚙️</div>Score Formula</div>
+      <div class="card-title"><div class="icon icon-blue">âï¸</div>Score Formula</div>
       <div style="background:var(--navy3);border-radius:10px;padding:16px;font-family:monospace;font-size:13px;color:var(--teal);line-height:1.8">
-        Score = Margin% × (100 / CPM_cents) × ViralCoeff<br><br>
+        Score = Margin% Ã (100 / CPM_cents) Ã ViralCoeff<br><br>
         <span style="color:var(--muted)">ViralCoeff:</span> TikTok=1.6, Pinterest=1.4, YT Shorts=1.2<br>
         <span style="color:var(--muted)">             </span> Reddit=1.1, IG Reels=1.0, Meta Paid=0.8<br><br>
         <span style="color:var(--gold)">Kill if Score &lt; 30 two weeks running</span><br>
@@ -385,35 +395,35 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
     </div>
     <div class="card">
-      <div class="card-title"><div class="icon icon-gold">📅</div>Weekly Cadence</div>
+      <div class="card-title"><div class="icon icon-gold">ð</div>Weekly Cadence</div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
-        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Monday</span><span style="color:var(--muted)">Run Decision Engine · Pick top 3 combos</span></div>
-        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Tue–Thu</span><span style="color:var(--muted)">Max content volume on #1 combo</span></div>
-        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Friday</span><span style="color:var(--muted)">Review ROAS · Kill bottom performers</span></div>
-        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--gold);font-weight:700;min-width:70px">Sunday</span><span style="color:var(--muted)">Research session · Update scores · Plan next week</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Monday</span><span style="color:var(--muted)">Run Decision Engine Â· Pick top 3 combos</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">TueâThu</span><span style="color:var(--muted)">Max content volume on #1 combo</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--blue);font-weight:700;min-width:70px">Friday</span><span style="color:var(--muted)">Review ROAS Â· Kill bottom performers</span></div>
+        <div style="display:flex;gap:10px;align-items:center"><span style="color:var(--gold);font-weight:700;min-width:70px">Sunday</span><span style="color:var(--muted)">Research session Â· Update scores Â· Plan next week</span></div>
         <div class="divider"></div>
-        <div style="font-size:12px;color:var(--muted)">Kill trigger: Score &lt; 30 for 2 consecutive weeks<br>Scale trigger: ROAS &gt; 3× after first 5 posts</div>
+        <div style="font-size:12px;color:var(--muted)">Kill trigger: Score &lt; 30 for 2 consecutive weeks<br>Scale trigger: ROAS &gt; 3Ã after first 5 posts</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ CHANNELS ═══════════ -->
+<!-- âââââââââââ CHANNELS âââââââââââ -->
 <div class="page" id="page-channels">
   <div class="sec-header">
-    <div class="sec-title">📡 Channel Intelligence</div>
-    <div class="sec-sub">Cheapest attention wins — Gary Vee framework. Lower CPM = more volume per dollar.</div>
+    <div class="sec-title">ð¡ Channel Intelligence</div>
+    <div class="sec-sub">Cheapest attention wins â Gary Vee framework. Lower CPM = more volume per dollar.</div>
   </div>
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title"><div class="icon icon-teal">📉</div>CPM Ranking (Cheapest → Most Expensive)</div>
+      <div class="card-title"><div class="icon icon-teal">ð</div>CPM Ranking (Cheapest â Most Expensive)</div>
       <div id="channel-bars" style="margin-top:4px">
-        <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Loading channel data…</div>
+        <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Loading channel dataâ¦</div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title"><div class="icon icon-blue">📊</div>Channel Properties</div>
+      <div class="card-title"><div class="icon icon-blue">ð</div>Channel Properties</div>
       <table class="winner-table" style="font-size:12px">
         <thead><tr><th>Channel</th><th>Traffic Type</th><th>Best Niche Fit</th><th>Status</th></tr></thead>
         <tbody>
@@ -430,7 +440,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   </div>
 
   <div class="card">
-    <div class="card-title"><div class="icon icon-gold">💡</div>Gary Vee Rules — Channel Playbook</div>
+    <div class="card-title"><div class="icon icon-gold">ð¡</div>Gary Vee Rules â Channel Playbook</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
       <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--teal)">
         <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px">Rule 1: Cheapest First</div>
@@ -438,46 +448,46 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
       <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--blue)">
         <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">Rule 2: Volume Over Perfection</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5">Post 3–5× per day on priority channels. Don't wait for the perfect post. Let data tell you what works, then double down.</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">Post 3â5Ã per day on priority channels. Don't wait for the perfect post. Let data tell you what works, then double down.</div>
       </div>
       <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--gold)">
         <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">Rule 3: Piggyback Viral</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5">Find viral content in your niche. Copy the format, the structure, the hook. Swap in your product. Never copy content — copy the strategy.</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">Find viral content in your niche. Copy the format, the structure, the hook. Swap in your product. Never copy content â copy the strategy.</div>
       </div>
       <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--purple)">
         <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">Rule 4: Repurpose Everything</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5">One pillar piece → 10 micro-content pieces. TikTok video → Reels → Shorts → Pinterest pin → Reddit post → X thread → email.</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">One pillar piece â 10 micro-content pieces. TikTok video â Reels â Shorts â Pinterest pin â Reddit post â X thread â email.</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PRODUCTS ═══════════ -->
+<!-- âââââââââââ PRODUCTS âââââââââââ -->
 <div class="page" id="page-products">
   <div class="sec-header">
-    <div class="sec-title">📦 Product Intelligence</div>
-    <div class="sec-sub">Highest margin × cheapest to source × easiest to fulfill. Live from decision engine + supplier APIs.</div>
+    <div class="sec-title">ð¦ Product Intelligence</div>
+    <div class="sec-sub">Highest margin Ã cheapest to source Ã easiest to fulfill. Live from decision engine + supplier APIs.</div>
   </div>
 
   <div class="kpi-grid">
-    <div class="kpi-card kpi-teal"><div class="kpi-label">Top Margin Product</div><div class="kpi-value" id="prod-top-name" style="font-size:18px">—</div><div class="kpi-change up" id="prod-top-margin">Run engine to populate</div></div>
-    <div class="kpi-card kpi-gold"><div class="kpi-label">Products Tracked</div><div class="kpi-value" id="prod-count">—</div><div class="kpi-change" id="prod-count-sub">From decision engine</div></div>
-    <div class="kpi-card kpi-blue"><div class="kpi-label">Scale Combos</div><div class="kpi-value" id="prod-scale-count">—</div><div class="kpi-change up">Score ≥ 70</div></div>
-    <div class="kpi-card kpi-red"><div class="kpi-label">Kill Signals</div><div class="kpi-value" id="prod-kill-count">—</div><div class="kpi-change down">Score &lt; 30</div></div>
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Top Margin Product</div><div class="kpi-value" id="prod-top-name" style="font-size:18px">â</div><div class="kpi-change up" id="prod-top-margin">Run engine to populate</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Products Tracked</div><div class="kpi-value" id="prod-count">â</div><div class="kpi-change" id="prod-count-sub">From decision engine</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Scale Combos</div><div class="kpi-value" id="prod-scale-count">â</div><div class="kpi-change up">Score â¥ 70</div></div>
+    <div class="kpi-card kpi-red"><div class="kpi-label">Kill Signals</div><div class="kpi-value" id="prod-kill-count">â</div><div class="kpi-change down">Score &lt; 30</div></div>
   </div>
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title"><div class="icon icon-teal">🏆</div>Top Product Opportunities</div>
+      <div class="card-title"><div class="icon icon-teal">ð</div>Top Product Opportunities</div>
       <div id="product-list">
         <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Run <code style="background:var(--navy3);padding:2px 6px;border-radius:4px">python decision_engine.py</code> to load real products</div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title"><div class="icon icon-gold">🏗️</div>Supplier Stack — Kamil Sattar Method</div>
+      <div class="card-title"><div class="icon icon-gold">ðï¸</div>Supplier Stack â Kamil Sattar Method</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
-          <div style="font-size:24px">⚡</div>
+          <div style="font-size:24px">â¡</div>
           <div>
             <div style="font-size:13px;font-weight:700;margin-bottom:2px">Zendrop</div>
             <div style="font-size:11px;color:var(--muted)">AI store builder + automated fulfillment. First choice for US products.</div>
@@ -485,7 +495,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
           </div>
         </div>
         <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
-          <div style="font-size:24px">🤖</div>
+          <div style="font-size:24px">ð¤</div>
           <div>
             <div style="font-size:13px;font-weight:700;margin-bottom:2px">AutoDS</div>
             <div style="font-size:11px;color:var(--muted)">Product import automation. Price monitoring. Auto-order fulfillment.</div>
@@ -493,10 +503,10 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
           </div>
         </div>
         <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
-          <div style="font-size:24px">🛒</div>
+          <div style="font-size:24px">ð</div>
           <div>
             <div style="font-size:13px;font-weight:700;margin-bottom:2px">AliExpress / CJ Dropshipping</div>
-            <div style="font-size:11px;color:var(--muted)">Fallback supplier. Wider catalog. 14–21d shipping unless CJ warehouse stock.</div>
+            <div style="font-size:11px;color:var(--muted)">Fallback supplier. Wider catalog. 14â21d shipping unless CJ warehouse stock.</div>
             <div style="margin-top:6px"><span class="badge badge-muted">Connect API Key</span></div>
           </div>
         </div>
@@ -505,32 +515,32 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   </div>
 </div>
 
-<!-- ═══════════ CONTENT ═══════════ -->
+<!-- âââââââââââ CONTENT âââââââââââ -->
 <div class="page" id="page-content">
   <div class="sec-header">
-    <div class="sec-title">🎬 Content Machine</div>
-    <div class="sec-sub">Gary V method: 1 pillar piece → 6+ platform-ready pieces → calendar → auto-post. <a href="/content" style="color:var(--blue);text-decoration:none;font-weight:700">→ Open Prometheus Creation Studio</a></div>
+    <div class="sec-title">ð¬ Content Machine</div>
+    <div class="sec-sub">Gary V method: 1 pillar piece â 6+ platform-ready pieces â calendar â auto-post. <a href="/content" style="color:var(--blue);text-decoration:none;font-weight:700">â Open Prometheus Creation Studio</a></div>
   </div>
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title"><div class="icon icon-blue">🔁</div>Repurposing Pipeline — Prometheus Studio</div>
+      <div class="card-title"><div class="icon icon-blue">ð</div>Repurposing Pipeline â Prometheus Studio</div>
       <div style="text-align:center;padding:16px 0">
-        <div style="display:inline-block;background:var(--blue);color:#fff;border-radius:12px;padding:12px 24px;font-weight:700;font-size:15px;margin-bottom:16px">📹 1 Pillar Video (60–90s)</div>
-        <div style="color:var(--muted);font-size:22px;margin-bottom:16px">↓</div>
+        <div style="display:inline-block;background:var(--blue);color:#fff;border-radius:12px;padding:12px 24px;font-weight:700;font-size:15px;margin-bottom:16px">ð¹ 1 Pillar Video (60â90s)</div>
+        <div style="color:var(--muted);font-size:22px;margin-bottom:16px">â</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">🎵</span><br>TikTok 15s</div>
-          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">📸</span><br>IG Reel 30s</div>
-          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">▶️</span><br>YT Short</div>
-          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">📌</span><br>Pinterest Pin</div>
-          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">🤖</span><br>Reddit Post</div>
-          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">📧</span><br>Email</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">ðµ</span><br>TikTok 15s</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">ð¸</span><br>IG Reel 30s</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">â¶ï¸</span><br>YT Short</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">ð</span><br>Pinterest Pin</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">ð¤</span><br>Reddit Post</div>
+          <div style="background:var(--navy3);border-radius:8px;padding:10px;text-align:center;font-size:12px;font-weight:600"><span style="font-size:18px">ð§</span><br>Email</div>
         </div>
-        <div style="margin-top:16px"><a href="/content" style="display:inline-block;background:var(--teal);color:#000;border-radius:10px;padding:12px 28px;font-weight:700;font-size:14px;text-decoration:none">🔥 Open Prometheus Studio</a></div>
+        <div style="margin-top:16px"><a href="/content" style="display:inline-block;background:var(--teal);color:#000;border-radius:10px;padding:12px 28px;font-weight:700;font-size:14px;text-decoration:none">ð¥ Open Prometheus Studio</a></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title"><div class="icon icon-gold">✍️</div>Hook Templates (Copy These)</div>
+      <div class="card-title"><div class="icon icon-gold">âï¸</div>Hook Templates (Copy These)</div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
         <div style="padding:10px;background:var(--navy3);border-radius:8px;border-left:3px solid var(--teal)">
           <div style="font-weight:700;color:var(--teal);margin-bottom:4px">Problem Hook</div>
@@ -553,75 +563,75 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   </div>
 
   <div class="card">
-    <div class="card-title"><div class="icon icon-teal">📅</div>Content Calendar — This Week <span style="font-size:11px;color:var(--muted);margin-left:8px">(real posts populate after Prometheus Studio is live)</span></div>
+    <div class="card-title"><div class="icon icon-teal">ð</div>Content Calendar â This Week <span style="font-size:11px;color:var(--muted);margin-left:8px">(real posts populate after Prometheus Studio is live)</span></div>
     <div class="cal-grid">
       <div class="cal-day-header">MON</div><div class="cal-day-header">TUE</div><div class="cal-day-header">WED</div>
       <div class="cal-day-header">THU</div><div class="cal-day-header">FRI</div><div class="cal-day-header">SAT</div><div class="cal-day-header">SUN</div>
     </div>
     <div class="cal-grid" id="cal-week"></div>
     <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-tiktok" style="display:inline-block">■</span> TikTok</span>
-      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-pin" style="display:inline-block">■</span> Pinterest</span>
-      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-ig" style="display:inline-block">■</span> Instagram</span>
-      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-yt" style="display:inline-block">■</span> YouTube</span>
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-tiktok" style="display:inline-block">â </span> TikTok</span>
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-pin" style="display:inline-block">â </span> Pinterest</span>
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-ig" style="display:inline-block">â </span> Instagram</span>
+      <span style="font-size:11px;font-weight:600"><span class="cal-post cp-yt" style="display:inline-block">â </span> YouTube</span>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ AGENTS ═══════════ -->
+<!-- âââââââââââ AGENTS âââââââââââ -->
 <div class="page" id="page-agents">
   <div class="sec-header">
-    <div class="sec-title">🤖 Agent Status</div>
-    <div class="sec-sub">Build order below — wire agents in sequence for maximum compound output.</div>
+    <div class="sec-title">ð¤ Agent Status</div>
+    <div class="sec-sub">Build order below â wire agents in sequence for maximum compound output.</div>
   </div>
   <div class="agent-grid mb-24">
     <div class="agent-card">
       <div class="agent-name">Decision Engine</div>
-      <div class="agent-type">Python · decision_engine.py</div>
-      <div class="agent-status as-live">🟢 Built — Run Daily</div>
+      <div class="agent-type">Python Â· decision_engine.py</div>
+      <div class="agent-status as-live">ð¢ Built â Run Daily</div>
       <div class="agent-actions"><span class="a-tag">Scoring</span><span class="a-tag">metrics.json</span><span class="a-tag">Reddit+8 channels</span></div>
     </div>
     <div class="agent-card">
       <div class="agent-name">Quinn Bridge</div>
-      <div class="agent-type">Python · quinn_web_bridge.py</div>
-      <div class="agent-status as-live">🟢 Live when running</div>
+      <div class="agent-type">Python Â· quinn_web_bridge.py</div>
+      <div class="agent-status as-live">ð¢ Live when running</div>
       <div class="agent-actions"><span class="a-tag">Qdrant</span><span class="a-tag">Ollama</span><span class="a-tag">Anthropic</span><span class="a-tag">/stats</span></div>
     </div>
     <div class="agent-card">
       <div class="agent-name">Memory Indexer</div>
-      <div class="agent-type">Qdrant · Quinn Stack</div>
-      <div class="agent-status as-live">🟢 Live</div>
-      <div class="agent-actions"><span class="a-tag" id="ag-sessions">— Sessions</span><span class="a-tag">Auto-ingest</span></div>
+      <div class="agent-type">Qdrant Â· Quinn Stack</div>
+      <div class="agent-status as-live">ð¢ Live</div>
+      <div class="agent-actions"><span class="a-tag" id="ag-sessions">â Sessions</span><span class="a-tag">Auto-ingest</span></div>
     </div>
     <div class="agent-card">
       <div class="agent-name">Social AI Agent</div>
-      <div class="agent-type">Python · social_ai_agent/</div>
-      <div class="agent-status as-scaffold">🟡 Scaffolded</div>
+      <div class="agent-type">Python Â· social_ai_agent/</div>
+      <div class="agent-status as-scaffold">ð¡ Scaffolded</div>
       <div class="agent-actions"><span class="a-tag">Pinterest</span><span class="a-tag">TikTok</span><span class="a-tag">Content Gen</span></div>
     </div>
     <div class="agent-card">
       <div class="agent-name">Prometheus Studio</div>
-      <div class="agent-type">Building · /content page</div>
-      <div class="agent-status as-todo">🔴 Building Now</div>
+      <div class="agent-type">Building Â· /content page</div>
+      <div class="agent-status as-todo">ð´ Building Now</div>
       <div class="agent-actions"><span class="a-tag">Pillar Builder</span><span class="a-tag">6-Platform Cut</span><span class="a-tag">Calendar</span></div>
     </div>
     <div class="agent-card">
       <div class="agent-name">ROI Product Finder</div>
-      <div class="agent-type">HTML/JS · roi-product-finder/</div>
-      <div class="agent-status as-scaffold">🟡 Scaffolded</div>
+      <div class="agent-type">HTML/JS Â· roi-product-finder/</div>
+      <div class="agent-status as-scaffold">ð¡ Scaffolded</div>
       <div class="agent-actions"><span class="a-tag">Margin Score</span><span class="a-tag">AutoDS API</span></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ MEMORY SEARCH ═══════════ -->
+<!-- âââââââââââ MEMORY SEARCH âââââââââââ -->
 <div class="page" id="page-memory">
   <div class="sec-header">
-    <div class="sec-title">🧠 Quinn Memory Search</div>
+    <div class="sec-title">ð§  Quinn Memory Search</div>
     <div class="sec-sub" id="memory-sub">Semantic search across Qdrant collections. Start Quinn bridge + ngrok to activate.</div>
   </div>
   <div class="card mb-18">
-    <div class="card-title"><div class="icon icon-purple">🔍</div>Search Research Memory</div>
+    <div class="card-title"><div class="icon icon-purple">ð</div>Search Research Memory</div>
     <div class="search-box">
       <input class="search-input" id="search-input" type="text" placeholder="e.g. cheapest CPM channels, pet product margins, TikTok hooks..."/>
       <button class="search-btn" onclick="runSearch()">Search Quinn</button>
@@ -631,59 +641,59 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     </div>
   </div>
   <div class="card">
-    <div class="card-title"><div class="icon icon-blue">📊</div>Memory Stack Status — Live from Qdrant</div>
+    <div class="card-title"><div class="icon icon-blue">ð</div>Memory Stack Status â Live from Qdrant</div>
     <div class="kpi-grid" style="margin-bottom:0">
-      <div class="kpi-card kpi-teal"><div class="kpi-label">Dropship Intel</div><div class="kpi-value" id="mem-dropship">—</div><div class="kpi-change up">dropship_intel</div></div>
-      <div class="kpi-card kpi-blue"><div class="kpi-label">General Knowledge</div><div class="kpi-value" id="mem-general">—</div><div class="kpi-change up">general_knowledge</div></div>
-      <div class="kpi-card kpi-purple"><div class="kpi-label">Agent Configs</div><div class="kpi-value" id="mem-agents">—</div><div class="kpi-change up">commandcore_memory</div></div>
-      <div class="kpi-card kpi-gold"><div class="kpi-label">Strategy Books</div><div class="kpi-value" id="mem-strategy">—</div><div class="kpi-change up">strategy_books</div></div>
+      <div class="kpi-card kpi-teal"><div class="kpi-label">Dropship Intel</div><div class="kpi-value" id="mem-dropship">â</div><div class="kpi-change up">dropship_intel</div></div>
+      <div class="kpi-card kpi-blue"><div class="kpi-label">General Knowledge</div><div class="kpi-value" id="mem-general">â</div><div class="kpi-change up">general_knowledge</div></div>
+      <div class="kpi-card kpi-purple"><div class="kpi-label">Agent Configs</div><div class="kpi-value" id="mem-agents">â</div><div class="kpi-change up">commandcore_memory</div></div>
+      <div class="kpi-card kpi-gold"><div class="kpi-label">Strategy Books</div><div class="kpi-value" id="mem-strategy">â</div><div class="kpi-change up">strategy_books</div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ DASHBOARDS ═══════════ -->
+<!-- âââââââââââ DASHBOARDS âââââââââââ -->
 <div class="page" id="page-dashboards">
   <div class="sec-header">
-    <div class="sec-title">🖥️ Individual Dashboards</div>
+    <div class="sec-title">ð¥ï¸ Individual Dashboards</div>
     <div class="sec-sub">Click any card to open the dashboard.</div>
   </div>
   <div class="launcher-grid">
-    <a class="launcher-card" href="/playbook" target="_blank"><div class="launcher-icon">📋</div><div class="launcher-title">Drop Ship Playbook</div><div class="launcher-desc">Social AI Agent playbook — full strategy, hooks, posting cadence</div><div class="launcher-status ls-live">🟢 Live</div></a>
-    <a class="launcher-card" href="/hormozi" target="_blank"><div class="launcher-icon">💰</div><div class="launcher-title">Hormozi Playbook</div><div class="launcher-desc">Offer construction, value stacking, $100M Offers framework</div><div class="launcher-status ls-live">🟢 Live</div></a>
-    <a class="launcher-card" href="/ecom-king" target="_blank"><div class="launcher-icon">🤖</div><div class="launcher-title">Ecom King Playbook</div><div class="launcher-desc">AI execution, Zendrop + AutoDS, Kamil Sattar method</div><div class="launcher-status ls-live">🟢 Live</div></a>
-    <a class="launcher-card" href="/pinterest" target="_blank"><div class="launcher-icon">📌</div><div class="launcher-title">Pinterest Strategy</div><div class="launcher-desc">Organic growth, pin SEO, board strategy, buyer intent signals</div><div class="launcher-status ls-live">🟢 Live</div></a>
-    <a class="launcher-card" href="/roi" target="_blank"><div class="launcher-icon">🔍</div><div class="launcher-title">ROI Product Finder</div><div class="launcher-desc">Product margin scorer — connect AutoDS API for live data</div><div class="launcher-status ls-scaffold">🟡 Scaffolded</div></a>
-    <a class="launcher-card" href="/content" target="_blank"><div class="launcher-icon">🔥</div><div class="launcher-title">Prometheus Creation Studio</div><div class="launcher-desc">Pillar Builder → Upload → Pipeline → Approve → Calendar. AI video at scale.</div><div class="launcher-status ls-todo">🔴 Building</div></a>
+    <a class="launcher-card" href="/playbook" target="_blank"><div class="launcher-icon">ð</div><div class="launcher-title">Drop Ship Playbook</div><div class="launcher-desc">Social AI Agent playbook â full strategy, hooks, posting cadence</div><div class="launcher-status ls-live">ð¢ Live</div></a>
+    <a class="launcher-card" href="/hormozi" target="_blank"><div class="launcher-icon">ð°</div><div class="launcher-title">Hormozi Playbook</div><div class="launcher-desc">Offer construction, value stacking, $100M Offers framework</div><div class="launcher-status ls-live">ð¢ Live</div></a>
+    <a class="launcher-card" href="/ecom-king" target="_blank"><div class="launcher-icon">ð¤</div><div class="launcher-title">Ecom King Playbook</div><div class="launcher-desc">AI execution, Zendrop + AutoDS, Kamil Sattar method</div><div class="launcher-status ls-live">ð¢ Live</div></a>
+    <a class="launcher-card" href="/pinterest" target="_blank"><div class="launcher-icon">ð</div><div class="launcher-title">Pinterest Strategy</div><div class="launcher-desc">Organic growth, pin SEO, board strategy, buyer intent signals</div><div class="launcher-status ls-live">ð¢ Live</div></a>
+    <a class="launcher-card" href="/roi" target="_blank"><div class="launcher-icon">ð</div><div class="launcher-title">ROI Product Finder</div><div class="launcher-desc">Product margin scorer â connect AutoDS API for live data</div><div class="launcher-status ls-scaffold">ð¡ Scaffolded</div></a>
+    <a class="launcher-card" href="/content" target="_blank"><div class="launcher-icon">ð¥</div><div class="launcher-title">Prometheus Creation Studio</div><div class="launcher-desc">Pillar Builder â Upload â Pipeline â Approve â Calendar. AI video at scale.</div><div class="launcher-status ls-todo">ð´ Building</div></a>
   </div>
 </div>
 
 
-<!-- ═══════════ REVENUE & ROI ═══════════ -->
+<!-- âââââââââââ REVENUE & ROI âââââââââââ -->
 <div class="page" id="page-revenue">
   <div class="sec-header">
-    <div class="sec-title">💰 Revenue & ROI Intelligence</div>
+    <div class="sec-title">ð° Revenue & ROI Intelligence</div>
     <div class="sec-sub">Live Stripe revenue, ROAS by channel, CPM benchmarks, margin by product. Connect APIs below to activate.</div>
   </div>
   <div class="kpi-grid" style="margin-bottom:18px">
-    <div class="kpi-card kpi-teal"><div class="kpi-label">Revenue Today</div><div class="kpi-value" id="rev-today">—</div><div class="kpi-change up" id="rev-today-sub">Stripe live</div></div>
-    <div class="kpi-card kpi-gold"><div class="kpi-label">Revenue This Month</div><div class="kpi-value" id="rev-month">—</div><div class="kpi-change" id="rev-month-sub">Stripe live</div></div>
-    <div class="kpi-card kpi-blue"><div class="kpi-label">Total Orders</div><div class="kpi-value" id="rev-orders">—</div><div class="kpi-change up" id="rev-orders-sub">All time</div></div>
-    <div class="kpi-card kpi-purple"><div class="kpi-label">Avg Order Value</div><div class="kpi-value" id="rev-aov">—</div><div class="kpi-change up" id="rev-aov-sub">per order</div></div>
-    <div class="kpi-card kpi-teal"><div class="kpi-label">Best ROAS Channel</div><div class="kpi-value" id="rev-best-roas">—</div><div class="kpi-change up" id="rev-best-roas-sub">Decision engine</div></div>
-    <div class="kpi-card kpi-gold"><div class="kpi-label">Best Margin Product</div><div class="kpi-value" id="rev-best-margin">—</div><div class="kpi-change up" id="rev-best-margin-sub">highest %</div></div>
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Revenue Today</div><div class="kpi-value" id="rev-today">â</div><div class="kpi-change up" id="rev-today-sub">Stripe live</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Revenue This Month</div><div class="kpi-value" id="rev-month">â</div><div class="kpi-change" id="rev-month-sub">Stripe live</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Total Orders</div><div class="kpi-value" id="rev-orders">â</div><div class="kpi-change up" id="rev-orders-sub">All time</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-label">Avg Order Value</div><div class="kpi-value" id="rev-aov">â</div><div class="kpi-change up" id="rev-aov-sub">per order</div></div>
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Best ROAS Channel</div><div class="kpi-value" id="rev-best-roas">â</div><div class="kpi-change up" id="rev-best-roas-sub">Decision engine</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Best Margin Product</div><div class="kpi-value" id="rev-best-margin">â</div><div class="kpi-change up" id="rev-best-margin-sub">highest %</div></div>
   </div>
   <div class="grid-2-1" style="margin-bottom:18px">
     <div class="card">
-      <div class="card-title"><div class="icon icon-teal">📡</div>ROAS by Channel — Live Ranking</div>
-      <div id="roas-channel-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Loading channel data…</div></div>
+      <div class="card-title"><div class="icon icon-teal">ð¡</div>ROAS by Channel â Live Ranking</div>
+      <div id="roas-channel-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Loading channel dataâ¦</div></div>
     </div>
     <div class="card">
-      <div class="card-title"><div class="icon icon-gold">📦</div>Margin by Product</div>
-      <div id="revenue-product-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Loading product data…</div></div>
+      <div class="card-title"><div class="icon icon-gold">ð¦</div>Margin by Product</div>
+      <div id="revenue-product-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Loading product dataâ¦</div></div>
     </div>
   </div>
   <div class="card mb-18">
-    <div class="card-title"><div class="icon icon-blue">💸</div>CPM Benchmark — Attention Cost by Channel</div>
+    <div class="card-title"><div class="icon icon-blue">ð¸</div>CPM Benchmark â Attention Cost by Channel</div>
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:13px">
         <thead><tr style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)">
@@ -694,98 +704,98 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
           <th style="text-align:right;padding:8px 12px">Status</th>
           <th style="text-align:right;padding:8px 12px">Action</th>
         </tr></thead>
-        <tbody id="cpm-table-body"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">Loading…</td></tr></tbody>
+        <tbody id="cpm-table-body"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">Loadingâ¦</td></tr></tbody>
       </table>
     </div>
   </div>
   <div class="card">
-    <div class="card-title"><div class="icon icon-purple">🔌</div>API Connection Wizard</div>
+    <div class="card-title"><div class="icon icon-purple">ð</div>API Connection Wizard</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:4px">
       <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div style="font-size:22px">💳</div>
+          <div style="font-size:22px">ð³</div>
           <div><div style="font-size:13px;font-weight:700">Stripe</div><div style="font-size:11px;color:var(--muted)">Revenue + orders</div></div>
           <div id="api-dot-stripe" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">STRIPE_SECRET_KEY</code> in .env</div>
-        <div id="api-status-stripe" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+        <div id="api-status-stripe" style="font-size:11px;color:var(--muted)">Status: checkingâ¦</div>
       </div>
       <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div style="font-size:22px">📌</div>
-          <div><div style="font-size:13px;font-weight:700">Pinterest API</div><div style="font-size:11px;color:var(--muted)">Auto-post pins · $0.28 CPM</div></div>
+          <div style="font-size:22px">ð</div>
+          <div><div style="font-size:13px;font-weight:700">Pinterest API</div><div style="font-size:11px;color:var(--muted)">Auto-post pins Â· $0.28 CPM</div></div>
           <div id="api-dot-pinterest" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">PINTEREST_ACCESS_TOKEN</code> in .env</div>
-        <div id="api-status-pinterest" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+        <div id="api-status-pinterest" style="font-size:11px;color:var(--muted)">Status: checkingâ¦</div>
       </div>
       <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div style="font-size:22px">🎵</div>
-          <div><div style="font-size:13px;font-weight:700">TikTok API</div><div style="font-size:11px;color:var(--muted)">Auto-post · $0 CPM viral</div></div>
+          <div style="font-size:22px">ðµ</div>
+          <div><div style="font-size:13px;font-weight:700">TikTok API</div><div style="font-size:11px;color:var(--muted)">Auto-post Â· $0 CPM viral</div></div>
           <div id="api-dot-tiktok" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">TIKTOK_ACCESS_TOKEN</code> in .env · ~2 wk approval</div>
-        <div id="api-status-tiktok" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">TIKTOK_ACCESS_TOKEN</code> in .env Â· ~2 wk approval</div>
+        <div id="api-status-tiktok" style="font-size:11px;color:var(--muted)">Status: checkingâ¦</div>
       </div>
       <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div style="font-size:22px">📦</div>
+          <div style="font-size:22px">ð¦</div>
           <div><div style="font-size:13px;font-weight:700">Zendrop</div><div style="font-size:11px;color:var(--muted)">Auto-fulfillment</div></div>
           <div id="api-dot-zendrop" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Set <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">ZENDROP_API_KEY</code> in .env</div>
-        <div id="api-status-zendrop" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+        <div id="api-status-zendrop" style="font-size:11px;color:var(--muted)">Status: checkingâ¦</div>
       </div>
       <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <div style="font-size:22px">🔥</div>
-          <div><div style="font-size:13px;font-weight:700">Prometheus Engine</div><div style="font-size:11px;color:var(--muted)">AI video pipeline · port 8766</div></div>
+          <div style="font-size:22px">ð¥</div>
+          <div><div style="font-size:13px;font-weight:700">Prometheus Engine</div><div style="font-size:11px;color:var(--muted)">AI video pipeline Â· port 8766</div></div>
           <div id="api-dot-prometheus" style="margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--muted)"></div>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Run <code style="background:var(--navy2);padding:1px 5px;border-radius:4px">START_PROMETHEUS.bat</code> to activate</div>
-        <div id="api-status-prometheus" style="font-size:11px;color:var(--muted)">Status: checking…</div>
+        <div id="api-status-prometheus" style="font-size:11px;color:var(--muted)">Status: checkingâ¦</div>
       </div>
     </div>
     <div style="margin-top:18px;background:var(--navy3);border:1px solid rgba(26,108,246,.2);border-radius:10px;padding:14px">
-      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px">⚡ Setup Order (highest ROI first)</div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px">â¡ Setup Order (highest ROI first)</div>
       <div style="display:grid;gap:7px;font-size:12px">
-        <div>1. 💳 <strong>Stripe</strong> → stripe.com → Developers → API Keys → copy Secret Key → add to .env</div>
-        <div>2. 📌 <strong>Pinterest</strong> → developers.pinterest.com → Create App → Generate token → add to .env</div>
-        <div>3. 📦 <strong>Zendrop</strong> → zendrop.com → Account → API → add to .env</div>
-        <div>4. 🎵 <strong>TikTok</strong> → developers.tiktok.com → Apply Content Posting API (~2 wk wait)</div>
-        <div>5. 🔥 <strong>Prometheus</strong> → START_PROMETHEUS.bat + add ATLAS_API_KEY + ELEVENLABS_API_KEY + SUNO_API_KEY</div>
+        <div>1. ð³ <strong>Stripe</strong> â stripe.com â Developers â API Keys â copy Secret Key â add to .env</div>
+        <div>2. ð <strong>Pinterest</strong> â developers.pinterest.com â Create App â Generate token â add to .env</div>
+        <div>3. ð¦ <strong>Zendrop</strong> â zendrop.com â Account â API â add to .env</div>
+        <div>4. ðµ <strong>TikTok</strong> â developers.tiktok.com â Apply Content Posting API (~2 wk wait)</div>
+        <div>5. ð¥ <strong>Prometheus</strong> â START_PROMETHEUS.bat + add ATLAS_API_KEY + ELEVENLABS_API_KEY + SUNO_API_KEY</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ BUILD PLAN ═══════════ -->
+<!-- âââââââââââ BUILD PLAN âââââââââââ -->
 <div class="page" id="page-buildplan">
   <div class="sec-header">
-    <div class="sec-title">🏗️ Build Plan</div>
+    <div class="sec-title">ðï¸ Build Plan</div>
     <div class="sec-sub">All 10 phases complete. Full system built and ready to activate.</div>
   </div>
   <div class="card mb-18">
-    <div class="card-title"><div class="icon icon-teal">✅</div>Completed — Phases 1–4 (Foundation)</div>
+    <div class="card-title"><div class="icon icon-teal">â</div>Completed â Phases 1â4 (Foundation)</div>
     <div class="build-list">
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Vercel Deployment — 6 pages live</div><div class="build-desc">shipstack-ai.vercel.app — GitHub: Integritylanddevelopment/dropship-os</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Decision Engine + 8 Channels</div><div class="build-desc">decision_engine.py — Pinterest, TikTok, YT Shorts, Reddit, IG, X, Meta, Google</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 1 — Live Metrics Infrastructure</div><div class="build-desc">/api/metrics.js + /stats Quinn route + metrics.json schema</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 2 — Strip Fake Data</div><div class="build-desc">All hardcoded numbers replaced with live JS fetch from /api/metrics</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 3 — Supplier Wizard + Push to Production</div><div class="build-desc">Product cards: Zendrop/AutoDS/AliExpress/CJ wizard + sessionStorage handoff to Prometheus</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 4 — Prometheus Creation Studio /content</div><div class="build-desc">5-step pipeline: Pillar Builder → Upload → Run Pipeline → Approve → Calendar</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Vercel Deployment â 6 pages live</div><div class="build-desc">shipstack-ai.vercel.app â GitHub: Integritylanddevelopment/dropship-os</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Decision Engine + 8 Channels</div><div class="build-desc">decision_engine.py â Pinterest, TikTok, YT Shorts, Reddit, IG, X, Meta, Google</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 1 â Live Metrics Infrastructure</div><div class="build-desc">/api/metrics.js + /stats Quinn route + metrics.json schema</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 2 â Strip Fake Data</div><div class="build-desc">All hardcoded numbers replaced with live JS fetch from /api/metrics</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 3 â Supplier Wizard + Push to Production</div><div class="build-desc">Product cards: Zendrop/AutoDS/AliExpress/CJ wizard + sessionStorage handoff to Prometheus</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 4 â Prometheus Creation Studio /content</div><div class="build-desc">5-step pipeline: Pillar Builder â Upload â Run Pipeline â Approve â Calendar</div></div><span class="badge badge-green">Done</span></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-title"><div class="icon icon-green">🚀</div>Completed — Phases 5–10 (Automation)</div>
+    <div class="card-title"><div class="icon icon-green">ð</div>Completed â Phases 5â10 (Automation)</div>
     <div class="build-list">
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 5 — Prometheus Engine (AI Video Pipeline)</div><div class="build-desc">prometheus_engine.py — FFmpeg+Whisper+Seedance 2.0+ElevenLabs+Suno. Start: START_PROMETHEUS.bat</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 6 — Content Calendar + Auto-Scheduler</div><div class="build-desc">Calendar view in Prometheus Studio. post_scheduler.py queues posts by time/channel.</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 7 — Social Distribution (Pinterest + TikTok)</div><div class="build-desc">pinterest_poster.py + tiktok_poster.py — auto-post from decisions.json. Run: python run_shipstack.py --pinterest</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 8 — Decision Engine Daily Auto-Run</div><div class="build-desc">SCHEDULE_DAILY.ps1 — Windows Task Scheduler 6am daily. metrics.json auto-committed → Vercel deploys.</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 9 — Revenue & ROI Live Dashboard</div><div class="build-desc">💰 Revenue tab: Stripe ROAS by channel, CPM benchmarks, margin by product, API wizard.</div></div><span class="badge badge-green">Done</span></div>
-      <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 10 — Full Automation Loop</div><div class="build-desc">run_shipstack.py --full: research → decide → Prometheus → Pinterest → post → pages → monitor</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 5 â Prometheus Engine (AI Video Pipeline)</div><div class="build-desc">prometheus_engine.py â FFmpeg+Whisper+Seedance 2.0+ElevenLabs+Suno. Start: START_PROMETHEUS.bat</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 6 â Content Calendar + Auto-Scheduler</div><div class="build-desc">Calendar view in Prometheus Studio. post_scheduler.py queues posts by time/channel.</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 7 â Social Distribution (Pinterest + TikTok)</div><div class="build-desc">pinterest_poster.py + tiktok_poster.py â auto-post from decisions.json. Run: python run_shipstack.py --pinterest</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 8 â Decision Engine Daily Auto-Run</div><div class="build-desc">SCHEDULE_DAILY.ps1 â Windows Task Scheduler 6am daily. metrics.json auto-committed â Vercel deploys.</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 9 â Revenue & ROI Live Dashboard</div><div class="build-desc">ð° Revenue tab: Stripe ROAS by channel, CPM benchmarks, margin by product, API wizard.</div></div><span class="badge badge-green">Done</span></div>
+      <div class="build-item b-done"><div class="b-icon">â</div><div><div class="build-label">Phase 10 â Full Automation Loop</div><div class="build-desc">run_shipstack.py --full: research â decide â Prometheus â Pinterest â post â pages â monitor</div></div><span class="badge badge-green">Done</span></div>
     </div>
   </div>
 </div>
@@ -793,11 +803,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 </div><!-- /main -->
 
 <script>
-// ── Date badge ──────────────────────────────────────────────────
+// ââ Date badge ââââââââââââââââââââââââââââââââââââââââââââââââââ
 const d = new Date();
 document.getElementById('date-badge').textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 
-// ── Tab navigation ──────────────────────────────────────────────
+// ââ Tab navigation ââââââââââââââââââââââââââââââââââââââââââââââ
 function showPage(id, btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
@@ -805,7 +815,7 @@ function showPage(id, btn){
   if(btn) btn.classList.add('active');
 }
 
-// ── Calendar (empty — real data comes from Prometheus pipeline) ─
+// ââ Calendar (empty â real data comes from Prometheus pipeline) â
 (function buildCal(){
   const grid = document.getElementById('cal-week');
   const today = new Date();
@@ -818,24 +828,24 @@ function showPage(id, btn){
     const isToday = d.toDateString() === today.toDateString();
     const cell = document.createElement('div');
     cell.className = 'cal-cell'+(isToday?' today':'');
-    cell.innerHTML = `<div class="cal-date">${d.getDate()}</div><div style="font-size:9px;color:var(--muted);margin-top:4px">${isToday?'Today — no posts yet':''}</div>`;
+    cell.innerHTML = `<div class="cal-date">${d.getDate()}</div><div style="font-size:9px;color:var(--muted);margin-top:4px">${isToday?'Today â no posts yet':''}</div>`;
     grid.appendChild(cell);
   }
 })();
 
-// ── Channel emoji map ──────────────────────────────────────────
+// ââ Channel emoji map ââââââââââââââââââââââââââââââââââââââââââ
 const CH_EMOJI = {
-  tiktok_organic:'🎵',pinterest_organic:'📌',youtube_shorts:'▶️',
-  reddit_organic:'🤖',instagram_reels:'📸',x_twitter:'🐦',
-  meta_paid:'📘',google_paid:'🔍'
+  tiktok_organic:'ðµ',pinterest_organic:'ð',youtube_shorts:'â¶ï¸',
+  reddit_organic:'ð¤',instagram_reels:'ð¸',x_twitter:'ð¦',
+  meta_paid:'ð',google_paid:'ð'
 };
 
-// ── Helper: format currency ────────────────────────────────────
-function fmtUSD(v){ return v===null?'—':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function fmtNum(v){ return v===null?'—':Number(v).toLocaleString(); }
-function fmtPct(v){ return v===null?'—':v+'%'; }
+// ââ Helper: format currency ââââââââââââââââââââââââââââââââââââ
+function fmtUSD(v){ return v===null?'â':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtNum(v){ return v===null?'â':Number(v).toLocaleString(); }
+function fmtPct(v){ return v===null?'â':v+'%'; }
 
-// ── Channel score → color ──────────────────────────────────────
+// ââ Channel score â color ââââââââââââââââââââââââââââââââââââââ
 function scoreColor(s){
   if(s>=80) return 'var(--teal)';
   if(s>=50) return 'var(--blue)';
@@ -843,7 +853,7 @@ function scoreColor(s){
   return 'var(--red)';
 }
 
-// ── Populate ticker bar ────────────────────────────────────────
+// ââ Populate ticker bar ââââââââââââââââââââââââââââââââââââââââ
 function buildTicker(m){
   const channels = m.channels||[];
   const top = m.top_combos||[];
@@ -860,17 +870,17 @@ function buildTicker(m){
   });
   if(top.length>0){
     const t=top[0];
-    items.push(`<span class="tick-item"><span class="tick-label">#1 COMBO</span><span class="tick-up">${t.product}×${t.channel_label||t.channel} SCORE ${t.score} ▲▲</span></span>`);
+    items.push(`<span class="tick-item"><span class="tick-label">#1 COMBO</span><span class="tick-up">${t.product}Ã${t.channel_label||t.channel} SCORE ${t.score} â²â²</span></span>`);
   }
   const html = [...items,...items].join(''); // double for seamless loop
   document.getElementById('ticker-inner').innerHTML = html || '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Run decision_engine.py to populate</span></span>';
 }
 
-// ── Populate overview KPIs ─────────────────────────────────────
+// ââ Populate overview KPIs âââââââââââââââââââââââââââââââââââââ
 function populateOverview(m){
   const rev = m.revenue||{};
   document.getElementById('kpi-revenue').textContent = fmtUSD(rev.today_usd);
-  document.getElementById('kpi-revenue-sub').textContent = rev.today_usd!==null?'▲ Stripe live':'Stripe not connected';
+  document.getElementById('kpi-revenue-sub').textContent = rev.today_usd!==null?'â² Stripe live':'Stripe not connected';
   document.getElementById('kpi-orders').textContent = fmtNum(rev.total_orders);
   document.getElementById('kpi-orders-sub').textContent = rev.total_orders!==null?'Stripe live':'Stripe not connected';
 
@@ -878,41 +888,41 @@ function populateOverview(m){
   if(channels.length>0){
     const top=channels[0];
     document.getElementById('kpi-top-cpm').textContent = top.cpm===0?'FREE':'$'+top.cpm.toFixed(2);
-    document.getElementById('kpi-top-cpm-sub').textContent = '▲ '+top.label;
+    document.getElementById('kpi-top-cpm-sub').textContent = 'â² '+top.label;
   }
 
   const products=(m.products||[]).sort((a,b)=>b.margin_pct-a.margin_pct);
   if(products.length>0){
     const tp=products[0];
     document.getElementById('kpi-top-margin').textContent = tp.margin_pct+'%';
-    document.getElementById('kpi-top-margin-sub').textContent = '▲ '+tp.niche;
+    document.getElementById('kpi-top-margin-sub').textContent = 'â² '+tp.niche;
   }
 
   const top_combos=m.top_combos||[];
   if(top_combos.length>0){
     document.getElementById('kpi-top-score').textContent = top_combos[0].score;
-    document.getElementById('kpi-top-score-sub').textContent = '▲ '+(top_combos[0].product||'')+'×'+(top_combos[0].channel_label||top_combos[0].channel||'');
+    document.getElementById('kpi-top-score-sub').textContent = 'â² '+(top_combos[0].product||'')+'Ã'+(top_combos[0].channel_label||top_combos[0].channel||'');
   }
 
   const q=m.qdrant||{};
   const totalSessions = (q.general_knowledge||0)+(q.dropship_intel||0);
-  document.getElementById('kpi-sessions').textContent = totalSessions>0?fmtNum(totalSessions):'—';
+  document.getElementById('kpi-sessions').textContent = totalSessions>0?fmtNum(totalSessions):'â';
 }
 
-// ── Populate decision engine ────────────────────────────────────
+// ââ Populate decision engine ââââââââââââââââââââââââââââââââââââ
 function populateDecision(m){
   const tc=m.top_combos||[];
   const kill=m.kill||[];
   const scale=m.scale||[];
-  const combo=(c,fb)=>c?(c.product||'—')+' × '+(c.channel_label||c.channel||'—'):fb;
-  document.getElementById('de-rank1-combo').textContent = combo(tc[0],'—');
-  document.getElementById('de-rank1-score').textContent = tc[0]?'Score '+tc[0].score+' — SCALE NOW':'Run engine';
-  document.getElementById('de-rank2-combo').textContent = combo(tc[1],'—');
-  document.getElementById('de-rank2-score').textContent = tc[1]?'Score '+tc[1].score+' — SCALE':'Run engine';
-  document.getElementById('de-rank3-combo').textContent = combo(tc[2],'—');
-  document.getElementById('de-rank3-score').textContent = tc[2]?'Score '+tc[2].score+' — TEST':'Run engine';
-  document.getElementById('de-kill-combo').textContent = combo(kill[0],'—');
-  document.getElementById('de-kill-score').textContent = kill[0]?'Score '+kill[0].score+' — CUT':'Run engine';
+  const combo=(c,fb)=>c?(c.product||'â')+' Ã '+(c.channel_label||c.channel||'â'):fb;
+  document.getElementById('de-rank1-combo').textContent = combo(tc[0],'â');
+  document.getElementById('de-rank1-score').textContent = tc[0]?'Score '+tc[0].score+' â SCALE NOW':'Run engine';
+  document.getElementById('de-rank2-combo').textContent = combo(tc[1],'â');
+  document.getElementById('de-rank2-score').textContent = tc[1]?'Score '+tc[1].score+' â SCALE':'Run engine';
+  document.getElementById('de-rank3-combo').textContent = combo(tc[2],'â');
+  document.getElementById('de-rank3-score').textContent = tc[2]?'Score '+tc[2].score+' â TEST':'Run engine';
+  document.getElementById('de-kill-combo').textContent = combo(kill[0],'â');
+  document.getElementById('de-kill-score').textContent = kill[0]?'Score '+kill[0].score+' â CUT':'Run engine';
 
   if(m.generated_at) document.getElementById('de-table-updated').textContent = 'Updated: '+new Date(m.generated_at).toLocaleDateString();
 
@@ -926,18 +936,18 @@ function populateDecision(m){
     const badgeClass = c.action==='SCALE'?'badge-green':(c.action==='TEST'?'badge-gold':(c.action==='KILL'?'badge-red':'badge-muted'));
     return `<tr>
       <td><span class="rank-num ${rc}">${i+1}</span></td>
-      <td>${c.product||'—'}</td>
-      <td>${c.channel_label||c.channel||'—'}</td>
+      <td>${c.product||'â'}</td>
+      <td>${c.channel_label||c.channel||'â'}</td>
       <td style="color:var(--teal);font-weight:700">${fmtPct(c.margin_pct)}</td>
       <td style="color:${c.cpm===0?'var(--teal)':'var(--muted)'};font-weight:700">${c.cpm===0?'FREE':'$'+c.cpm}</td>
       <td style="color:${scoreColor(sc)};font-weight:800;font-size:16px">${sc}</td>
-      <td><span class="badge ${badgeClass}">${c.action||'—'}</span></td>
-      <td style="font-size:12px;color:var(--muted)">${c.action==='SCALE'?'Max volume →':(c.action==='TEST'?'3 posts, watch ROAS':(c.action==='KILL'?'Cut all spend':'Hold'))}</td>
+      <td><span class="badge ${badgeClass}">${c.action||'â'}</span></td>
+      <td style="font-size:12px;color:var(--muted)">${c.action==='SCALE'?'Max volume â':(c.action==='TEST'?'3 posts, watch ROAS':(c.action==='KILL'?'Cut all spend':'Hold'))}</td>
     </tr>`;
   }).join('');
 }
 
-// ── Populate channels ───────────────────────────────────────────
+// ââ Populate channels âââââââââââââââââââââââââââââââââââââââââââ
 function populateChannels(m){
   const channels=(m.channels||[]).sort((a,b)=>a.cpm-b.cpm);
   if(!channels.length) return;
@@ -948,7 +958,7 @@ function populateChannels(m){
     const cpmLabel = c.cpm===0?'FREE':'$'+c.cpm.toFixed(2);
     const col = c.cpm===0?'var(--teal)':(c.cpm<1?'var(--teal)':(c.cpm<5?'var(--blue)':(c.cpm<15?'var(--gold)':'var(--red)')));
     return `<div class="channel-row">
-      <div class="channel-name">${CH_EMOJI[c.key]||'📡'} ${c.label}</div>
+      <div class="channel-name">${CH_EMOJI[c.key]||'ð¡'} ${c.label}</div>
       <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col}"></div></div>
       <div class="channel-cpm" style="color:${col}">${cpmLabel}</div>
       <div class="channel-score" style="color:${col}">${c.score}</div>
@@ -956,7 +966,7 @@ function populateChannels(m){
   }).join('');
 }
 
-// ── Populate products ───────────────────────────────────────────
+// ââ Populate products âââââââââââââââââââââââââââââââââââââââââââ
 function populateProducts(m){
   const products=(m.products||[]).sort((a,b)=>b.margin_pct-a.margin_pct);
   const scale=m.scale||[];
@@ -966,8 +976,8 @@ function populateProducts(m){
 
   if(products.length>0){
     const tp=products[0];
-    document.getElementById('prod-top-name').textContent = tp.niche||tp.name||'—';
-    document.getElementById('prod-top-margin').textContent = '▲ '+tp.margin_pct+'% avg margin';
+    document.getElementById('prod-top-name').textContent = tp.niche||tp.name||'â';
+    document.getElementById('prod-top-margin').textContent = 'â² '+tp.margin_pct+'% avg margin';
   }
   document.getElementById('prod-count').textContent = fmtNum(products.length||null);
   document.getElementById('prod-scale-count').textContent = fmtNum((m.summary||{}).scale_count||null);
@@ -979,28 +989,28 @@ function populateProducts(m){
     const em=nicheEmoji(p.niche||'');
     const col=p.margin_pct>=60?'var(--teal)':(p.margin_pct<40?'var(--red)':'var(--gold)');
     const bestCombo=_allCombos.find(c=>c.product===p.name);
-    const chLabel=bestCombo?(bestCombo.channel_label||bestCombo.channel):'—';
+    const chLabel=bestCombo?(bestCombo.channel_label||bestCombo.channel):'â';
     return `<div class="prod-card">
       <div class="prod-card-top">
         <div class="prod-card-emoji">${em}</div>
         <div class="prod-card-info">
           <div class="prod-card-name">${p.name}</div>
-          <div class="prod-card-meta">${p.niche||''}${p.trending?' · 🔥 Trending':''}${chLabel!=='—'?' · Best: '+chLabel:''}</div>
+          <div class="prod-card-meta">${p.niche||''}${p.trending?' Â· ð¥ Trending':''}${chLabel!=='â'?' Â· Best: '+chLabel:''}</div>
         </div>
         <div class="prod-card-margin" style="color:${col}">${p.margin_pct}%</div>
       </div>
       <div class="prod-card-btns">
-        <button class="btn-supplier" onclick="openSupplierWizard(${i})">🏗️ Get Supplier</button>
-        <button class="btn-push" onclick="openSupplierWizard(${i},true)">🚀 Push to Production</button>
-        <a class="btn-prometheus" href="/content">🔥 Prometheus Studio</a>
-        ${p.trending?'<span class="prod-channel-badge">🔥 Trending</span>':''}
+        <button class="btn-supplier" onclick="openSupplierWizard(${i})">ðï¸ Get Supplier</button>
+        <button class="btn-push" onclick="openSupplierWizard(${i},true)">ð Push to Production</button>
+        <a class="btn-prometheus" href="/content">ð¥ Prometheus Studio</a>
+        ${p.trending?'<span class="prod-channel-badge">ð¥ Trending</span>':''}
         ${bestCombo&&bestCombo.score>=70?'<span class="prod-channel-badge" style="background:rgba(34,197,94,.12);color:var(--green)">SCALE</span>':''}
       </div>
     </div>`;
   }).join('');
 }
 
-// ── Populate memory section ─────────────────────────────────────
+// ââ Populate memory section âââââââââââââââââââââââââââââââââââââ
 function populateMemory(m){
   const q=m.qdrant||{};
   document.getElementById('mem-dropship').textContent = fmtNum(q.dropship_intel||null);
@@ -1012,7 +1022,7 @@ function populateMemory(m){
   document.getElementById('memory-sub').textContent = 'Semantic search across '+fmtNum(totalSessions||null)+' vectors in Qdrant. Start Quinn bridge + ngrok to activate.';
 }
 
-// ── Status pill ─────────────────────────────────────────────────
+// ââ Status pill âââââââââââââââââââââââââââââââââââââââââââââââââ
 function setStatusPill(src){
   const pill=document.getElementById('metrics-status-pill');
   const dot=pill.querySelector('.dot');
@@ -1023,7 +1033,7 @@ function setStatusPill(src){
   } else if(src.decisions!=='unavailable'){
     pill.className='status-pill pill-gold';
     dot.className='dot dot-gold';
-    pill.innerHTML='<div class="dot dot-gold"></div>Partial — Run Engine';
+    pill.innerHTML='<div class="dot dot-gold"></div>Partial â Run Engine';
   } else {
     pill.className='status-pill pill-red';
     dot.className='dot dot-red';
@@ -1031,7 +1041,7 @@ function setStatusPill(src){
   }
 }
 
-// ── Main: fetch /api/metrics and populate everything ───────────
+// ââ Main: fetch /api/metrics and populate everything âââââââââââ
 async function loadMetrics(){
   try{
     const res = await fetch('/api/metrics');
@@ -1047,10 +1057,10 @@ async function loadMetrics(){
     setStatusPill(m.sources||{});
   } catch(e){
     console.warn('Metrics load failed:',e.message);
-    // Show — everywhere, do not show fake numbers
+    // Show â everywhere, do not show fake numbers
     document.getElementById('ticker-inner').innerHTML =
-      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline — run decision_engine.py + Quinn bridge</span></span>'+
-      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline — run decision_engine.py + Quinn bridge</span></span>';
+      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline â run decision_engine.py + Quinn bridge</span></span>'+
+      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline â run decision_engine.py + Quinn bridge</span></span>';
     const pill=document.getElementById('metrics-status-pill');
     pill.className='status-pill pill-red';
     pill.innerHTML='<div class="dot dot-red"></div>Metrics Offline';
@@ -1059,26 +1069,26 @@ async function loadMetrics(){
 loadMetrics();
 setInterval(loadMetrics, 60000); // Refresh every 60s
 
-// ── Memory search ───────────────────────────────────────────────
+// ââ Memory search âââââââââââââââââââââââââââââââââââââââââââââââ
 async function runSearch(){
   const query=document.getElementById('search-input').value.trim();
   if(!query) return;
   const resultsDiv=document.getElementById('search-results');
-  resultsDiv.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Searching Quinn memory stack…</div>';
+  resultsDiv.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Searching Quinn memory stackâ¦</div>';
   try{
     const resp=await fetch('http://localhost:4001/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,top_k:5})});
     if(!resp.ok) throw new Error('Quinn not reachable');
     const data=await resp.json();
     const results=data.results||[];
     if(!results.length){resultsDiv.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">No results. Is Quinn stack running?</div>';return;}
-    resultsDiv.innerHTML=results.map(r=>`<div class="result-card"><div class="result-source">${r.project||'general'} · ${r.section||'—'}</div><div class="result-text">${r.text}</div><div class="result-score">Score: ${(r.score||0).toFixed(3)} · ${r.source||''}</div></div>`).join('');
+    resultsDiv.innerHTML=results.map(r=>`<div class="result-card"><div class="result-source">${r.project||'general'} Â· ${r.section||'â'}</div><div class="result-text">${r.text}</div><div class="result-score">Score: ${(r.score||0).toFixed(3)} Â· ${r.source||''}</div></div>`).join('');
   } catch(e){
     resultsDiv.innerHTML=`<div class="result-card" style="border-color:var(--red)"><div class="result-source" style="color:var(--red)">Quinn Stack Offline</div><div class="result-text">Memory search requires the local Quinn stack to be running.<br><br>Run: <code style="background:var(--navy3);padding:2px 6px;border-radius:4px">START_QUINN_BRIDGE.bat</code></div></div>`;
   }
 }
 document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch()});
 
-// ── Supplier Wizard ─────────────────────────────────────────────
+// ââ Supplier Wizard âââââââââââââââââââââââââââââââââââââââââââââ
 let _wizardProduct = null;
 const SUPPLIER_URLS = {
   zendrop:'https://zendrop.com/products?search=',
@@ -1088,7 +1098,7 @@ const SUPPLIER_URLS = {
 };
 function openSupplierWizard(productIndex,scrollToPush){
   const p=_allProducts[productIndex];
-  if(!p){alert('Product data not loaded — run decision_engine.py first');return;}
+  if(!p){alert('Product data not loaded â run decision_engine.py first');return;}
   _wizardProduct=p;
   document.getElementById('modal-product-name').textContent=p.name;
   document.getElementById('modal-product-name2').textContent=p.name;
@@ -1097,7 +1107,7 @@ function openSupplierWizard(productIndex,scrollToPush){
   document.getElementById('modal-margin').textContent=p.margin_pct+'%';
   const bestCombo=_allCombos.find(c=>c.product===p.name);
   document.getElementById('modal-channel-label').textContent=bestCombo
-    ?`${bestCombo.channel_label||bestCombo.channel} · Score ${bestCombo.score} · ${bestCombo.action}`
+    ?`${bestCombo.channel_label||bestCombo.channel} Â· Score ${bestCombo.score} Â· ${bestCombo.action}`
     :'Run decision_engine.py for channel recommendation';
   const q=encodeURIComponent(p.name);
   document.getElementById('link-zendrop').value=SUPPLIER_URLS.zendrop+q;
@@ -1118,7 +1128,7 @@ function switchSupplier(key,btn){
 }
 function copyLink(inputId){
   const el=document.getElementById(inputId);if(!el)return;
-  navigator.clipboard.writeText(el.value).then(()=>{const btn=el.nextElementSibling;if(btn){const orig=btn.textContent;btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent=orig,1800);}}).catch(()=>{el.select();document.execCommand('copy');});
+  navigator.clipboard.writeText(el.value).then(()=>{const btn=el.nextElementSibling;if(btn){const orig=btn.textContent;btn.textContent='â Copied!';setTimeout(()=>btn.textContent=orig,1800);}}).catch(()=>{el.select();document.execCommand('copy');});
 }
 function openSupplier(key){if(!_wizardProduct)return;window.open(SUPPLIER_URLS[key]+encodeURIComponent(_wizardProduct.name),'_blank');}
 function pushToProduction(supplierKey){
@@ -1127,7 +1137,7 @@ function pushToProduction(supplierKey){
   try{sessionStorage.setItem('prometheus_queued_product',JSON.stringify({product:_wizardProduct.name,niche:_wizardProduct.niche,margin:_wizardProduct.margin_pct,supplier:supplierKey,timestamp:new Date().toISOString(),bestCombo:_allCombos.find(c=>c.product===_wizardProduct.name)||null}));}catch(e){}
 }
 
-// ── Populate revenue tab ────────────────────────────────────────
+// ââ Populate revenue tab ââââââââââââââââââââââââââââââââââââââââ
 function populateRevenue(m){
   const rev=m.revenue||{};
   const channels=(m.channels||[]).sort((a,b)=>a.cpm-b.cpm);
@@ -1138,11 +1148,11 @@ function populateRevenue(m){
   document.getElementById('rev-orders').textContent=fmtNum(rev.total_orders);
   const aov=rev.total_orders>0&&rev.month_usd>0?(rev.month_usd/rev.total_orders):null;
   document.getElementById('rev-aov').textContent=fmtUSD(aov);
-  document.getElementById('rev-today-sub').textContent=rev.today_usd!==null?'▲ Stripe live':'Add STRIPE_SECRET_KEY';
-  document.getElementById('rev-month-sub').textContent=rev.month_usd!==null?'▲ Stripe live':'Add STRIPE_SECRET_KEY';
+  document.getElementById('rev-today-sub').textContent=rev.today_usd!==null?'â² Stripe live':'Add STRIPE_SECRET_KEY';
+  document.getElementById('rev-month-sub').textContent=rev.month_usd!==null?'â² Stripe live':'Add STRIPE_SECRET_KEY';
   document.getElementById('rev-orders-sub').textContent=rev.total_orders!==null?'Stripe live':'Add STRIPE_SECRET_KEY';
-  if(tc.length>0){document.getElementById('rev-best-roas').textContent=tc[0].channel_label||tc[0].channel||'—';document.getElementById('rev-best-roas-sub').textContent='Score '+tc[0].score+' · '+tc[0].action;}
-  if(products.length>0){document.getElementById('rev-best-margin').textContent=products[0].margin_pct+'%';document.getElementById('rev-best-margin-sub').textContent=products[0].name||'—';}
+  if(tc.length>0){document.getElementById('rev-best-roas').textContent=tc[0].channel_label||tc[0].channel||'â';document.getElementById('rev-best-roas-sub').textContent='Score '+tc[0].score+' Â· '+tc[0].action;}
+  if(products.length>0){document.getElementById('rev-best-margin').textContent=products[0].margin_pct+'%';document.getElementById('rev-best-margin-sub').textContent=products[0].name||'â';}
   const roasList=document.getElementById('roas-channel-list');
   if(channels.length>0){
     const maxS=Math.max(...channels.map(c=>c.score||0));
@@ -1151,7 +1161,7 @@ function populateRevenue(m){
       const pct=maxS>0?Math.round((c.score/maxS)*100):0;
       const action=c.score>=70?'SCALE':(c.score>=40?'TEST':'HOLD');
       return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="width:22px">${CH_EMOJI[c.key]||'📡'}</div>
+        <div style="width:22px">${CH_EMOJI[c.key]||'ð¡'}</div>
         <div style="flex:1"><div style="font-size:12px;font-weight:700;margin-bottom:3px">${c.label}</div>
           <div style="height:5px;background:var(--navy3);border-radius:3px"><div style="height:5px;width:${pct}%;background:${col};border-radius:3px"></div></div></div>
         <div style="text-align:right;min-width:80px"><div style="font-size:13px;font-weight:800;color:${col}">${c.cpm===0?'FREE':'$'+c.cpm.toFixed(2)}</div>
@@ -1177,9 +1187,9 @@ function populateRevenue(m){
       const action=c.score>=70?'SCALE':(c.score>=40?'TEST':(c.score>=20?'HOLD':'KILL'));
       const bc=c.score>=70?'badge-green':(c.score>=40?'badge-gold':(c.score>=20?'badge-muted':'badge-red'));
       return `<tr style="border-bottom:1px solid var(--border)">
-        <td style="padding:9px 12px">${CH_EMOJI[c.key]||'📡'} ${c.label}</td>
+        <td style="padding:9px 12px">${CH_EMOJI[c.key]||'ð¡'} ${c.label}</td>
         <td style="text-align:right;padding:9px 12px;font-weight:800;color:${col}">${c.cpm===0?'FREE':'$'+c.cpm.toFixed(2)}</td>
-        <td style="text-align:right;padding:9px 12px;color:var(--muted)">${c.viral_coeff||'—'}</td>
+        <td style="text-align:right;padding:9px 12px;color:var(--muted)">${c.viral_coeff||'â'}</td>
         <td style="text-align:right;padding:9px 12px;font-weight:800;color:${col}">${c.score}</td>
         <td style="text-align:right;padding:9px 12px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.score>=40?'var(--green)':'var(--muted)'};margin-right:6px"></span>${c.score>=40?'Active':'Monitor'}</td>
         <td style="text-align:right;padding:9px 12px"><span class="badge ${bc}">${action}</span></td></tr>`;
@@ -1190,7 +1200,7 @@ function populateRevenue(m){
     const dot=document.getElementById('api-dot-'+key);const status=document.getElementById('api-status-'+key);
     if(!dot||!status)return;
     dot.style.background=connected?'var(--green)':'var(--muted)';
-    status.textContent='Status: '+(connected?'✅ Connected':'⚠️ Not connected — add key to .env');
+    status.textContent='Status: '+(connected?'â Connected':'â ï¸ Not connected â add key to .env');
     status.style.color=connected?'var(--green)':'var(--muted)';
   }
   setApiDot('stripe',src2.stripe==='live');
@@ -1202,7 +1212,7 @@ function populateRevenue(m){
 
 </script>
 
-<!-- ═══════════════ CHAT WIDGET ═══════════════ -->
+<!-- âââââââââââââââ CHAT WIDGET âââââââââââââââ -->
 <style>
 #ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
 #ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
@@ -1233,11 +1243,11 @@ function populateRevenue(m){
 </button>
 <div id="ai-chat-panel">
   <div id="ai-chat-header">
-    <div class="title"><span class="dot"></span>Claude AI — Drop Ship Intel</div>
-    <button id="ai-chat-close" onclick="toggleChat()">✕</button>
+    <div class="title"><span class="dot"></span>Claude AI â Drop Ship Intel</div>
+    <button id="ai-chat-close" onclick="toggleChat()">â</button>
   </div>
   <div id="ai-chat-msgs">
-    <div class="cm cm-ai">Hey Alex 👋 I'm your Drop Ship AI. Ask me anything — products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
+    <div class="cm cm-ai">Hey Alex ð I'm your Drop Ship AI. Ask me anything â products, channels, strategy, margins, content ideas. I'm wired into your playbooks.</div>
   </div>
   <div id="ai-chat-input-row">
     <input id="ai-chat-input" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
@@ -1271,7 +1281,7 @@ function populateRevenue(m){
     input.value='';input.disabled=true;btn.disabled=true;
     addMsg(userText,'user');
     history.push({role:'user',content:userText});
-    const thinking=addMsg('…','ai');
+    const thinking=addMsg('â¦','ai');
     thinking.className='cm cm-ai cm-typing';
     try{
       const res=await fetch('/api/chat',{
@@ -1299,29 +1309,29 @@ function populateRevenue(m){
 })();
 </script>
 
-<!-- ═══════════════ SUPPLIER WIZARD MODAL ═══════════════ -->
+<!-- âââââââââââââââ SUPPLIER WIZARD MODAL âââââââââââââââ -->
 <div class="modal-overlay" id="supplier-modal" onclick="closeSupplierModal(event)">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-title">🏗️ Supplier Wizard — <span id="modal-product-name">Product</span></div>
-      <button class="modal-close" onclick="document.getElementById('supplier-modal').classList.remove('open')">✕</button>
+      <div class="modal-title">ðï¸ Supplier Wizard â <span id="modal-product-name">Product</span></div>
+      <button class="modal-close" onclick="document.getElementById('supplier-modal').classList.remove('open')">â</button>
     </div>
     <div class="modal-body">
       <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:14px">
-        <div style="font-size:28px" id="modal-product-emoji">📦</div>
+        <div style="font-size:28px" id="modal-product-emoji">ð¦</div>
         <div style="flex:1">
-          <div style="font-size:14px;font-weight:700" id="modal-product-name2">—</div>
-          <div style="font-size:12px;color:var(--muted)" id="modal-product-niche">—</div>
+          <div style="font-size:14px;font-weight:700" id="modal-product-name2">â</div>
+          <div style="font-size:12px;color:var(--muted)" id="modal-product-niche">â</div>
         </div>
         <div style="text-align:right">
-          <div style="font-size:22px;font-weight:900;color:var(--teal)" id="modal-margin">—</div>
+          <div style="font-size:22px;font-weight:900;color:var(--teal)" id="modal-margin">â</div>
           <div style="font-size:10px;color:var(--muted)">est. margin</div>
         </div>
       </div>
       <div style="background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:12px;display:flex;align-items:center;gap:8px">
-        <span style="font-size:16px">⚡</span>
+        <span style="font-size:16px">â¡</span>
         <span style="color:var(--teal);font-weight:700">Decision Engine Rec:</span>
-        <span id="modal-channel-label" style="color:var(--text)">Loading…</span>
+        <span id="modal-channel-label" style="color:var(--text)">Loadingâ¦</span>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <button class="supplier-tab active" onclick="switchSupplier('zendrop',this)">Zendrop</button>
@@ -1330,56 +1340,97 @@ function populateRevenue(m){
         <button class="supplier-tab" onclick="switchSupplier('cj',this)">CJ Drop</button>
       </div>
       <div id="sc-zendrop" class="supplier-card active">
-        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--teal)">Zendrop — US Warehouse · Fast Ship · Best Quality</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--teal)">Zendrop â US Warehouse Â· Fast Ship Â· Best Quality</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-          <div class="supplier-stat-box"><div class="supplier-stat-val">3–7d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">3â7d</div><div class="supplier-stat-lbl">Shipping</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">High</div><div class="supplier-stat-lbl">Quality</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">Auto</div><div class="supplier-stat-lbl">Fulfillment</div></div>
         </div>
         <div class="link-box"><input class="link-input" id="link-zendrop" readonly/><button class="btn-copy" onclick="copyLink('link-zendrop')">Copy</button></div>
-        <button class="btn-open-supplier" onclick="openSupplier('zendrop')">🔍 Search Zendrop for This Product</button>
-        <button class="btn-push-prod" onclick="pushToProduction('zendrop')">🚀 Push to Production with Zendrop</button>
-        <div class="push-confirm" id="pc-zendrop">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+        <button class="btn-open-supplier" onclick="openSupplier('zendrop')">ð Search Zendrop for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('zendrop')">ð Push to Production with Zendrop</button>
+        <div class="push-confirm" id="pc-zendrop">â Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio â</a></div>
       </div>
       <div id="sc-autods" class="supplier-card">
-        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--blue)">AutoDS — Automation-First · AI Pricing · 25+ Suppliers</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--blue)">AutoDS â Automation-First Â· AI Pricing Â· 25+ Suppliers</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-          <div class="supplier-stat-box"><div class="supplier-stat-val">5–12d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">5â12d</div><div class="supplier-stat-lbl">Shipping</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">Auto</div><div class="supplier-stat-lbl">Price Watch</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">Bulk</div><div class="supplier-stat-lbl">Import</div></div>
         </div>
         <div class="link-box"><input class="link-input" id="link-autods" readonly/><button class="btn-copy" onclick="copyLink('link-autods')">Copy</button></div>
-        <button class="btn-open-supplier" onclick="openSupplier('autods')">🔍 Search AutoDS for This Product</button>
-        <button class="btn-push-prod" onclick="pushToProduction('autods')">🚀 Push to Production with AutoDS</button>
-        <div class="push-confirm" id="pc-autods">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+        <button class="btn-open-supplier" onclick="openSupplier('autods')">ð Search AutoDS for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('autods')">ð Push to Production with AutoDS</button>
+        <div class="push-confirm" id="pc-autods">â Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio â</a></div>
       </div>
       <div id="sc-ali" class="supplier-card">
-        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--gold)">AliExpress — Lowest Cost · Huge Selection · ePacket</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--gold)">AliExpress â Lowest Cost Â· Huge Selection Â· ePacket</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-          <div class="supplier-stat-box"><div class="supplier-stat-val">10–20d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">10â20d</div><div class="supplier-stat-lbl">Shipping</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">Lowest</div><div class="supplier-stat-lbl">Cost</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">Huge</div><div class="supplier-stat-lbl">Selection</div></div>
         </div>
         <div class="link-box"><input class="link-input" id="link-ali" readonly/><button class="btn-copy" onclick="copyLink('link-ali')">Copy</button></div>
-        <button class="btn-open-supplier" onclick="openSupplier('ali')">🔍 Search AliExpress for This Product</button>
-        <button class="btn-push-prod" onclick="pushToProduction('ali')">🚀 Push to Production with AliExpress</button>
-        <div class="push-confirm" id="pc-ali">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+        <button class="btn-open-supplier" onclick="openSupplier('ali')">ð Search AliExpress for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('ali')">ð Push to Production with AliExpress</button>
+        <div class="push-confirm" id="pc-ali">â Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio â</a></div>
       </div>
       <div id="sc-cj" class="supplier-card">
-        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--purple)">CJ Dropshipping — US+CN Warehouses · Print on Demand</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--purple)">CJ Dropshipping â US+CN Warehouses Â· Print on Demand</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-          <div class="supplier-stat-box"><div class="supplier-stat-val">5–10d</div><div class="supplier-stat-lbl">Shipping</div></div>
+          <div class="supplier-stat-box"><div class="supplier-stat-val">5â10d</div><div class="supplier-stat-lbl">Shipping</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">POD</div><div class="supplier-stat-lbl">Print On Demand</div></div>
           <div class="supplier-stat-box"><div class="supplier-stat-val">Free</div><div class="supplier-stat-lbl">Sourcing</div></div>
         </div>
         <div class="link-box"><input class="link-input" id="link-cj" readonly/><button class="btn-copy" onclick="copyLink('link-cj')">Copy</button></div>
-        <button class="btn-open-supplier" onclick="openSupplier('cj')">🔍 Search CJ for This Product</button>
-        <button class="btn-push-prod" onclick="pushToProduction('cj')">🚀 Push to Production with CJ</button>
-        <div class="push-confirm" id="pc-cj">✅ Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio →</a></div>
+        <button class="btn-open-supplier" onclick="openSupplier('cj')">ð Search CJ for This Product</button>
+        <button class="btn-push-prod" onclick="pushToProduction('cj')">ð Push to Production with CJ</button>
+        <div class="push-confirm" id="pc-cj">â Queued! Go to <a href="/content" style="color:var(--teal)">Prometheus Studio â</a></div>
       </div>
     </div>
   </div>
 </div>
 
+
+<!-- LAUNCH MODAL -->
+<div class="launch-modal-overlay" id="launch-modal">
+  <div class="launch-modal">
+    <div class="launch-modal-header">
+      <h2>🚀 Launch ShipStack AI</h2>
+      <button class="launch-modal-close" onclick="closeLaunchModal()">✕</button>
+    </div>
+    <div class="launch-modal-sub">3 steps — takes ~30 seconds on your Windows machine.</div>
+    <div class="launch-step">
+      <div class="launch-step-num">1</div>
+      <div class="launch-step-text">
+        <div class="launch-step-title">Double-click the desktop shortcut</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">Find <strong style="color:var(--text)">LAUNCH SHIPSTACK.lnk</strong> on your desktop — starts Quinn Bridge + ngrok automatically.</div>
+      </div>
+    </div>
+    <div class="launch-step">
+      <div class="launch-step-num">2</div>
+      <div class="launch-step-text">
+        <div class="launch-step-title">Copy the ngrok URL</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">In the ngrok window, copy the line: <code style="color:var(--teal);background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">https://xxxx.ngrok-free.app</code></div>
+      </div>
+    </div>
+    <div class="launch-step">
+      <div class="launch-step-num" style="background:var(--teal)">3</div>
+      <div class="launch-step-text">
+        <div class="launch-step-title">Paste into Vercel → QUINN_ENDPOINT</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">Set <code style="color:var(--gold);background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">QUINN_ENDPOINT = https://xxxx.ngrok-free.app</code> — live chat activates in 60s.</div>
+        <a href="https://vercel.com/togetherwe/shipstack-ai/settings/environment-variables" target="_blank" style="display:inline-block;margin-top:8px;font-size:13px;color:var(--blue);font-weight:700;text-decoration:none">→ Open Vercel Settings</a>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:14px 18px;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.25);border-radius:12px;font-size:13px;color:var(--teal)">
+      ✅ Stripe live · Anthropic active · Quinn ready · All 10 phases built
+    </div>
+  </div>
+</div>
+<script>
+function openLaunchModal(){document.getElementById('launch-modal').classList.add('open')}
+function closeLaunchModal(){document.getElementById('launch-modal').classList.remove('open')}
+document.addEventListener('DOMContentLoaded',function(){var m=document.getElementById('launch-modal');if(m)m.addEventListener('click',function(e){if(e.target===this)closeLaunchModal()})});
+</script>
 </body>
 </html>
