@@ -1091,16 +1091,19 @@ async function runSearch(){
   const query=document.getElementById('search-input').value.trim();
   if(!query) return;
   const resultsDiv=document.getElementById('search-results');
-  resultsDiv.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Searching Quinn memory stack…</div>';
+  resultsDiv.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Searching Quinn memory stack&#8230;</div>';
   try{
-    const resp=await fetch('http://localhost:4001/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,top_k:5})});
-    if(!resp.ok) throw new Error('Quinn not reachable');
+    const resp=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,collection:'dropship_intel',top_k:5})});
+    if(!resp.ok) throw new Error('Search API error '+resp.status);
     const data=await resp.json();
     const results=data.results||[];
-    if(!results.length){resultsDiv.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">No results. Is Quinn stack running?</div>';return;}
-    resultsDiv.innerHTML=results.map(r=>`<div class="result-card"><div class="result-source">${r.project||'general'} · ${r.section||'—'}</div><div class="result-text">${r.text}</div><div class="result-score">Score: ${(r.score||0).toFixed(3)} · ${r.source||''}</div></div>`).join('');
+    if(!results.length){resultsDiv.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">No results found.</div>';return;}
+    resultsDiv.innerHTML=results.map(r=>`<div class="result-card"><div class="result-source">${r.project||'general'} &#183; ${r.section||'&#8212;'}</div><div class="result-text">${r.text}</div><div class="result-score">Score: ${(r.score||0).toFixed(3)} &#183; ${r.source||''}</div></div>`).join('');
+    if(data.source==='claude_fallback'){
+      resultsDiv.insertAdjacentHTML('afterbegin','<div style="color:var(--yellow);font-size:11px;padding:4px 8px;margin-bottom:8px;background:rgba(255,200,0,0.08);border-radius:4px">[AI FALLBACK] Quinn bridge offline &#8212; answering via Claude AI</div>');
+    }
   } catch(e){
-    resultsDiv.innerHTML=`<div class="result-card" style="border-color:var(--red)"><div class="result-source" style="color:var(--red)">Quinn Stack Offline</div><div class="result-text">Memory search requires the local Quinn stack to be running.<br><br>Run: <code style="background:var(--navy3);padding:2px 6px;border-radius:4px">START_QUINN_BRIDGE.bat</code></div></div>`;
+    resultsDiv.innerHTML=`<div class="result-card" style="border-color:var(--red)"><div class="result-source" style="color:var(--red)">Search Error</div><div class="result-text">Memory search failed: ${e.message}<br><br>Set ANTHROPIC_API_KEY in Vercel env vars for AI fallback.</div></div>`;
   }
 }
 document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch()});
@@ -1148,10 +1151,25 @@ function copyLink(inputId){
   navigator.clipboard.writeText(el.value).then(()=>{const btn=el.nextElementSibling;if(btn){const orig=btn.textContent;btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent=orig,1800);}}).catch(()=>{el.select();document.execCommand('copy');});
 }
 function openSupplier(key){if(!_wizardProduct)return;window.open(SUPPLIER_URLS[key]+encodeURIComponent(_wizardProduct.name),'_blank');}
-function pushToProduction(supplierKey){
+async function pushToProduction(supplierKey){
   if(!_wizardProduct)return;
   const pc=document.getElementById('pc-'+supplierKey);if(pc)pc.classList.add('shown');
-  try{sessionStorage.setItem('prometheus_queued_product',JSON.stringify({product:_wizardProduct.name,niche:_wizardProduct.niche,margin:_wizardProduct.margin_pct,supplier:supplierKey,timestamp:new Date().toISOString(),bestCombo:_allCombos.find(c=>c.product===_wizardProduct.name)||null}));}catch(e){}
+  const statusEl=pc?pc.querySelector('.push-status')||null:null;
+  function setStatus(msg,color){if(statusEl){statusEl.textContent=msg;statusEl.style.color=color||'var(--green)';}}
+  setStatus('[QUEUING] Sending to Prometheus...','var(--yellow)');
+  const payload={product:_wizardProduct.name,niche:_wizardProduct.niche,margin:_wizardProduct.margin_pct,supplier:supplierKey,timestamp:new Date().toISOString(),bestCombo:_allCombos.find(c=>c.product===_wizardProduct.name)||null};
+  try{sessionStorage.setItem('prometheus_queued_product',JSON.stringify(payload));}catch(e){}
+  try{
+    const bestCombo=_allCombos.find(c=>c.product===_wizardProduct.name)||{};
+    const platforms=(bestCombo.channel?[bestCombo.channel]:['pinterest','tiktok']);
+    const resp=await fetch('/api/prometheus',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate_script',product:_wizardProduct.name,niche:_wizardProduct.niche,platforms})});
+    if(resp.ok){
+      const d=await resp.json();
+      if(d.script||d.result){setStatus('[DONE] Running in Prometheus Engine','var(--green)');}
+      else if(d.source==='claude_script'){setStatus('[AI SCRIPT] Script generated via Claude fallback','var(--green)');}
+      else{setStatus('[QUEUED] Prometheus offline — queued locally','var(--yellow)');}
+    } else {setStatus('[QUEUED] Prometheus offline — queued locally','var(--yellow)');}
+  } catch(err){setStatus('[QUEUED] Prometheus offline — queued locally','var(--yellow)');}
 }
 
 // ── Populate revenue tab ────────────────────────────────────────

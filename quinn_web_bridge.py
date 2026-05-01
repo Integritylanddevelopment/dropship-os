@@ -429,8 +429,45 @@ class BridgeHandler(BaseHTTPRequestHandler):
             self._proxy_prometheus(self.path[len("/prometheus"):], "POST", body)
             return
 
+        if self.path == "/search":
+            # Semantic memory search — called by /api/search Vercel edge function
+            if BRIDGE_SECRET:
+                auth = self.headers.get("Authorization", "")
+                if auth != f"Bearer {BRIDGE_SECRET}":
+                    self._json({"error": "Unauthorized"}, 401)
+                    return
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                data = json.loads(self.rfile.read(length))
+            except Exception:
+                self._json({"error": "Invalid JSON"}, 400)
+                return
+            query = data.get("query", "").strip()
+            collection = data.get("collection", "dropship_intel")
+            top_k = int(data.get("top_k", 5))
+            if not query:
+                self._json({"error": "query is required"}, 400)
+                return
+            # Override QDRANT_COLLECTIONS for this targeted search
+            original = list(QDRANT_COLLECTIONS)
+            QDRANT_COLLECTIONS.clear()
+            QDRANT_COLLECTIONS.append(collection)
+            if collection != "general_knowledge":
+                QDRANT_COLLECTIONS.append("general_knowledge")
+            try:
+                loop = asyncio.new_event_loop()
+                results = loop.run_until_complete(search_qdrant(query, top_k))
+                loop.close()
+                self._json({"results": results, "query": query, "collection": collection})
+            except Exception as e:
+                self._json({"error": str(e)}, 500)
+            finally:
+                QDRANT_COLLECTIONS.clear()
+                QDRANT_COLLECTIONS.extend(original)
+            return
+
         if self.path != "/chat":
-            self._json({"error": "POST to /chat"}, 404)
+            self._json({"error": "POST to /chat or /search"}, 404)
             return
 
         if BRIDGE_SECRET:
