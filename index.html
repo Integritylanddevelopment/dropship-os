@@ -1153,10 +1153,11 @@ function copyLink(inputId){
 function openSupplier(key){if(!_wizardProduct)return;window.open(SUPPLIER_URLS[key]+encodeURIComponent(_wizardProduct.name),'_blank');}
 async function pushToProduction(supplierKey){
   if(!_wizardProduct)return;
-  const pc=document.getElementById('pc-'+supplierKey);if(pc)pc.classList.add('shown');
-  const statusEl=pc?pc.querySelector('.push-status')||null:null;
-  function setStatus(msg,color){if(statusEl){statusEl.textContent=msg;statusEl.style.color=color||'var(--green)';}}
-  setStatus('[QUEUING] Sending to Prometheus...','var(--yellow)');
+  const pc=document.getElementById('pc-'+supplierKey);
+  if(pc){
+    pc.classList.add('shown');
+    pc.innerHTML='<span style="color:var(--yellow)">[QUEUING] Sending to Prometheus&#8230;</span>';
+  }
   const payload={product:_wizardProduct.name,niche:_wizardProduct.niche,margin:_wizardProduct.margin_pct,supplier:supplierKey,timestamp:new Date().toISOString(),bestCombo:_allCombos.find(c=>c.product===_wizardProduct.name)||null};
   try{sessionStorage.setItem('prometheus_queued_product',JSON.stringify(payload));}catch(e){}
   try{
@@ -1165,11 +1166,11 @@ async function pushToProduction(supplierKey){
     const resp=await fetch('/api/prometheus',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate_script',product:_wizardProduct.name,niche:_wizardProduct.niche,platforms})});
     if(resp.ok){
       const d=await resp.json();
-      if(d.script||d.result){setStatus('[DONE] Running in Prometheus Engine','var(--green)');}
-      else if(d.source==='claude_script'){setStatus('[AI SCRIPT] Script generated via Claude fallback','var(--green)');}
-      else{setStatus('[QUEUED] Prometheus offline — queued locally','var(--yellow)');}
-    } else {setStatus('[QUEUED] Prometheus offline — queued locally','var(--yellow)');}
-  } catch(err){setStatus('[QUEUED] Prometheus offline — queued locally','var(--yellow)');}
+      if(d.script||d.result){if(pc)pc.innerHTML='&#x2705; [DONE] Running in Prometheus Engine &mdash; <a href="/content" style="color:var(--teal)">Open Prometheus Studio &#8594;</a>';}
+      else if(d.source==='claude_script'){if(pc)pc.innerHTML='&#x2705; [AI SCRIPT] Script ready &mdash; <a href="/content" style="color:var(--teal)">Open Prometheus Studio &#8594;</a>';}
+      else{if(pc)pc.innerHTML='&#x26A1; [QUEUED] Prometheus offline &mdash; queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';}
+    } else {if(pc)pc.innerHTML='&#x26A1; [QUEUED] Prometheus offline &mdash; queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';}
+  } catch(err){if(pc)pc.innerHTML='&#x26A1; [QUEUED] Prometheus offline &mdash; queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';}
 }
 
 // ── Populate revenue tab ────────────────────────────────────────
