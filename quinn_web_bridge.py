@@ -335,7 +335,7 @@ async def fetch_qdrant_stats() -> dict:
                     timeout=5.0,
                 )
                 if resp.status_code == 200:
-                    count = resp.json().get("result", {}).get("vectors_count", 0)
+                    count = resp.json().get("result", {}).get("points_count", 0)
                     result[collection] = count
                     result["total_vectors"] += count
             except Exception as e:
