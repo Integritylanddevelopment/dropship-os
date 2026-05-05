@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/store",     "destination": "/store.html" },
     { "source": "/playbook",  "destination": "/playbook.html" },
     { "source": "/hormozi",   "destination": "/hormozi.html" },
     { "source": "/ecom-king", "destination": "/ecom-king.html" },
