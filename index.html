@@ -852,10 +852,20 @@ function showPage(id, btn){
 
 // ── Channel emoji map ──────────────────────────────────────────
 const CH_EMOJI = {
-  tiktok_organic:'🎵',pinterest_organic:'📌',youtube_shorts:'▶️',
-  reddit_organic:'🤖',instagram_reels:'📸',x_twitter:'🐦',
-  meta_paid:'📘',google_paid:'🔍'
+  tiktok_organic:'&#x1F3B5;',pinterest_organic:'&#x1F4CC;',youtube_shorts:'&#x25B6;&#xFE0F;',
+  reddit_organic:'&#x1F916;',instagram_reels:'&#x1F4F8;',x_twitter:'&#x1F426;',
+  meta_paid:'&#x1F4D8;',google_paid:'&#x1F50D;'
 };
+
+function nicheEmoji(niche){
+  const map={
+    'pet accessories':'&#x1F43E;','home kitchen':'&#x1F373;',
+    'fitness tools':'&#x1F4AA;','beauty skincare':'&#x1F484;',
+    'desk organizers':'&#x1F4CB;','led grow lights':'&#x1F331;',
+    'outdoor camping':'&#x26FA;','dropshipping':'&#x1F4E6;'
+  };
+  return map[(niche||'').toLowerCase()]||'&#x1F4E6;';
+}
 
 // ── Helper: format currency ────────────────────────────────────
 function fmtUSD(v){ return v===null?'—':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
