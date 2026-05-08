@@ -233,15 +233,12 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 <!-- NAV TABS -->
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="showPage('overview',this)">📊 Overview</button>
+  <button class="nav-tab" onclick="showPage('research',this)">🔬 Research</button>
   <button class="nav-tab" onclick="showPage('decision',this)">🎯 Decision Engine</button>
-  <button class="nav-tab" onclick="showPage('channels',this)">📡 Channels</button>
-  <button class="nav-tab" onclick="showPage('products',this)">📦 Products</button>
-  <button class="nav-tab" onclick="showPage('content',this)">🎬 Content</button>
+  <button class="nav-tab" onclick="showPage('shop',this)">🛒 Shop</button>
+  <button class="nav-tab" onclick="showPage('prometheus',this)">🔥 Prometheus</button>
   <button class="nav-tab" onclick="showPage('agents',this)">🤖 Agents</button>
-  <button class="nav-tab" onclick="showPage('memory',this)">🧠 Memory Search</button>
-  <button class="nav-tab" onclick="showPage('dashboards',this)">🖥️ Dashboards</button>
   <button class="nav-tab" onclick="showPage('revenue',this)">💰 Revenue</button>
-  <button class="nav-tab" onclick="showPage('buildplan',this)">🏗️ Build Plan</button>
 </div>
 
 <div class="main">
@@ -299,53 +296,53 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   <div class="grid-2-1">
     <div class="card">
       <div class="card-title"><div class="icon icon-blue">⚡</div>Operating System — 6-Layer Framework</div>
-      <div class="layer-row">
+      <div class="layer-row" onclick="showPage('research',document.querySelector('[onclick*=research]'))">
         <div class="layer-num ln-1">1</div>
         <div class="layer-content">
           <div class="layer-title">Research Engine</div>
-          <div class="layer-desc">Cheapest attention tracker · Highest margin product scanner · Viral content tracker · Competitor copy log</div>
+          <div class="layer-desc">Find winning products (highest margin) + find cheapest channels (lowest CPM). Collect competitor intel and content seeds.</div>
         </div>
-        <div class="layer-right"><span class="badge badge-gold">Scaffolded</span></div>
+        <div class="layer-right"><span class="badge badge-gold">Research Tab</span></div>
       </div>
-      <div class="layer-row">
+      <div class="layer-row" onclick="showPage('decision',document.querySelector('[onclick*=decision]'))">
         <div class="layer-num ln-2">2</div>
         <div class="layer-content">
           <div class="layer-title">Decision Layer</div>
-          <div class="layer-desc">Match product × channel · Score and rank · Weekly reallocation · Kill/scale signals</div>
+          <div class="layer-desc">Score and rank product × channel combos. Weekly reallocation. Kill/scale signals. Approve products to Shop.</div>
         </div>
-        <div class="layer-right"><span class="badge badge-green">Live</span></div>
+        <div class="layer-right"><span class="badge badge-green">Decision Tab</span></div>
       </div>
-      <div class="layer-row">
+      <div class="layer-row" onclick="showPage('shop',document.querySelector('[onclick*=shop]'))">
         <div class="layer-num ln-3">3</div>
         <div class="layer-content">
-          <div class="layer-title">Prometheus Creation Studio</div>
-          <div class="layer-desc">AI video generation · Pillar Builder · 6-channel repurposing pipeline · Auto-approve calendar</div>
+          <div class="layer-title">Shop</div>
+          <div class="layer-desc">Approved products live in store. Collect content collateral per product: videos, competitor ads, reviews, images, Zendrop links.</div>
         </div>
-        <div class="layer-right"><span class="badge badge-red">Building</span></div>
+        <div class="layer-right"><span class="badge badge-teal">Shop Tab</span></div>
       </div>
-      <div class="layer-row">
+      <div class="layer-row" onclick="showPage('prometheus',document.querySelector('[onclick*=prometheus]'))">
         <div class="layer-num ln-4">4</div>
         <div class="layer-content">
-          <div class="layer-title">Content Machine</div>
-          <div class="layer-desc">Gary V pillar content → TikTok / Reels / Shorts / Pinterest / Reddit / X micro-repurposing</div>
+          <div class="layer-title">Prometheus</div>
+          <div class="layer-desc">AI content creation from Shop collateral. Pillar video → 6-platform cut-downs. Calendar. Auto-approve pipeline.</div>
         </div>
-        <div class="layer-right"><span class="badge badge-gold">Scaffolded</span></div>
+        <div class="layer-right"><span class="badge badge-red">Prometheus Tab</span></div>
       </div>
-      <div class="layer-row">
+      <div class="layer-row" onclick="showPage('agents',document.querySelector('[onclick*=agents]'))">
         <div class="layer-num ln-5">5</div>
         <div class="layer-content">
-          <div class="layer-title">Automation Pipeline</div>
-          <div class="layer-desc">Auto site spin-up · Auto posting · Auto data pull · Auto fulfillment</div>
+          <div class="layer-title">Agents</div>
+          <div class="layer-desc">Auto-post to TikTok, Pinterest, Instagram, YouTube. AI scheduling, content distribution, platform automation.</div>
         </div>
-        <div class="layer-right"><span class="badge badge-red">Building</span></div>
+        <div class="layer-right"><span class="badge badge-gold">Agents Tab</span></div>
       </div>
-      <div class="layer-row">
+      <div class="layer-row" onclick="showPage('revenue',document.querySelector('[onclick*=revenue]'))">
         <div class="layer-num ln-6">6</div>
         <div class="layer-content">
-          <div class="layer-title">Metrics Dashboard</div>
-          <div class="layer-desc">CPM/CPC/CTR by channel · Margin by product · ROAS by combo · Stripe revenue live</div>
+          <div class="layer-title">Revenue</div>
+          <div class="layer-desc">Track Stripe revenue, ROAS by channel, margin by product. Feed results back to Research Engine to close the loop.</div>
         </div>
-        <div class="layer-right"><span class="badge badge-green">This File</span></div>
+        <div class="layer-right"><span class="badge badge-green">Revenue Tab</span></div>
       </div>
     </div>
 
@@ -371,6 +368,32 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
           <div><div style="font-size:13px;font-weight:700">Kamil Sattar (Ecom King)</div><div style="font-size:11px;color:var(--muted)">AI execution · Zendrop / AutoDS</div></div>
         </div>
         <div style="font-size:12px;color:var(--purple);padding:8px 12px;background:rgba(139,92,246,.08);border-radius:8px;border-left:3px solid var(--purple)">"Move fast with AI tools. Zendrop builds the store, AutoDS imports products. Ship in hours."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE TOOLS -->
+  <div class="card" style="margin-top:18px">
+    <div class="card-title"><div class="icon icon-purple">🗂️</div>Reference Tools</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Quick access to research memory, dashboards, and build plan.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer" onclick="showPage('memory',null)">
+        <div style="font-size:20px;margin-bottom:6px">🧠</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Memory Search</div>
+        <div style="font-size:11px;color:var(--muted)">Semantic search across Qdrant research memory. Find past research, strategies, intel.</div>
+        <div style="margin-top:10px"><span class="badge badge-purple" onclick="event.stopPropagation();showPage('memory',null)" style="cursor:pointer">Open Memory Search →</span></div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer" onclick="showPage('dashboards',null)">
+        <div style="font-size:20px;margin-bottom:6px">🖥️</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Dashboards</div>
+        <div style="font-size:11px;color:var(--muted)">Individual tool dashboards — Store, Playbooks, Pinterest, ROI Finder, Prometheus Studio.</div>
+        <div style="margin-top:10px"><span class="badge badge-blue" onclick="event.stopPropagation();showPage('dashboards',null)" style="cursor:pointer">Open Dashboards →</span></div>
+      </div>
+      <div style="background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer" onclick="showPage('buildplan',null)">
+        <div style="font-size:20px;margin-bottom:6px">🏗️</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Build Plan</div>
+        <div style="font-size:11px;color:var(--muted)">All 10 phases — foundation through full automation. Status of every component.</div>
+        <div style="margin-top:10px"><span class="badge badge-green" onclick="event.stopPropagation();showPage('buildplan',null)" style="cursor:pointer">View Build Plan →</span></div>
       </div>
     </div>
   </div>
@@ -426,116 +449,196 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 </div>
 
 <!-- ═══════════ CHANNELS ═══════════ -->
-<div class="page" id="page-channels">
+<div class="page" id="page-research">
   <div class="sec-header">
-    <div class="sec-title">📡 Channel Intelligence</div>
-    <div class="sec-sub">Cheapest attention wins — Gary Vee framework. Lower CPM = more volume per dollar.</div>
+    <div class="sec-title">🔬 Research Hub</div>
+    <div class="sec-sub">Find winning products AND the cheapest channels to promote them. Feed results to Decision Engine.</div>
   </div>
 
   <div class="grid-2">
-    <div class="card">
-      <div class="card-title"><div class="icon icon-teal">📉</div>CPM Ranking (Cheapest → Most Expensive)</div>
-      <div id="channel-bars" style="margin-top:4px">
-        <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Loading channel data…</div>
+    <!-- PRODUCT RESEARCH -->
+    <div>
+      <div class="card mb-18">
+        <div class="card-title"><div class="icon icon-teal">📦</div>Product Intelligence</div>
+        <div class="kpi-grid" style="margin-bottom:12px">
+          <div class="kpi-card kpi-teal"><div class="kpi-label">Top Margin Product</div><div class="kpi-value" id="prod-top-name" style="font-size:18px">—</div><div class="kpi-change up" id="prod-top-margin">Run engine to populate</div></div>
+          <div class="kpi-card kpi-gold"><div class="kpi-label">Products Tracked</div><div class="kpi-value" id="prod-count">—</div><div class="kpi-change" id="prod-count-sub">From decision engine</div></div>
+        </div>
+        <div class="card-title" style="margin-top:0"><div class="icon icon-teal">🏆</div>Top Product Opportunities</div>
+        <div id="product-list">
+          <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Run <code style="background:var(--navy3);padding:2px 6px;border-radius:4px">python decision_engine.py</code> to load real products</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="icon icon-gold">🏗️</div>Supplier Stack — Kamil Sattar Method</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
+            <div style="font-size:24px">⚡</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:2px">Zendrop</div>
+              <div style="font-size:11px;color:var(--muted)">AI store builder + automated fulfillment. First choice for US products.</div>
+              <div style="margin-top:6px"><span class="badge badge-gold">Connect API Key</span></div>
+            </div>
+          </div>
+          <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
+            <div style="font-size:24px">🤖</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:2px">AutoDS</div>
+              <div style="font-size:11px;color:var(--muted)">Product import automation. Price monitoring. Auto-order fulfillment.</div>
+              <div style="margin-top:6px"><span class="badge badge-gold">Connect API Key</span></div>
+            </div>
+          </div>
+          <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
+            <div style="font-size:24px">🛒</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:2px">AliExpress / CJ Dropshipping</div>
+              <div style="font-size:11px;color:var(--muted)">Fallback supplier. Wider catalog. 14–21d shipping unless CJ warehouse stock.</div>
+              <div style="margin-top:6px"><span class="badge badge-muted">Connect API Key</span></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-title"><div class="icon icon-blue">📊</div>Channel Properties</div>
-      <table class="winner-table" style="font-size:12px">
-        <thead><tr><th>Channel</th><th>Traffic Type</th><th>Best Niche Fit</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td>TikTok Organic</td><td>Discovery</td><td>Viral products</td><td><span class="badge badge-green">Priority 1</span></td></tr>
-          <tr><td>Pinterest Organic</td><td>Search intent</td><td>Home, Pet, Beauty</td><td><span class="badge badge-green">Priority 1</span></td></tr>
-          <tr><td>YouTube Shorts</td><td>Search + feed</td><td>Fitness, Gadgets</td><td><span class="badge badge-blue">Priority 2</span></td></tr>
-          <tr><td>Reddit Organic</td><td>Community</td><td>Tech, Gaming, Niche</td><td><span class="badge badge-blue">Priority 2</span></td></tr>
-          <tr><td>Instagram Reels</td><td>Discovery</td><td>Fashion, Lifestyle</td><td><span class="badge badge-gold">Test</span></td></tr>
-          <tr><td>X / Twitter</td><td>Conversation</td><td>Finance, Trend</td><td><span class="badge badge-muted">Monitor</span></td></tr>
-          <tr><td>Meta Paid</td><td>Paid interrupt</td><td>Retargeting only</td><td><span class="badge badge-red">Low Priority</span></td></tr>
+
+    <!-- CHANNEL RESEARCH -->
+    <div>
+      <div class="card mb-18">
+        <div class="card-title"><div class="icon icon-blue">📡</div>Channel Intelligence</div>
+        <div style="margin-bottom:12px;font-size:12px;color:var(--muted)">Cheapest attention wins — Gary Vee framework. Lower CPM = more volume per dollar.</div>
+        <div id="channel-bars" style="margin-top:4px">
+          <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Loading channel data…</div>
+        </div>
+      </div>
+      <div class="card mb-18">
+        <div class="card-title"><div class="icon icon-blue">📊</div>Channel Properties</div>
+        <table class="winner-table" style="font-size:12px">
+          <thead><tr><th>Channel</th><th>Traffic Type</th><th>Best Niche Fit</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>TikTok Organic</td><td>Discovery</td><td>Viral products</td><td><span class="badge badge-green">Priority 1</span></td></tr>
+            <tr><td>Pinterest Organic</td><td>Search intent</td><td>Home, Pet, Beauty</td><td><span class="badge badge-green">Priority 1</span></td></tr>
+            <tr><td>YouTube Shorts</td><td>Search + feed</td><td>Fitness, Gadgets</td><td><span class="badge badge-blue">Priority 2</span></td></tr>
+            <tr><td>Reddit Organic</td><td>Community</td><td>Tech, Gaming, Niche</td><td><span class="badge badge-blue">Priority 2</span></td></tr>
+            <tr><td>Instagram Reels</td><td>Discovery</td><td>Fashion, Lifestyle</td><td><span class="badge badge-gold">Test</span></td></tr>
+            <tr><td>X / Twitter</td><td>Conversation</td><td>Finance, Trend</td><td><span class="badge badge-muted">Monitor</span></td></tr>
+            <tr><td>Meta Paid</td><td>Paid interrupt</td><td>Retargeting only</td><td><span class="badge badge-red">Low Priority</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="icon icon-gold">💡</div>Gary Vee Rules — Channel Playbook</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:12px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--teal)">
+            <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px">Rule 1: Cheapest First</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Always max out organic (free) channels before spending a dollar on paid. TikTok, Pinterest, Reddit organic before any Meta spend.</div>
+          </div>
+          <div style="padding:12px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--blue)">
+            <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">Rule 2: Volume Over Perfection</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Post 3–5× per day on priority channels. Don't wait for the perfect post. Let data tell you what works, then double down.</div>
+          </div>
+          <div style="padding:12px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--gold)">
+            <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">Rule 3: Piggyback Viral</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Find viral content in your niche. Copy the format, the structure, the hook. Swap in your product. Never copy content — copy the strategy.</div>
+          </div>
+          <div style="padding:12px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--purple)">
+            <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">Rule 4: Repurpose Everything</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">One pillar piece → 10 micro-content pieces. TikTok video → Reels → Shorts → Pinterest pin → Reddit post → X thread → email.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SHOP ═══════════ -->
+<div class="page" id="page-shop">
+  <div class="sec-header">
+    <div class="sec-title">🛒 Shop — Approved Products</div>
+    <div class="sec-sub">Products approved by the Decision Engine and live in the store. Manage collateral, links, and content assets here.</div>
+  </div>
+
+  <div class="kpi-grid" style="margin-bottom:18px">
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Live Products</div><div class="kpi-value" id="shop-prod-count">—</div><div class="kpi-change up">In store</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Avg Margin</div><div class="kpi-value" id="shop-avg-margin">—</div><div class="kpi-change up">Decision engine</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Content Assets</div><div class="kpi-value" id="shop-asset-count">—</div><div class="kpi-change up">Total collateral</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-label">Store Status</div><div class="kpi-value" style="font-size:16px">🟢 Live</div><div class="kpi-change up"><a href="/store" target="_blank" style="color:var(--teal)">Open Store →</a></div></div>
+  </div>
+
+  <!-- Product Table -->
+  <div class="card mb-18">
+    <div class="card-title"><div class="icon icon-teal">🏆</div>Approved Products — Live in Store</div>
+    <div style="overflow-x:auto">
+      <table class="winner-table">
+        <thead><tr><th>Product</th><th>Niche</th><th>Margin %</th><th>Supplier</th><th>Score</th><th>Status</th></tr></thead>
+        <tbody id="shop-product-table-body">
+          <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Run <code style="background:var(--navy3);padding:2px 6px;border-radius:4px">python decision_engine.py</code> to populate approved products</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
+  <!-- Content Intelligence Panel -->
   <div class="card">
-    <div class="card-title"><div class="icon icon-gold">💡</div>Gary Vee Rules — Channel Playbook</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
-      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--teal)">
-        <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px">Rule 1: Cheapest First</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5">Always max out organic (free) channels before spending a dollar on paid. TikTok, Pinterest, Reddit organic before any Meta spend.</div>
+    <div class="card-title"><div class="icon icon-blue">🎨</div>Content Intelligence — Collateral Manager</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px">For each approved product, collect source material before feeding to Prometheus. Research, gather, attach.</div>
+
+    <div id="shop-collateral-list">
+      <!-- Sample product collateral cards - these will be dynamically populated -->
+      <div class="shop-collateral-item" style="background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-size:22px">📦</div>
+            <div>
+              <div style="font-size:14px;font-weight:700">Product Name (from Decision Engine)</div>
+              <div style="font-size:11px;color:var(--muted)">Niche · Margin —% · Score —</div>
+            </div>
+          </div>
+          <button onclick="alert('Web search coming soon — wire to Research Engine')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">🔍 Research Product</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+          <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">🎬 Source Videos</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">TikTok / YouTube raw footage, demo videos</div>
+            <input type="text" placeholder="Paste URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+          </div>
+          <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">📣 Competitor Ads</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Facebook Ad Library, TikTok ads</div>
+            <input type="text" placeholder="Paste URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+          </div>
+          <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">⭐ Reviews / Copy</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Amazon reviews, product copy, testimonials</div>
+            <textarea placeholder="Paste reviews or copy..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none;resize:vertical;min-height:52px;font-family:inherit"></textarea>
+          </div>
+          <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">🖼️ Images</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Product photos, lifestyle images, UGC</div>
+            <input type="text" placeholder="Paste image URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+          </div>
+          <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">⚡ Zendrop Link</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Supplier product page + fulfillment link</div>
+            <input type="text" placeholder="Zendrop product URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button style="background:var(--teal);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">💾 Save Collateral</button>
+          <button onclick="window.open('/content','_blank')" style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer">🔥 Send to Prometheus</button>
+        </div>
       </div>
-      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--blue)">
-        <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px">Rule 2: Volume Over Perfection</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5">Post 3–5× per day on priority channels. Don't wait for the perfect post. Let data tell you what works, then double down.</div>
-      </div>
-      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--gold)">
-        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">Rule 3: Piggyback Viral</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5">Find viral content in your niche. Copy the format, the structure, the hook. Swap in your product. Never copy content — copy the strategy.</div>
-      </div>
-      <div style="padding:14px;background:var(--navy3);border-radius:10px;border-left:3px solid var(--purple)">
-        <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">Rule 4: Repurpose Everything</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.5">One pillar piece → 10 micro-content pieces. TikTok video → Reels → Shorts → Pinterest pin → Reddit post → X thread → email.</div>
+
+      <div style="text-align:center;padding:16px">
+        <button onclick="addCollateralSlot()" style="background:var(--navy3);border:1px dashed var(--border);border-radius:10px;padding:12px 24px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;width:100%">+ Add Product Collateral Slot</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════ PRODUCTS ═══════════ -->
-<div class="page" id="page-products">
+
+<!-- ═══════════ PROMETHEUS ═══════════ -->
+<div class="page" id="page-prometheus">
   <div class="sec-header">
-    <div class="sec-title">📦 Product Intelligence</div>
-    <div class="sec-sub">Highest margin × cheapest to source × easiest to fulfill. Live from decision engine + supplier APIs.</div>
-  </div>
-
-  <div class="kpi-grid">
-    <div class="kpi-card kpi-teal"><div class="kpi-label">Top Margin Product</div><div class="kpi-value" id="prod-top-name" style="font-size:18px">—</div><div class="kpi-change up" id="prod-top-margin">Run engine to populate</div></div>
-    <div class="kpi-card kpi-gold"><div class="kpi-label">Products Tracked</div><div class="kpi-value" id="prod-count">—</div><div class="kpi-change" id="prod-count-sub">From decision engine</div></div>
-    <div class="kpi-card kpi-blue"><div class="kpi-label">Scale Combos</div><div class="kpi-value" id="prod-scale-count">—</div><div class="kpi-change up">Score ≥ 70</div></div>
-    <div class="kpi-card kpi-red"><div class="kpi-label">Kill Signals</div><div class="kpi-value" id="prod-kill-count">—</div><div class="kpi-change down">Score &lt; 30</div></div>
-  </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title"><div class="icon icon-teal">🏆</div>Top Product Opportunities</div>
-      <div id="product-list">
-        <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Run <code style="background:var(--navy3);padding:2px 6px;border-radius:4px">python decision_engine.py</code> to load real products</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><div class="icon icon-gold">🏗️</div>Supplier Stack — Kamil Sattar Method</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
-          <div style="font-size:24px">⚡</div>
-          <div>
-            <div style="font-size:13px;font-weight:700;margin-bottom:2px">Zendrop</div>
-            <div style="font-size:11px;color:var(--muted)">AI store builder + automated fulfillment. First choice for US products.</div>
-            <div style="margin-top:6px"><span class="badge badge-gold">Connect API Key</span></div>
-          </div>
-        </div>
-        <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
-          <div style="font-size:24px">🤖</div>
-          <div>
-            <div style="font-size:13px;font-weight:700;margin-bottom:2px">AutoDS</div>
-            <div style="font-size:11px;color:var(--muted)">Product import automation. Price monitoring. Auto-order fulfillment.</div>
-            <div style="margin-top:6px"><span class="badge badge-gold">Connect API Key</span></div>
-          </div>
-        </div>
-        <div style="padding:12px;background:var(--navy3);border-radius:10px;display:flex;gap:12px;align-items:center">
-          <div style="font-size:24px">🛒</div>
-          <div>
-            <div style="font-size:13px;font-weight:700;margin-bottom:2px">AliExpress / CJ Dropshipping</div>
-            <div style="font-size:11px;color:var(--muted)">Fallback supplier. Wider catalog. 14–21d shipping unless CJ warehouse stock.</div>
-            <div style="margin-top:6px"><span class="badge badge-muted">Connect API Key</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════ CONTENT ═══════════ -->
-<div class="page" id="page-content">
-  <div class="sec-header">
-    <div class="sec-title">🎬 Content Machine</div>
+    <div class="sec-title">🔥 Prometheus Creation Studio</div>
     <div class="sec-sub">Gary V method: 1 pillar piece → 6+ platform-ready pieces → calendar → auto-post. <a href="/content" style="color:var(--blue);text-decoration:none;font-weight:700">→ Open Prometheus Creation Studio</a></div>
   </div>
 
@@ -675,6 +778,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub">Click any card to open the dashboard.</div>
   </div>
   <div class="launcher-grid">
+    <a class="launcher-card" href="/store" target="_blank" style="border-color:rgba(0,201,167,.4)"><div class="launcher-icon">🛒</div><div class="launcher-title">ShipStack Store</div><div class="launcher-desc">5 AI-scored products with live Stripe checkout. Real revenue starts here.</div><div class="launcher-status ls-live">🟢 Live — Buy Now buttons active</div></a>
     <a class="launcher-card" href="/playbook" target="_blank"><div class="launcher-icon">📋</div><div class="launcher-title">Drop Ship Playbook</div><div class="launcher-desc">Social AI Agent playbook — full strategy, hooks, posting cadence</div><div class="launcher-status ls-live">🟢 Live</div></a>
     <a class="launcher-card" href="/hormozi" target="_blank"><div class="launcher-icon">💰</div><div class="launcher-title">Hormozi Playbook</div><div class="launcher-desc">Offer construction, value stacking, $100M Offers framework</div><div class="launcher-status ls-live">🟢 Live</div></a>
     <a class="launcher-card" href="/ecom-king" target="_blank"><div class="launcher-icon">🤖</div><div class="launcher-title">Ecom King Playbook</div><div class="launcher-desc">AI execution, Zendrop + AutoDS, Kamil Sattar method</div><div class="launcher-status ls-live">🟢 Live</div></a>
@@ -825,6 +929,53 @@ const d = new Date();
 document.getElementById('date-badge').textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 
 // ── Tab navigation ──────────────────────────────────────────────
+function addCollateralSlot(){
+  const list = document.getElementById('shop-collateral-list');
+  const btn = list.querySelector('[onclick="addCollateralSlot()"]').parentElement;
+  const slot = document.createElement('div');
+  slot.className = 'shop-collateral-item';
+  slot.style.cssText = 'background:var(--navy3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px';
+  slot.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:22px">📦</div>
+        <div>
+          <input type="text" placeholder="Product Name..." style="background:var(--navy2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:14px;font-weight:700;outline:none;width:220px"/>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Add niche, margin, score below</div>
+        </div>
+      </div>
+      <button onclick="alert('Web search coming soon — wire to Research Engine')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">🔍 Research Product</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">🎬 Source Videos</div>
+        <input type="text" placeholder="Paste URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+      </div>
+      <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">📣 Competitor Ads</div>
+        <input type="text" placeholder="Paste URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+      </div>
+      <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">⭐ Reviews / Copy</div>
+        <textarea placeholder="Paste reviews..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none;resize:vertical;min-height:52px;font-family:inherit"></textarea>
+      </div>
+      <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">🖼️ Images</div>
+        <input type="text" placeholder="Paste image URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+      </div>
+      <div style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">⚡ Zendrop Link</div>
+        <input type="text" placeholder="Zendrop product URL..." style="width:100%;background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none"/>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button style="background:var(--teal);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">💾 Save Collateral</button>
+      <button onclick="window.open('/content','_blank')" style="background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer">🔥 Send to Prometheus</button>
+    </div>
+  `;
+  list.insertBefore(slot, btn);
+}
+
 function showPage(id, btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
