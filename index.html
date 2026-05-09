@@ -205,6 +205,20 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .btn-prometheus{padding:7px 14px;background:rgba(245,158,11,.1);color:var(--gold);border:1px solid rgba(245,158,11,.25);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
 .btn-prometheus:hover{background:rgba(245,158,11,.2);border-color:var(--gold)}
 .prod-channel-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(0,201,167,.12);color:var(--teal)}
+/* ── Stage status + activity log ── */
+.stage-status{background:#0a0f14;border:1px solid #253447;border-radius:6px;padding:10px 14px;margin:8px 0;font-family:monospace;font-size:12px;color:#7a9ab5;min-height:36px;display:inline-block;min-width:280px}
+.stage-status.running{color:#00ff88;border-color:#00ff88}
+.stage-status.done{color:#00c9a7;border-color:#00c9a7}
+.stage-status.error{color:#e8413e;border-color:#e8413e}
+.activity-log{background:#0a0f14;border:1px solid #1c2f3f;border-radius:6px;padding:8px 12px;margin-top:6px;font-family:monospace;font-size:11px;color:#7a9ab5;max-height:90px;overflow-y:auto;display:none}
+.activity-log.visible{display:block}
+.activity-log-entry{padding:2px 0;border-bottom:1px solid rgba(37,52,71,.4)}
+.activity-log-entry:last-child{border-bottom:none}
+.go-push-bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:12px 0 6px 0}
+.btn-go{background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px}
+.btn-go:hover{opacity:.88}
+.btn-push-stage{background:#0f1923;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px}
+.btn-push-stage:hover{background:rgba(0,255,136,.08)}
 </style>
 </head>
 <body>
@@ -250,10 +264,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub">Live intelligence — cheapest attention × highest margin → execute. Data from Stripe + Qdrant + Decision Engine.</div>
   </div>
 
-  <div class="go-push-bar" style="margin:12px 0 18px 0;">
-    <button onclick="runStage('overview')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] REFRESH RESULTS</button>
-    <span id="overview-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  <div class="go-push-bar">
+    <button class="btn-go" onclick="runStage('overview')">[REFRESH RESULTS]</button>
   </div>
+  <div class="stage-status" id="overview-status"></div>
+  <div class="activity-log" id="overview-activity-log"></div>
 
   
   <!-- LAUNCH BANNER -->
@@ -421,10 +436,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub" id="decision-sub">Score = Margin% × (1/CPM) × Viral Coefficient. Run decision_engine.py daily to refresh.</div>
   </div>
 
-  <div class="go-push-bar" style="margin:12px 0 18px 0;">
-    <button onclick="runStage('decision')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN DECISION ENGINE</button>
-    <span id="decision-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  <div class="go-push-bar">
+    <button class="btn-go" onclick="runStage('decision')">[RUN DECISION ENGINE]</button>
   </div>
+  <div class="stage-status" id="decision-status"></div>
+  <div class="activity-log" id="decision-activity-log"></div>
 
   <div class="kpi-grid" id="decision-kpi-grid">
     <div class="kpi-card kpi-teal"><div class="kpi-label">Rank #1 Combo</div><div class="kpi-value" id="de-rank1-combo" style="font-size:18px">—</div><div class="kpi-change up" id="de-rank1-score">Run engine</div></div>
@@ -466,9 +482,10 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
-  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
-    <button onclick="showPage('shop',document.querySelector('[onclick*=shop]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; SHOP</button>
+  <div class="go-push-bar" style="margin-top:24px;">
+    <button class="btn-push-stage" onclick="pushStage('decision','shop')">[PUSH TO SHOP]</button>
   </div>
+  <div class="stage-status" id="decision-push-status"></div>
 </div>
 
 <!-- ═══════════ CHANNELS ═══════════ -->
@@ -478,10 +495,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub">Find winning products AND the cheapest channels to promote them. Feed results to Decision Engine.</div>
   </div>
 
-  <div class="go-push-bar" style="margin:12px 0 18px 0;">
-    <button onclick="runStage('research')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN RESEARCH</button>
-    <span id="research-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  <div class="go-push-bar">
+    <button class="btn-go" onclick="runStage('research')">[RUN RESEARCH]</button>
   </div>
+  <div class="stage-status" id="research-status"></div>
+  <div class="activity-log" id="research-activity-log"></div>
 
   <div class="grid-2">
     <!-- PRODUCT RESEARCH -->
@@ -575,9 +593,10 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
-  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
-    <button onclick="showPage('decision',document.querySelector('[onclick*=decision]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; DECISION ENGINE</button>
+  <div class="go-push-bar" style="margin-top:24px;">
+    <button class="btn-push-stage" onclick="pushStage('research','decision')">[PUSH TO DECISION ENGINE]</button>
   </div>
+  <div class="stage-status" id="research-push-status"></div>
 </div>
 
 <!-- ═══════════ SHOP ═══════════ -->
@@ -587,10 +606,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub">Products approved by the Decision Engine and live in the store. Manage collateral, links, and content assets here.</div>
   </div>
 
-  <div class="go-push-bar" style="margin:12px 0 18px 0;">
-    <button onclick="runStage('shop')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN SHOP</button>
-    <span id="shop-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  <div class="go-push-bar">
+    <button class="btn-go" onclick="runStage('shop')">[LOAD SHOP INTEL]</button>
   </div>
+  <div class="stage-status" id="shop-status"></div>
+  <div class="activity-log" id="shop-activity-log"></div>
 
   <div class="kpi-grid" style="margin-bottom:18px">
     <div class="kpi-card kpi-teal"><div class="kpi-label">Live Products</div><div class="kpi-value" id="shop-prod-count">—</div><div class="kpi-change up">In store</div></div>
@@ -668,9 +688,10 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
-  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
-    <button onclick="showPage('prometheus',document.querySelector('[onclick*=prometheus]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; PROMETHEUS</button>
+  <div class="go-push-bar" style="margin-top:24px;">
+    <button class="btn-push-stage" onclick="pushStage('shop','prometheus')">[PUSH TO PROMETHEUS]</button>
   </div>
+  <div class="stage-status" id="shop-push-status"></div>
 </div>
 
 
@@ -681,10 +702,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub">Gary V method: 1 pillar piece → 6+ platform-ready pieces → calendar → auto-post. <a href="/content" style="color:var(--blue);text-decoration:none;font-weight:700">→ Open Prometheus Creation Studio</a></div>
   </div>
 
-  <div class="go-push-bar" style="margin:12px 0 18px 0;">
-    <button onclick="runStage('prometheus')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN PROMETHEUS</button>
-    <span id="prometheus-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  <div class="go-push-bar">
+    <button class="btn-go" onclick="runStage('prometheus')">[RUN PROMETHEUS]</button>
   </div>
+  <div class="stage-status" id="prometheus-status"></div>
+  <div class="activity-log" id="prometheus-activity-log"></div>
 
   <div class="grid-2">
     <div class="card">
@@ -740,9 +762,10 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       <span style="font-size:11px;font-weight:600"><span class="cal-post cp-yt" style="display:inline-block">■</span> YouTube</span>
     </div>
   </div>
-  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
-    <button onclick="showPage('agents',document.querySelector('[onclick*=agents]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; AGENTS</button>
+  <div class="go-push-bar" style="margin-top:24px;">
+    <button class="btn-push-stage" onclick="pushStage('prometheus','agents')">[PUSH TO AGENTS]</button>
   </div>
+  <div class="stage-status" id="prometheus-push-status"></div>
 </div>
 
 <!-- ═══════════ AGENTS ═══════════ -->
@@ -752,10 +775,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub">Build order below — wire agents in sequence for maximum compound output.</div>
   </div>
 
-  <div class="go-push-bar" style="margin:12px 0 18px 0;">
-    <button onclick="runStage('agents')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN AGENTS</button>
-    <span id="agents-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  <div class="go-push-bar">
+    <button class="btn-go" onclick="runStage('agents')">[QUEUE AGENTS]</button>
   </div>
+  <div class="stage-status" id="agents-status"></div>
+  <div class="activity-log" id="agents-activity-log"></div>
 
   <div class="agent-grid mb-24">
     <div class="agent-card">
@@ -795,6 +819,10 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       <div class="agent-actions"><span class="a-tag">Margin Score</span><span class="a-tag">AutoDS API</span></div>
     </div>
   </div>
+  <div class="go-push-bar" style="margin-top:24px;">
+    <button class="btn-push-stage" onclick="pushStage('agents','overview')">[PUSH TO RESULTS]</button>
+  </div>
+  <div class="stage-status" id="agents-push-status"></div>
 </div>
 
 <!-- ═══════════ MEMORY SEARCH ═══════════ -->
@@ -852,10 +880,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub">Live Stripe revenue, ROAS by channel, CPM benchmarks, margin by product. Connect APIs below to activate.</div>
   </div>
 
-  <div class="go-push-bar" style="margin:12px 0 18px 0;">
-    <button onclick="runStage('revenue')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN REVENUE</button>
-    <span id="revenue-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  <div class="go-push-bar">
+    <button class="btn-go" onclick="runStage('revenue')">[REFRESH REVENUE]</button>
   </div>
+  <div class="stage-status" id="revenue-status"></div>
+  <div class="activity-log" id="revenue-activity-log"></div>
 
   <div class="kpi-grid" style="margin-bottom:18px">
     <div class="kpi-card kpi-teal"><div class="kpi-label">Revenue Today</div><div class="kpi-value" id="rev-today">—</div><div class="kpi-change up" id="rev-today-sub">Stripe live</div></div>
@@ -989,6 +1018,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 </div><!-- /main -->
 
 <script>
+// ── Engine URL (overridable via window.SHIPSTACK_ENGINE_URL) ────
+const ENGINE_URL = window.SHIPSTACK_ENGINE_URL || 'http://localhost:8889';
+
 // ── Date badge ──────────────────────────────────────────────────
 const d = new Date();
 document.getElementById('date-badge').textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
@@ -1485,22 +1517,97 @@ function populateRevenue(m){
   fetch('/api/prometheus?action=status',{signal:AbortSignal.timeout(3000)}).then(r=>r.ok?r.json():{}).then(s=>setApiDot('prometheus',s.prometheus_local?.online===true)).catch(()=>setApiDot('prometheus',false));
 }
 
-// ── GO button: run a stage via local engine API ─────────────────
+// ── Stage endpoint map ────────────────────────────────────
+const STAGE_ENDPOINTS = {
+  research:   { method: 'POST', path: '/api/research/run' },
+  decision:   { method: 'POST', path: '/api/decision/run' },
+  shop:       { method: 'POST', path: '/api/shop/load' },
+  prometheus: { method: 'POST', path: '/api/prometheus/run' },
+  agents:     { method: 'POST', path: '/api/agents/queue' },
+  overview:   { method: 'GET',  path: '/api/revenue/stats' },
+  revenue:    { method: 'GET',  path: '/api/revenue/stats' }
+};
+const PUSH_ENDPOINTS = {
+  research:   { method: 'POST', path: '/api/decision/run' },
+  decision:   { method: 'POST', path: '/api/shop/load' },
+  shop:       { method: 'POST', path: '/api/prometheus/run' },
+  prometheus: { method: 'POST', path: '/api/agents/queue' },
+  agents:     { method: 'GET',  path: '/api/revenue/stats' }
+};
+
+// ── Activity log polling ───────────────────────────────
+var _activityPollers = {};
+function startActivityLog(stage) {
+  var logEl = document.getElementById(stage + '-activity-log');
+  if (!logEl) return;
+  logEl.classList.add('visible');
+  if (_activityPollers[stage]) clearInterval(_activityPollers[stage]);
+  _activityPollers[stage] = setInterval(function() {
+    fetch(ENGINE_URL + '/api/status', { signal: AbortSignal.timeout(2500) })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var entries = (data.activity_log || []).slice(-5);
+        logEl.innerHTML = entries.length
+          ? entries.map(function(e) { return '<div class="activity-log-entry">' + String(e).replace(/</g,'&lt;') + '</div>'; }).join('')
+          : '<div class="activity-log-entry">[no activity]</div>';
+      })
+      .catch(function() { /* engine offline, keep polling */ });
+  }, 3000);
+}
+function stopActivityLog(stage) {
+  if (_activityPollers[stage]) { clearInterval(_activityPollers[stage]); delete _activityPollers[stage]; }
+}
+
+// ── Set stage-status display ──────────────────────────
+function setStageStatus(elId, state, msg) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  el.className = 'stage-status ' + state;
+  el.textContent = msg;
+}
+
+// ── GO button: run a stage via engine API ────────────────
 function runStage(stage) {
-  var statusEl = document.getElementById(stage + '-status');
-  if (statusEl) statusEl.textContent = '[RUNNING...]';
-  fetch('http://localhost:8889/api/' + stage + '/run', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({})
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    if (statusEl) statusEl.textContent = d.status ? '[' + d.status.toUpperCase() + ']' : '[DONE]';
-  })
-  .catch(function(e) {
-    if (statusEl) statusEl.textContent = '[ERROR - engine offline]';
-  });
+  var ep = STAGE_ENDPOINTS[stage];
+  if (!ep) ep = { method: 'POST', path: '/api/' + stage + '/run' };
+  setStageStatus(stage + '-status', 'running', '[RUNNING...]');
+  startActivityLog(stage);
+  var opts = { method: ep.method, headers: { 'Content-Type': 'application/json' } };
+  if (ep.method === 'POST') opts.body = JSON.stringify({});
+  fetch(ENGINE_URL + ep.path, opts)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      stopActivityLog(stage);
+      var preview = JSON.stringify(data).substring(0, 120);
+      setStageStatus(stage + '-status', 'done', '[DONE] ' + preview);
+    })
+    .catch(function(e) {
+      stopActivityLog(stage);
+      setStageStatus(stage + '-status', 'error', '[ERROR] ' + (e.message || 'engine offline'));
+    });
+}
+
+// ── PUSH button: forward results to next stage API ─────────
+function pushStage(from, toPage) {
+  var ep = PUSH_ENDPOINTS[from];
+  if (!ep) return;
+  var statusId = from + '-push-status';
+  setStageStatus(statusId, 'running', '[PUSHING...]');
+  var opts = { method: ep.method, headers: { 'Content-Type': 'application/json' } };
+  if (ep.method === 'POST') opts.body = JSON.stringify({});
+  fetch(ENGINE_URL + ep.path, opts)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var preview = JSON.stringify(data).substring(0, 120);
+      setStageStatus(statusId, 'done', '[DONE] ' + preview);
+      if (toPage) {
+        var tab = document.querySelector('[onclick*="showPage(\'' + toPage + '\'"]');
+        showPage(toPage, tab);
+      }
+    })
+    .catch(function(e) {
+      setStageStatus(statusId, 'error', '[ERROR] ' + (e.message || 'engine offline'));
+    });
 }
 
 </script>
