@@ -232,8 +232,8 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 
 <!-- NAV TABS -->
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showPage('overview',this)">📊 Overview</button>
-  <button class="nav-tab" onclick="showPage('research',this)">🔬 Research</button>
+  <button class="nav-tab" onclick="showPage('overview',this)">📊 Results</button>
+  <button class="nav-tab active" onclick="showPage('research',this)">🔬 Research</button>
   <button class="nav-tab" onclick="showPage('decision',this)">🎯 Decision Engine</button>
   <button class="nav-tab" onclick="showPage('shop',this)">🛒 Shop</button>
   <button class="nav-tab" onclick="showPage('prometheus',this)">🔥 Prometheus</button>
@@ -244,10 +244,15 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 <div class="main">
 
 <!-- ═══════════ OVERVIEW ═══════════ -->
-<div class="page active" id="page-overview">
+<div class="page" id="page-overview">
   <div class="sec-header">
     <div class="sec-title">Command Center Overview</div>
     <div class="sec-sub">Live intelligence — cheapest attention × highest margin → execute. Data from Stripe + Qdrant + Decision Engine.</div>
+  </div>
+
+  <div class="go-push-bar" style="margin:12px 0 18px 0;">
+    <button onclick="runStage('overview')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] REFRESH RESULTS</button>
+    <span id="overview-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
   </div>
 
   
@@ -291,6 +296,16 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       <div class="kpi-value" id="kpi-sessions">—</div>
       <div class="kpi-change up">Qdrant live</div>
     </div>
+  </div>
+
+  <!-- Revenue KPI Cards mirrored on Results page -->
+  <div class="kpi-grid" style="margin-bottom:24px">
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Revenue Today</div><div class="kpi-value" id="ov-rev-today">—</div><div class="kpi-change up" id="ov-rev-today-sub">Stripe live</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Revenue This Month</div><div class="kpi-value" id="ov-rev-month">—</div><div class="kpi-change" id="ov-rev-month-sub">Stripe live</div></div>
+    <div class="kpi-card kpi-blue"><div class="kpi-label">Total Orders</div><div class="kpi-value" id="ov-rev-orders">—</div><div class="kpi-change up" id="ov-rev-orders-sub">All time</div></div>
+    <div class="kpi-card kpi-purple"><div class="kpi-label">Avg Order Value</div><div class="kpi-value" id="ov-rev-aov">—</div><div class="kpi-change up">per order</div></div>
+    <div class="kpi-card kpi-teal"><div class="kpi-label">Best ROAS Channel</div><div class="kpi-value" id="ov-rev-best-roas">—</div><div class="kpi-change up" id="ov-rev-best-roas-sub">Decision engine</div></div>
+    <div class="kpi-card kpi-gold"><div class="kpi-label">Best Margin Product</div><div class="kpi-value" id="ov-rev-best-margin">—</div><div class="kpi-change up" id="ov-rev-best-margin-sub">highest %</div></div>
   </div>
 
   <div class="grid-2-1">
@@ -406,6 +421,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-sub" id="decision-sub">Score = Margin% × (1/CPM) × Viral Coefficient. Run decision_engine.py daily to refresh.</div>
   </div>
 
+  <div class="go-push-bar" style="margin:12px 0 18px 0;">
+    <button onclick="runStage('decision')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN DECISION ENGINE</button>
+    <span id="decision-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  </div>
+
   <div class="kpi-grid" id="decision-kpi-grid">
     <div class="kpi-card kpi-teal"><div class="kpi-label">Rank #1 Combo</div><div class="kpi-value" id="de-rank1-combo" style="font-size:18px">—</div><div class="kpi-change up" id="de-rank1-score">Run engine</div></div>
     <div class="kpi-card kpi-blue"><div class="kpi-label">Rank #2 Combo</div><div class="kpi-value" id="de-rank2-combo" style="font-size:18px">—</div><div class="kpi-change up" id="de-rank2-score">Run engine</div></div>
@@ -446,13 +466,21 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
+  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
+    <button onclick="showPage('shop',document.querySelector('[onclick*=shop]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; SHOP</button>
+  </div>
 </div>
 
 <!-- ═══════════ CHANNELS ═══════════ -->
-<div class="page" id="page-research">
+<div class="page active" id="page-research">
   <div class="sec-header">
     <div class="sec-title">🔬 Research Hub</div>
     <div class="sec-sub">Find winning products AND the cheapest channels to promote them. Feed results to Decision Engine.</div>
+  </div>
+
+  <div class="go-push-bar" style="margin:12px 0 18px 0;">
+    <button onclick="runStage('research')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN RESEARCH</button>
+    <span id="research-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
   </div>
 
   <div class="grid-2">
@@ -547,6 +575,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
+  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
+    <button onclick="showPage('decision',document.querySelector('[onclick*=decision]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; DECISION ENGINE</button>
+  </div>
 </div>
 
 <!-- ═══════════ SHOP ═══════════ -->
@@ -554,6 +585,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   <div class="sec-header">
     <div class="sec-title">🛒 Shop — Approved Products</div>
     <div class="sec-sub">Products approved by the Decision Engine and live in the store. Manage collateral, links, and content assets here.</div>
+  </div>
+
+  <div class="go-push-bar" style="margin:12px 0 18px 0;">
+    <button onclick="runStage('shop')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN SHOP</button>
+    <span id="shop-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
   </div>
 
   <div class="kpi-grid" style="margin-bottom:18px">
@@ -632,6 +668,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
+  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
+    <button onclick="showPage('prometheus',document.querySelector('[onclick*=prometheus]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; PROMETHEUS</button>
+  </div>
 </div>
 
 
@@ -640,6 +679,11 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   <div class="sec-header">
     <div class="sec-title">🔥 Prometheus Creation Studio</div>
     <div class="sec-sub">Gary V method: 1 pillar piece → 6+ platform-ready pieces → calendar → auto-post. <a href="/content" style="color:var(--blue);text-decoration:none;font-weight:700">→ Open Prometheus Creation Studio</a></div>
+  </div>
+
+  <div class="go-push-bar" style="margin:12px 0 18px 0;">
+    <button onclick="runStage('prometheus')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN PROMETHEUS</button>
+    <span id="prometheus-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
   </div>
 
   <div class="grid-2">
@@ -696,6 +740,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       <span style="font-size:11px;font-weight:600"><span class="cal-post cp-yt" style="display:inline-block">■</span> YouTube</span>
     </div>
   </div>
+  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
+    <button onclick="showPage('agents',document.querySelector('[onclick*=agents]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; AGENTS</button>
+  </div>
 </div>
 
 <!-- ═══════════ AGENTS ═══════════ -->
@@ -704,6 +751,12 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-title">🤖 Agent Status</div>
     <div class="sec-sub">Build order below — wire agents in sequence for maximum compound output.</div>
   </div>
+
+  <div class="go-push-bar" style="margin:12px 0 18px 0;">
+    <button onclick="runStage('agents')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN AGENTS</button>
+    <span id="agents-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  </div>
+
   <div class="agent-grid mb-24">
     <div class="agent-card">
       <div class="agent-name">Decision Engine</div>
@@ -786,6 +839,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <a class="launcher-card" href="/roi" target="_blank"><div class="launcher-icon">🔍</div><div class="launcher-title">ROI Product Finder</div><div class="launcher-desc">Product margin scorer — connect AutoDS API for live data</div><div class="launcher-status ls-scaffold">🟡 Scaffolded</div></a>
     <a class="launcher-card" href="/content" target="_blank"><div class="launcher-icon">🔥</div><div class="launcher-title">Prometheus Creation Studio</div><div class="launcher-desc">Pillar Builder → Upload → Pipeline → Approve → Calendar. AI video at scale.</div><div class="launcher-status ls-todo">🔴 Building</div></a>
   </div>
+  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
+    <button onclick="showPage('revenue',document.querySelector('[onclick*=revenue]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; REVENUE</button>
+  </div>
 </div>
 
 
@@ -795,6 +851,12 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     <div class="sec-title">💰 Revenue & ROI Intelligence</div>
     <div class="sec-sub">Live Stripe revenue, ROAS by channel, CPM benchmarks, margin by product. Connect APIs below to activate.</div>
   </div>
+
+  <div class="go-push-bar" style="margin:12px 0 18px 0;">
+    <button onclick="runStage('revenue')" style="background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[GO] RUN REVENUE</button>
+    <span id="revenue-status" style="margin-left:14px;font-size:12px;color:#888;"></span>
+  </div>
+
   <div class="kpi-grid" style="margin-bottom:18px">
     <div class="kpi-card kpi-teal"><div class="kpi-label">Revenue Today</div><div class="kpi-value" id="rev-today">—</div><div class="kpi-change up" id="rev-today-sub">Stripe live</div></div>
     <div class="kpi-card kpi-gold"><div class="kpi-label">Revenue This Month</div><div class="kpi-value" id="rev-month">—</div><div class="kpi-change" id="rev-month-sub">Stripe live</div></div>
@@ -918,6 +980,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
       <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 9 — Revenue & ROI Live Dashboard</div><div class="build-desc">💰 Revenue tab: Stripe ROAS by channel, CPM benchmarks, margin by product, API wizard.</div></div><span class="badge badge-green">Done</span></div>
       <div class="build-item b-done"><div class="b-icon">✅</div><div><div class="build-label">Phase 10 — Full Automation Loop</div><div class="build-desc">run_shipstack.py --full: research → decide → Prometheus → Pinterest → post → pages → monitor</div></div><span class="badge badge-green">Done</span></div>
     </div>
+  </div>
+  <div class="push-bar" style="margin:24px 0 8px 0;text-align:right;">
+    <button onclick="showPage('overview',document.querySelector('[onclick*=overview]'))" style="background:#1a1a2e;color:#00ff88;border:1px solid #00ff88;padding:10px 28px;font-weight:700;font-size:14px;cursor:pointer;border-radius:4px;letter-spacing:1px;">[PUSH] --&gt; RESULTS</button>
   </div>
 </div>
 
@@ -1085,6 +1150,19 @@ function populateOverview(m){
   const q=m.qdrant||{};
   const totalSessions = (q.general_knowledge||0)+(q.dropship_intel||0);
   document.getElementById('kpi-sessions').textContent = totalSessions>0?fmtNum(totalSessions):'—';
+
+  // Mirror revenue KPIs on Results (overview) page
+  const aov2=rev.total_orders>0&&rev.month_usd>0?(rev.month_usd/rev.total_orders):null;
+  var ov=document.getElementById('ov-rev-today'); if(ov) ov.textContent=fmtUSD(rev.today_usd);
+  var ovs=document.getElementById('ov-rev-today-sub'); if(ovs) ovs.textContent=rev.today_usd!==null?'▲ Stripe live':'Add STRIPE_SECRET_KEY';
+  var ovm=document.getElementById('ov-rev-month'); if(ovm) ovm.textContent=fmtUSD(rev.month_usd||null);
+  var ovms=document.getElementById('ov-rev-month-sub'); if(ovms) ovms.textContent=rev.month_usd!==null?'▲ Stripe live':'Add STRIPE_SECRET_KEY';
+  var ovo=document.getElementById('ov-rev-orders'); if(ovo) ovo.textContent=fmtNum(rev.total_orders);
+  var ovos=document.getElementById('ov-rev-orders-sub'); if(ovos) ovos.textContent=rev.total_orders!==null?'Stripe live':'Add STRIPE_SECRET_KEY';
+  var ovav=document.getElementById('ov-rev-aov'); if(ovav) ovav.textContent=fmtUSD(aov2);
+  const tc2=m.top_combos||[]; const prods2=(m.products||[]).sort((a,b)=>b.margin_pct-a.margin_pct);
+  if(tc2.length>0){var ovr=document.getElementById('ov-rev-best-roas');if(ovr)ovr.textContent=tc2[0].channel_label||tc2[0].channel||'—';var ovrs=document.getElementById('ov-rev-best-roas-sub');if(ovrs)ovrs.textContent='Score '+tc2[0].score+' · '+tc2[0].action;}
+  if(prods2.length>0){var ovbm=document.getElementById('ov-rev-best-margin');if(ovbm)ovbm.textContent=prods2[0].margin_pct+'%';var ovbms=document.getElementById('ov-rev-best-margin-sub');if(ovbms)ovbms.textContent=prods2[0].name||'—';}
 }
 
 // ── Populate decision engine ────────────────────────────────────
@@ -1405,6 +1483,24 @@ function populateRevenue(m){
   setApiDot('tiktok',!!m.tiktok_connected);
   setApiDot('zendrop',!!m.zendrop_connected);
   fetch('/api/prometheus?action=status',{signal:AbortSignal.timeout(3000)}).then(r=>r.ok?r.json():{}).then(s=>setApiDot('prometheus',s.prometheus_local?.online===true)).catch(()=>setApiDot('prometheus',false));
+}
+
+// ── GO button: run a stage via local engine API ─────────────────
+function runStage(stage) {
+  var statusEl = document.getElementById(stage + '-status');
+  if (statusEl) statusEl.textContent = '[RUNNING...]';
+  fetch('http://localhost:8889/api/' + stage + '/run', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({})
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (statusEl) statusEl.textContent = d.status ? '[' + d.status.toUpperCase() + ']' : '[DONE]';
+  })
+  .catch(function(e) {
+    if (statusEl) statusEl.textContent = '[ERROR - engine offline]';
+  });
 }
 
 </script>
