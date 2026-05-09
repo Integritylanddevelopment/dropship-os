@@ -1018,8 +1018,9 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 </div><!-- /main -->
 
 <script>
-// ── Engine URL (overridable via window.SHIPSTACK_ENGINE_URL) ────
-const ENGINE_URL = window.SHIPSTACK_ENGINE_URL || 'http://localhost:8889';
+// ── Engine URL ────────────────────────────────────────────────
+// All API calls are proxied through /api/engine/ (see vercel.json)
+// const ENGINE_URL = window.SHIPSTACK_ENGINE_URL || 'http://localhost:8889';
 
 // ── Date badge ──────────────────────────────────────────────────
 const d = new Date();
@@ -1519,20 +1520,20 @@ function populateRevenue(m){
 
 // ── Stage endpoint map ────────────────────────────────────
 const STAGE_ENDPOINTS = {
-  research:   { method: 'POST', path: '/api/research/run' },
-  decision:   { method: 'POST', path: '/api/decision/run' },
-  shop:       { method: 'POST', path: '/api/shop/load' },
-  prometheus: { method: 'POST', path: '/api/prometheus/run' },
-  agents:     { method: 'POST', path: '/api/agents/queue' },
-  overview:   { method: 'GET',  path: '/api/revenue/stats' },
-  revenue:    { method: 'GET',  path: '/api/revenue/stats' }
+  research:   { method: 'POST', path: '/research/run' },
+  decision:   { method: 'POST', path: '/decision/run' },
+  shop:       { method: 'POST', path: '/shop/load' },
+  prometheus: { method: 'POST', path: '/prometheus/run' },
+  agents:     { method: 'POST', path: '/agents/queue' },
+  overview:   { method: 'GET',  path: '/revenue/stats' },
+  revenue:    { method: 'GET',  path: '/revenue/stats' }
 };
 const PUSH_ENDPOINTS = {
-  research:   { method: 'POST', path: '/api/decision/run' },
-  decision:   { method: 'POST', path: '/api/shop/load' },
-  shop:       { method: 'POST', path: '/api/prometheus/run' },
-  prometheus: { method: 'POST', path: '/api/agents/queue' },
-  agents:     { method: 'GET',  path: '/api/revenue/stats' }
+  research:   { method: 'POST', path: '/decision/run' },
+  decision:   { method: 'POST', path: '/shop/load' },
+  shop:       { method: 'POST', path: '/prometheus/run' },
+  prometheus: { method: 'POST', path: '/agents/queue' },
+  agents:     { method: 'GET',  path: '/revenue/stats' }
 };
 
 // ── Activity log polling ───────────────────────────────
@@ -1543,7 +1544,7 @@ function startActivityLog(stage) {
   logEl.classList.add('visible');
   if (_activityPollers[stage]) clearInterval(_activityPollers[stage]);
   _activityPollers[stage] = setInterval(function() {
-    fetch(ENGINE_URL + '/api/status', { signal: AbortSignal.timeout(2500) })
+    fetch('/api/engine/status', { signal: AbortSignal.timeout(2500) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         var entries = (data.activity_log || []).slice(-5);
@@ -1569,12 +1570,12 @@ function setStageStatus(elId, state, msg) {
 // ── GO button: run a stage via engine API ────────────────
 function runStage(stage) {
   var ep = STAGE_ENDPOINTS[stage];
-  if (!ep) ep = { method: 'POST', path: '/api/' + stage + '/run' };
+  if (!ep) ep = { method: 'POST', path: '/' + stage + '/run' };
   setStageStatus(stage + '-status', 'running', '[RUNNING...]');
   startActivityLog(stage);
   var opts = { method: ep.method, headers: { 'Content-Type': 'application/json' } };
   if (ep.method === 'POST') opts.body = JSON.stringify({});
-  fetch(ENGINE_URL + ep.path, opts)
+  fetch('/api/engine' + ep.path, opts)
     .then(function(r) { return r.json(); })
     .then(function(data) {
       stopActivityLog(stage);
@@ -1595,7 +1596,7 @@ function pushStage(from, toPage) {
   setStageStatus(statusId, 'running', '[PUSHING...]');
   var opts = { method: ep.method, headers: { 'Content-Type': 'application/json' } };
   if (ep.method === 'POST') opts.body = JSON.stringify({});
-  fetch(ENGINE_URL + ep.path, opts)
+  fetch('/api/engine' + ep.path, opts)
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var preview = JSON.stringify(data).substring(0, 120);
