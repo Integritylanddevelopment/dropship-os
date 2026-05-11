@@ -1,180 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ShipStack AI — Shop</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipStack Store &mdash; Premium Wellness Products</title>
+<meta name="description" content="ShipStack AI curated wellness products. Pet hair removers, posture correctors, facial rollers, resistance bands, ab rollers. Free shipping today.">
 <style>
-:root{
-  --navy:#0f1923;--navy2:#16222e;--navy3:#1c2f3f;
-  --blue:#1a6cf6;--teal:#00c9a7;--gold:#f5a623;
-  --red:#e8413e;--green:#22c55e;--purple:#8b5cf6;
-  --text:#e4eaf0;--muted:#7a9ab5;--border:#253447;
-  --card:#19293a;--card2:#1e3347;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-.header{background:var(--navy2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.logo-block{display:flex;align-items:center;gap:14px}
-.logo{width:44px;height:44px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff}
-.header-title{font-size:18px;font-weight:800}
-.header-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.nav-links{display:flex;gap:16px}
-.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
-.nav-links a:hover{color:var(--text)}
-.nav-links a.active{color:var(--teal)}
-.hero{text-align:center;padding:56px 24px 32px;background:linear-gradient(180deg,var(--navy2) 0%,var(--navy) 100%)}
-.hero h1{font-size:36px;font-weight:900;margin-bottom:12px}
-.hero h1 span{color:var(--teal)}
-.hero p{color:var(--muted);font-size:16px;max-width:500px;margin:0 auto}
-.badge{display:inline-block;background:rgba(0,201,167,.12);color:var(--teal);border:1px solid rgba(0,201,167,.3);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;margin-bottom:16px;letter-spacing:.04em}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;max-width:1100px;margin:40px auto;padding:0 24px 60px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform .2s,box-shadow .2s}
-.card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
-.card-img{width:100%;height:200px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:64px;border-bottom:1px solid var(--border)}
-.card-body{padding:20px}
-.card-niche{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
-.card-name{font-size:18px;font-weight:800;margin-bottom:8px;line-height:1.3}
-.card-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px}
-.card-footer{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.price{font-size:28px;font-weight:900;color:var(--teal)}
-.price-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.score-badge{background:rgba(26,108,246,.15);color:var(--blue);border:1px solid rgba(26,108,246,.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700}
-.btn-buy{display:block;width:100%;background:linear-gradient(135deg,var(--teal),#00a888);color:#0f1923;font-weight:900;font-size:15px;border:none;border-radius:10px;padding:14px;cursor:pointer;text-decoration:none;text-align:center;margin-top:16px;transition:opacity .2s,transform .1s;letter-spacing:.02em}
-.btn-buy:hover{opacity:.9;transform:scale(1.01)}
-.supplier{font-size:11px;color:var(--muted);margin-top:10px;text-align:center}
-.supplier span{color:var(--gold);font-weight:700}
-.trust-bar{display:flex;justify-content:center;gap:32px;padding:24px;background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:0}
-.trust-item{text-align:center;font-size:12px;color:var(--muted)}
-.trust-icon{font-size:22px;display:block;margin-bottom:4px}
-.trust-label{font-weight:700;color:var(--text)}
-.emoji-map{beauty:💆;fitness:🏋️;pet:🐾;home:🏠}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #1a1a1a;
+    --bg3: #242424;
+    --accent: #00d4aa;
+    --accent-dark: #00a882;
+    --white: #ffffff;
+    --gray: #aaaaaa;
+    --warn: #ff6b35;
+  }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  .announce-bar {
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* HEADER */
+  header {
+    background: #0a0a0a;
+    border-bottom: 1px solid #1e1e1e;
+    padding: 22px 20px;
+    text-align: center;
+  }
+  header .logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  header .logo span { color: var(--accent); }
+  header p {
+    color: var(--gray);
+    font-size: 0.88rem;
+    margin-top: 4px;
+  }
+
+  /* HERO STRIP */
+  .hero-strip {
+    background: linear-gradient(160deg, #0f0f0f 0%, #1a2e28 100%);
+    padding: 56px 20px 48px;
+    text-align: center;
+  }
+  .hero-strip h1 {
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .hero-strip h1 span { color: var(--accent); }
+  .hero-strip p {
+    color: var(--gray);
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* PRODUCT GRID */
+  .store-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 52px 20px 64px;
+  }
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 520px) {
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .product-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .product-card {
+    background: var(--bg2);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #2a2a2a;
+    transition: border-color 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  .product-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+  .product-card.featured {
+    border-color: var(--accent);
+    position: relative;
+  }
+  .featured-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: var(--warn);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+
+  .card-img {
+    background: var(--bg3);
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .card-body {
+    padding: 22px 20px 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-body .tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .card-body h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .card-body .hook {
+    font-size: 0.88rem;
+    color: var(--gray);
+    margin-bottom: 16px;
+    line-height: 1.6;
+    flex: 1;
+  }
+  .card-body .stars {
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  .card-body .stars span {
+    color: var(--gray);
+    font-size: 0.78rem;
+    margin-left: 6px;
+    letter-spacing: 0;
+  }
+  .shop-btn {
+    display: block;
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    padding: 13px 20px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .shop-btn:hover { background: var(--accent-dark); }
+
+  /* TRUST BAR */
+  .trust-bar {
+    background: var(--bg2);
+    border-top: 1px solid #1e1e1e;
+    border-bottom: 1px solid #1e1e1e;
+    padding: 28px 20px;
+  }
+  .trust-items {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px 40px;
+  }
+  .trust-item {
+    text-align: center;
+    font-size: 0.88rem;
+  }
+  .trust-item .ti-label { color: var(--white); font-weight: 700; margin-bottom: 2px; }
+  .trust-item .ti-sub { color: var(--gray); font-size: 0.78rem; }
+
+  /* URGENCY BANNER */
+  .urgency-bar {
+    text-align: center;
+    padding: 18px 20px;
+    background: #1a1208;
+    border-top: 1px solid #2a1f0a;
+    border-bottom: 1px solid #2a1f0a;
+  }
+  .urgency-bar p { color: var(--warn); font-weight: 700; font-size: 0.92rem; }
+  .urgency-bar p span { color: var(--gray); font-weight: 400; }
+
+  /* FOOTER */
+  footer { background: #080808; border-top: 1px solid #1e1e1e; padding: 28px 20px; text-align: center; }
+  footer p { color: var(--gray); font-size: 0.82rem; }
+  footer a { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo-block">
-    <div class="logo">S</div>
-    <div>
-      <div class="header-title">ShipStack AI</div>
-      <div class="header-sub">AI-Curated Products</div>
-    </div>
-  </div>
-  <nav class="nav-links">
-    <a href="/">Dashboard</a>
-    <a href="/store" class="active">Shop</a>
-    <a href="/playbook">Playbook</a>
-    <a href="/content">Content</a>
-  </nav>
-</div>
+<div class="announce-bar">FREE SHIPPING TODAY ONLY &mdash; Orders ship within 24 hours</div>
 
-<div class="hero">
-  <div class="badge">⚡ AI-Scored Products</div>
-  <h1>High-Margin Products,<br><span>Zero Guesswork</span></h1>
-  <p>Every product scored by ShipStack AI for margin, trend velocity, and channel fit. Ships in 7–10 days.</p>
-</div>
+<header>
+  <div class="logo">ShipStack <span>Store</span></div>
+  <p>AI-curated wellness products &mdash; selected for quality, results, and value</p>
+</header>
+
+<section class="hero-strip">
+  <h1>Premium Wellness.<br><span>Without the Premium Price.</span></h1>
+  <p>Every product in this store is hand-selected by ShipStack AI for viral potential, customer satisfaction, and genuine results. Free shipping on all orders today.</p>
+</section>
 
 <div class="trust-bar">
-  <div class="trust-item"><span class="trust-icon">🔒</span><div class="trust-label">Secure Checkout</div>Powered by Stripe</div>
-  <div class="trust-item"><span class="trust-icon">📦</span><div class="trust-label">7–10 Day Shipping</div>US fulfillment</div>
-  <div class="trust-item"><span class="trust-icon">↩️</span><div class="trust-label">30-Day Returns</div>No questions asked</div>
-  <div class="trust-item"><span class="trust-icon">🤖</span><div class="trust-label">AI-Curated</div>Top 5 of 144 scored</div>
+  <div class="trust-items">
+    <div class="trust-item"><div class="ti-label">&#10003; Free Shipping</div><div class="ti-sub">Today only &mdash; all orders</div></div>
+    <div class="trust-item"><div class="ti-label">&#10003; Ships in 24 Hours</div><div class="ti-sub">Fast fulfillment via Zendrop</div></div>
+    <div class="trust-item"><div class="ti-label">&#10003; 30-Day Guarantee</div><div class="ti-sub">Love it or we fix it</div></div>
+    <div class="trust-item"><div class="ti-label">&#10003; 20,000+ Customers</div><div class="ti-sub">4.9-star average rating</div></div>
+  </div>
 </div>
 
-<div class="grid">
+<section class="store-section">
+  <div class="section-label">All Products &mdash; Free Shipping Today</div>
+  <div class="product-grid">
 
-  <div class="card">
-    <div class="card-img">💆</div>
-    <div class="card-body">
-      <div class="card-niche">Beauty · Skincare</div>
-      <div class="card-name">Facial Roller (Rose Quartz)</div>
-      <div class="card-desc">Premium rose quartz facial roller. Reduces puffiness, improves circulation and skin tone. Used by 10,000+ customers.</div>
-      <div class="card-footer">
-        <div>
-          <div class="price">$34.99</div>
-          <div class="price-sub">Free shipping</div>
-        </div>
-        <div class="score-badge">Score 71.8 🔥</div>
+    <!-- #1 PRIORITY: Pet Hair Remover -->
+    <div class="product-card featured">
+      <div class="featured-badge">#1 Bestseller</div>
+      <div class="card-img">[Product image &mdash; Zendrop 2005402]</div>
+      <div class="card-body">
+        <div class="tag">CleanTok Viral</div>
+        <h2>Pet Hair Remover</h2>
+        <p class="hook">"One swipe. Pet hair gone." The reusable lint remover that works on every fabric &mdash; couch, clothes, car seats, carpet.</p>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.9 (2,847 reviews)</span></div>
+        <a class="shop-btn" href="pet-hair-remover.html">Shop Now &#8594;</a>
       </div>
-      <a class="btn-buy" href="https://buy.stripe.com/7sY5kEesH6ZJ0fKaXL3F60c" target="_blank">Buy Now →</a>
-      <div class="supplier">Fulfilled by <span>Zendrop</span> · 81.6% margin</div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="card-img">🏋️</div>
-    <div class="card-body">
-      <div class="card-niche">Fitness · Core</div>
-      <div class="card-name">Ab Roller Wheel</div>
-      <div class="card-desc">Pro-grade ab roller with knee pad included. Build core strength in minutes per day. Full range of motion design.</div>
-      <div class="card-footer">
-        <div>
-          <div class="price">$24.99</div>
-          <div class="price-sub">Free shipping</div>
-        </div>
-        <div class="score-badge">Score 71.3 🔥</div>
+    <!-- Posture Corrector -->
+    <div class="product-card">
+      <div class="card-img">[Product image &mdash; Zendrop 2990129]</div>
+      <div class="card-body">
+        <div class="tag">Remote Worker Essential</div>
+        <h2>Posture Corrector</h2>
+        <p class="hook">"I sat wrong for 27 years. This fixed it in 2 weeks." Invisible under clothes. Relieves back pain on day one.</p>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.8 (1,923 reviews)</span></div>
+        <a class="shop-btn" href="posture-corrector.html">Shop Now &#8594;</a>
       </div>
-      <a class="btn-buy" href="https://buy.stripe.com/8x214o84j1Fp5A48PD3F60e" target="_blank">Buy Now →</a>
-      <div class="supplier">Fulfilled by <span>AliExpress</span> · 81.0% margin</div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="card-img">🧘</div>
-    <div class="card-body">
-      <div class="card-niche">Fitness · Posture</div>
-      <div class="card-name">Posture Corrector Brace</div>
-      <div class="card-desc">Adjustable posture corrector for back and shoulder alignment. Wear under or over clothes. See results in 2–4 weeks.</div>
-      <div class="card-footer">
-        <div>
-          <div class="price">$29.99</div>
-          <div class="price-sub">Free shipping</div>
-        </div>
-        <div class="score-badge">Score 69.5</div>
+    <!-- Facial Roller -->
+    <div class="product-card">
+      <div class="card-img">[Product image &mdash; Zendrop 1857795]</div>
+      <div class="card-body">
+        <div class="tag">SkinTok Viral</div>
+        <h2>Facial Roller</h2>
+        <p class="hook">"Dermatologists don't want you to find this." Spa-quality jade roller that reduces puffiness and boosts your glow.</p>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.9 (3,102 reviews)</span></div>
+        <a class="shop-btn" href="facial-roller.html">Shop Now &#8594;</a>
       </div>
-      <a class="btn-buy" href="https://buy.stripe.com/dRm5kEacrck3aUo2rf3F60a" target="_blank">Buy Now →</a>
-      <div class="supplier">Fulfilled by <span>Zendrop</span> · 79.0% margin</div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="card-img">💪</div>
-    <div class="card-body">
-      <div class="card-niche">Fitness · Resistance</div>
-      <div class="card-name">Resistance Band Set (11pc)</div>
-      <div class="card-desc">Complete 11-piece resistance band set covering all training levels. Comes with carry bag and door anchor. No gym needed.</div>
-      <div class="card-footer">
-        <div>
-          <div class="price">$39.99</div>
-          <div class="price-sub">Free shipping</div>
-        </div>
-        <div class="score-badge">Score 68.6</div>
+    <!-- Resistance Bands -->
+    <div class="product-card">
+      <div class="card-img">[Product image &mdash; Zendrop 2019581]</div>
+      <div class="card-body">
+        <div class="tag">Home Gym Essential</div>
+        <h2>Resistance Bands</h2>
+        <p class="hook">"Gym in a bag. No membership. No excuses." Five resistance levels. Full body workout. Fits in any bag.</p>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.8 (2,214 reviews)</span></div>
+        <a class="shop-btn" href="resistance-bands.html">Shop Now &#8594;</a>
       </div>
-      <a class="btn-buy" href="https://buy.stripe.com/3cIeVeacr1FpgeIaXL3F60d" target="_blank">Buy Now →</a>
-      <div class="supplier">Fulfilled by <span>Zendrop</span> · 78.0% margin</div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="card-img">🐾</div>
-    <div class="card-body">
-      <div class="card-niche">Pet · Accessories</div>
-      <div class="card-name">Pet Hair Remover Brush</div>
-      <div class="card-desc">Self-cleaning pet hair remover brush. Works on furniture, carpet, clothes, and car seats. One click to empty.</div>
-      <div class="card-footer">
-        <div>
-          <div class="price">$19.99</div>
-          <div class="price-sub">Free shipping</div>
-        </div>
-        <div class="score-badge">Score 63.1</div>
+    <!-- Ab Roller -->
+    <div class="product-card">
+      <div class="card-img">[Product image &mdash; Zendrop 1913578]</div>
+      <div class="card-body">
+        <div class="tag">FitTok 30-Day Challenge</div>
+        <h2>Ab Roller</h2>
+        <p class="hook">"30 days. No gym. This happened." Engages 6 muscle groups. Non-slip wheels. Folds flat under your bed.</p>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733; <span>4.7 (1,671 reviews)</span></div>
+        <a class="shop-btn" href="ab-roller.html">Shop Now &#8594;</a>
       </div>
-      <a class="btn-buy" href="https://buy.stripe.com/4gM6oI84jdo73rW8PD3F60b" target="_blank">Buy Now →</a>
-      <div class="supplier">Fulfilled by <span>Zendrop</span> · 78.9% margin</div>
     </div>
-  </div>
 
+  </div>
+</section>
+
+<div class="urgency-bar">
+  <p>&#9888; Free shipping ends tonight &mdash; <span>all orders placed today ship within 24 hours</span></p>
 </div>
+
+<footer>
+  <p>Powered by <strong>ShipStack AI</strong> &mdash; <a href="https://dropship-os-gamma.vercel.app/privacy">Privacy Policy</a></p>
+  <p style="margin-top:6px;">&copy; 2026 ShipStack AI. All rights reserved.</p>
+</footer>
 
 </body>
 </html>

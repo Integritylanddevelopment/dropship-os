@@ -1,13 +1,18 @@
 {
   "rewrites": [
     { "source": "/api/engine/(.*)", "destination": "/api/engine" },
-    { "source": "/store",     "destination": "/store.html" },
-    { "source": "/playbook",  "destination": "/playbook.html" },
-    { "source": "/hormozi",   "destination": "/hormozi.html" },
-    { "source": "/ecom-king", "destination": "/ecom-king.html" },
-    { "source": "/pinterest", "destination": "/pinterest.html" },
-    { "source": "/roi",       "destination": "/roi.html" },
-    { "source": "/content",   "destination": "/content.html" },
-    { "source": "/privacy",   "destination": "/privacy.html" }
+    { "source": "/store",              "destination": "/store.html" },
+    { "source": "/playbook",           "destination": "/playbook.html" },
+    { "source": "/hormozi",            "destination": "/hormozi.html" },
+    { "source": "/ecom-king",          "destination": "/ecom-king.html" },
+    { "source": "/pinterest",          "destination": "/pinterest.html" },
+    { "source": "/roi",                "destination": "/roi.html" },
+    { "source": "/content",            "destination": "/content.html" },
+    { "source": "/privacy",            "destination": "/privacy.html" },
+    { "source": "/pet-hair-remover",   "destination": "/pet-hair-remover.html" },
+    { "source": "/posture-corrector",  "destination": "/posture-corrector.html" },
+    { "source": "/facial-roller",      "destination": "/facial-roller.html" },
+    { "source": "/resistance-bands",   "destination": "/resistance-bands.html" },
+    { "source": "/ab-roller",          "destination": "/ab-roller.html" }
   ]
 }
