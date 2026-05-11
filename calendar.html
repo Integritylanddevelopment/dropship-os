@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Content Calendar — ShipStack AI</title>
+<style>
+:root{
+  --navy:#0f1923;--navy2:#16222e;--navy3:#1c2f3f;
+  --blue:#1a6cf6;--teal:#00c9a7;--gold:#f5a623;
+  --red:#e8413e;--green:#22c55e;--purple:#8b5cf6;
+  --text:#e4eaf0;--muted:#7a9ab5;--border:#253447;
+  --card:#19293a;--card2:#1e3347;
+  --tiktok:#ff0050;--instagram:#833ab4;--youtube:#ff0000;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* ── Header ── */
+.header{background:var(--navy2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo-block{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff}
+.header-title{font-size:18px;font-weight:800}
+.header-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .2s}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1558d6}
+.btn-outline{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-outline:hover{color:var(--text);border-color:var(--muted)}
+.btn-teal{background:var(--teal);color:#000}
+.nav-back{font-size:13px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid var(--border);transition:all .2s}
+.nav-back:hover{color:var(--text);border-color:var(--muted)}
+
+/* ── Controls bar ── */
+.controls{background:var(--navy2);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.controls-left{display:flex;align-items:center;gap:12px;flex:1}
+.platform-filter{display:flex;gap:6px}
+.pf-btn{padding:6px 14px;border-radius:20px;border:2px solid transparent;background:var(--navy3);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.pf-btn:hover{color:var(--text)}
+.pf-btn.active-tiktok{background:rgba(255,0,80,.15);border-color:var(--tiktok);color:var(--tiktok)}
+.pf-btn.active-instagram{background:rgba(131,58,180,.15);border-color:var(--instagram);color:var(--instagram)}
+.pf-btn.active-youtube{background:rgba(255,0,0,.15);border-color:var(--youtube);color:var(--youtube)}
+.pf-btn.active-all{background:rgba(26,108,246,.15);border-color:var(--blue);color:var(--blue)}
+.status-filter{display:flex;gap:6px}
+.sf-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.sf-btn.active{background:var(--navy3);color:var(--text);border-color:var(--muted)}
+.week-nav{display:flex;align-items:center;gap:10px;margin-left:auto}
+.week-label{font-size:14px;font-weight:700;min-width:180px;text-align:center}
+.wn-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.wn-btn:hover{color:var(--text);border-color:var(--muted)}
+
+/* ── Stats bar ── */
+.stats-bar{padding:16px 28px;display:flex;gap:16px;flex-wrap:wrap;background:var(--navy)}
+.stat-pill{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 18px;display:flex;align-items:center;gap:10px}
+.stat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600}
+.stat-val{font-size:18px;font-weight:800;margin-left:4px}
+
+/* ── Calendar grid ── */
+.calendar-wrap{padding:0 28px 28px}
+.week-grid{display:grid;grid-template-columns:80px repeat(7,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden}
+.day-header{background:var(--navy2);padding:10px 8px;text-align:center;font-size:12px;font-weight:700}
+.day-header .day-name{color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.day-header .day-num{font-size:18px;font-weight:800;margin-top:2px}
+.day-header.today .day-num{color:var(--teal)}
+.time-label{background:var(--navy3);padding:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);font-weight:600;text-align:center}
+.day-cell{background:var(--card);padding:6px;min-height:120px;position:relative}
+.day-cell:hover{background:var(--card2)}
+.time-slot-row{display:contents}
+
+/* ── Post cards ── */
+.post-card{border-radius:8px;padding:7px 8px;margin-bottom:5px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-size:11px;line-height:1.4}
+.post-card:hover{transform:translateX(2px);filter:brightness(1.1)}
+.post-card.tiktok{background:rgba(255,0,80,.12);border-left-color:var(--tiktok)}
+.post-card.instagram{background:rgba(131,58,180,.12);border-left-color:var(--instagram)}
+.post-card.youtube{background:rgba(255,0,0,.12);border-left-color:var(--youtube)}
+.post-card.hidden{display:none}
+.post-platform{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;display:flex;align-items:center;gap:5px;justify-content:space-between}
+.post-time{font-size:10px;color:var(--muted)}
+.post-type{color:var(--muted);font-size:10px;margin-bottom:2px}
+.post-preview{color:var(--text);font-size:11px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-queued{background:var(--gold)}
+.status-sent{background:var(--green)}
+.status-failed{background:var(--red)}
+.platform-icon{font-size:12px}
+.corner-label{background:var(--navy2);padding:8px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:80px 28px;color:var(--muted)}
+.empty-icon{font-size:56px;margin-bottom:20px;opacity:.5}
+.empty-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+.empty-sub{font-size:14px;line-height:1.6;max-width:420px;margin:0 auto 24px}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--navy2);border:1px solid var(--border);border-radius:16px;width:600px;max-width:95vw;max-height:85vh;overflow-y:auto;padding:24px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:800}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--navy3);color:var(--text)}
+.modal-section{margin-bottom:18px}
+.modal-section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.modal-body-text{font-size:13px;line-height:1.7;color:var(--text);background:var(--navy3);border-radius:8px;padding:12px;white-space:pre-wrap;word-break:break-word}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px}
+.hashtag{background:rgba(26,108,246,.15);color:var(--blue);border-radius:5px;padding:3px 9px;font-size:11px;font-weight:600}
+.platform-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.badge-tiktok{background:rgba(255,0,80,.2);color:var(--tiktok)}
+.badge-instagram{background:rgba(131,58,180,.2);color:var(--instagram)}
+.badge-youtube{background:rgba(255,0,0,.2);color:var(--youtube)}
+.status-badge{display:inline-block;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700}
+.sb-queued{background:rgba(245,166,35,.15);color:var(--gold)}
+.sb-sent{background:rgba(34,197,94,.15);color:var(--green)}
+.sb-failed{background:rgba(232,65,62,.15);color:var(--red)}
+.framework-pill{background:rgba(139,92,246,.12);color:var(--purple);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;display:inline-block;margin-top:6px}
+.dispatch-btn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--teal);color:#000;font-size:14px;font-weight:800;cursor:pointer;margin-top:16px;transition:all .2s}
+.dispatch-btn:hover{background:#00b394}
+
+/* Loading state */
+.loading{text-align:center;padding:60px;color:var(--muted);font-size:14px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="logo-block">
+    <div class="logo">📅</div>
+    <div>
+      <div class="header-title">Content Calendar</div>
+      <div class="header-sub">Hormozi × Gary Vee × Kamil Sattar — 128 posts per launch</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-outline" onclick="refreshCalendar()">↺ Refresh</button>
+    <button class="btn btn-teal" onclick="dispatchDue()">⚡ Dispatch Due Posts</button>
+    <a href="index.html" class="nav-back">← Command Center</a>
+  </div>
+</div>
+
+<!-- ── Controls ── -->
+<div class="controls">
+  <div class="controls-left">
+    <div class="platform-filter">
+      <button class="pf-btn active-all" id="pf-all" onclick="filterPlatform('all')">All Platforms</button>
+      <button class="pf-btn" id="pf-tiktok" onclick="filterPlatform('tiktok')">🎵 TikTok</button>
+      <button class="pf-btn" id="pf-instagram" onclick="filterPlatform('instagram')">📷 Instagram</button>
+      <button class="pf-btn" id="pf-youtube" onclick="filterPlatform('youtube')">▶ YouTube</button>
+    </div>
+    <div class="status-filter">
+      <button class="sf-btn active" id="sf-all" onclick="filterStatus('all')">All</button>
+      <button class="sf-btn" id="sf-queued" onclick="filterStatus('queued')">Queued</button>
+      <button class="sf-btn" id="sf-sent" onclick="filterStatus('sent')">Sent</button>
+      <button class="sf-btn" id="sf-failed" onclick="filterStatus('failed')">Failed</button>
+    </div>
+  </div>
+  <div class="week-nav">
+    <button class="wn-btn" onclick="prevWeek()">‹</button>
+    <div class="week-label" id="week-label">Week of —</div>
+    <button class="wn-btn" onclick="nextWeek()">›</button>
+  </div>
+</div>
+
+<!-- ── Stats bar ── -->
+<div class="stats-bar">
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--teal)"></div>
+    <span class="stat-label">Total Posts</span>
+    <span class="stat-val" id="stat-total">—</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--tiktok)"></div>
+    <span class="stat-label">TikTok</span>
+    <span class="stat-val" id="stat-tiktok">—</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--instagram)"></div>
+    <span class="stat-label">Instagram</span>
+    <span class="stat-val" id="stat-instagram">—</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--youtube)"></div>
+    <span class="stat-label">YouTube</span>
+    <span class="stat-val" id="stat-youtube">—</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--gold)"></div>
+    <span class="stat-label">Queued</span>
+    <span class="stat-val" id="stat-queued">—</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--green)"></div>
+    <span class="stat-label">Sent</span>
+    <span class="stat-val" id="stat-sent">—</span>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-dot" style="background:var(--red)"></div>
+    <span class="stat-label">Failed</span>
+    <span class="stat-val" id="stat-failed">—</span>
+  </div>
+</div>
+
+<!-- ── Calendar ── -->
+<div class="calendar-wrap">
+  <div id="calendar-container">
+    <div class="loading"><div class="spinner"></div>Loading content calendar...</div>
+  </div>
+</div>
+
+<!-- ── Post Detail Modal ── -->
+<div class="modal-overlay" id="post-modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div id="modal-platform-badge" class="platform-badge"></div>
+      <button class="modal-close" onclick="closePostModal()">✕</button>
+    </div>
+    <div class="modal-section">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <span id="modal-date" style="font-size:13px;color:var(--muted)"></span>
+        <span id="modal-time" style="font-size:13px;color:var(--muted)"></span>
+        <span id="modal-status-badge" class="status-badge"></span>
+        <span id="modal-framework" class="framework-pill"></span>
+      </div>
+      <div class="modal-section-title">Product</div>
+      <div id="modal-product" style="font-size:14px;font-weight:700;color:var(--teal);margin-bottom:12px"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Script / Copy</div>
+      <div id="modal-script" class="modal-body-text"></div>
+    </div>
+    <div id="modal-hashtags-wrap" class="modal-section">
+      <div class="modal-section-title">Hashtags</div>
+      <div id="modal-hashtags" class="tag-row"></div>
+    </div>
+    <div id="modal-comment-wrap" class="modal-section" style="display:none">
+      <div class="modal-section-title">💬 Comment Bait</div>
+      <div id="modal-comment" class="modal-body-text"></div>
+    </div>
+    <button class="dispatch-btn" id="modal-dispatch-btn" onclick="markSent()">✅ Mark as Sent</button>
+  </div>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────
+let ALL_POSTS = [];
+let CURRENT_WEEK_START = getWeekStart(new Date());
+let ACTIVE_PLATFORM = 'all';
+let ACTIVE_STATUS = 'all';
+let CURRENT_POST = null;
+const ENGINE_BASE = 'http://localhost:8889';
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const PLATFORM_ICONS = {tiktok:'🎵', instagram:'📷', youtube:'▶'};
+
+// ── Init ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', refreshCalendar);
+
+async function refreshCalendar() {
+  document.getElementById('calendar-container').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Loading calendar from engine...</div>';
+  try {
+    const res = await fetch(`${ENGINE_BASE}/api/engine/calendar`, {signal: AbortSignal.timeout(10000)});
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    ALL_POSTS = data.posts || [];
+    updateStats();
+    renderCalendar();
+  } catch(e) {
+    // Demo mode — show skeleton if engine is offline
+    ALL_POSTS = generateDemoPosts();
+    updateStats();
+    renderCalendar();
+    console.warn('Engine offline — showing demo data:', e.message);
+  }
+}
+
+// ── Demo data (when engine is offline) ───────────────────────────────────
+function generateDemoPosts() {
+  const posts = [];
+  const today = new Date();
+  let id = 1;
+  for(let d = 0; d < 30; d++) {
+    const date = new Date(today); date.setDate(today.getDate() + d);
+    const dateStr = date.toISOString().split('T')[0];
+    const day = d + 1;
+    // TikTok x3
+    const angles = ['problem_focus','demo_focus','social_proof_focus'];
+    [['07:00','problem_focus'],['12:00','demo_focus'],['20:00','social_proof_focus']].forEach(([t,a])=>{
+      posts.push({id:id++,day,date:dateStr,time:t,platform:'tiktok',content_type:`pod_video_${a}`,
+        angle:a,framework:'Kamil POD + Hormozi hook',
+        script:`[HOOK 0-3s] Stop — why are you still dealing with this?\n[PROBLEM 3-8s] Most people just accept this frustration.\n[AGITATE 8-13s] Every day costs you time and money.\n[SOLUTION 13-20s] This product fixes it in seconds.\n[PROOF 20-25s] 47,000 five-star reviews.\n[CTA 25-30s] Link in bio. Ships free today.`,
+        caption:'Link in bio — ships free today',comment_bait:'Would you try this? Yes or no 👇',
+        hashtags:['#tiktokmademebuyit','#musthave','#productreview','#viralproduct','#fyp'],
+        product:'Demo Product',jab_hook: d%4===3?'right_hook':'jab',is_hook:d%4===3,
+        status:'queued'});
+    });
+    // Instagram x1
+    const ig_types = ['jab_educational','jab_entertainment','right_hook_offer'];
+    const ig_type = ig_types[day%3];
+    posts.push({id:id++,day,date:dateStr,time:'12:00',platform:'instagram',content_type:`reel_${ig_type}`,
+      angle:ig_type,framework:'Gary Vee Jab-Jab-Right-Hook',
+      script:"Here's what most people get wrong about this product...\n\nThe problem isn't effort — it's using the wrong tool.\n\nFollow for more finds like this.",
+      caption:'Follow for more finds like this.',comment_bait:'Save this for later 📌',
+      hashtags:['#musthave','#productreview','#lifehack','#homehacks','#explore'],
+      product:'Demo Product',jab_hook:ig_type==='right_hook_offer'?'right_hook':'jab',
+      is_hook:ig_type==='right_hook_offer',status:'queued'});
+    // YouTube Mon+Thu
+    if([1,4].includes(date.getDay()) && id < 200) {
+      posts.push({id:id++,day,date:dateStr,time:'07:00',platform:'youtube',content_type:'shorts_demo',
+        angle:'shorts_demo',framework:'Gary Vee repurposing pyramid',
+        script:"This product is going viral — here's why\nSolves the problem in seconds. Watch this.",
+        caption:'This product is going viral — here\'s why',
+        hashtags:['#Shorts','#ProductReview','#MustHave','#Trending'],
+        product:'Demo Product',jab_hook:'jab',is_hook:false,status:'queued'});
+    }
+  }
+  return posts;
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────
+function updateStats() {
+  const byPlatform = p => ALL_POSTS.filter(x => x.platform === p).length;
+  const byStatus   = s => ALL_POSTS.filter(x => x.status === s).length;
+  document.getElementById('stat-total').textContent     = ALL_POSTS.length;
+  document.getElementById('stat-tiktok').textContent    = byPlatform('tiktok');
+  document.getElementById('stat-instagram').textContent = byPlatform('instagram');
+  document.getElementById('stat-youtube').textContent   = byPlatform('youtube');
+  document.getElementById('stat-queued').textContent    = byStatus('queued');
+  document.getElementById('stat-sent').textContent      = byStatus('sent');
+  document.getElementById('stat-failed').textContent    = byStatus('failed');
+}
+
+// ── Week navigation ───────────────────────────────────────────────────────
+function getWeekStart(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=Sun
+  d.setDate(d.getDate() - day);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function prevWeek() { CURRENT_WEEK_START.setDate(CURRENT_WEEK_START.getDate()-7); renderCalendar(); }
+function nextWeek() { CURRENT_WEEK_START.setDate(CURRENT_WEEK_START.getDate()+7); renderCalendar(); }
+
+function getWeekDates() {
+  return Array.from({length:7}, (_,i) => {
+    const d = new Date(CURRENT_WEEK_START);
+    d.setDate(d.getDate()+i);
+    return d;
+  });
+}
+
+// ── Platform/status filter ─────────────────────────────────────────────
+function filterPlatform(p) {
+  ACTIVE_PLATFORM = p;
+  document.querySelectorAll('.pf-btn').forEach(b => {
+    b.className = 'pf-btn';
+    if(b.id === `pf-${p}`) b.className = `pf-btn active-${p}`;
+  });
+  renderCalendar();
+}
+
+function filterStatus(s) {
+  ACTIVE_STATUS = s;
+  document.querySelectorAll('.sf-btn').forEach(b => {
+    b.className = 'sf-btn';
+    if(b.id === `sf-${s}`) b.className = 'sf-btn active';
+  });
+  renderCalendar();
+}
+
+function postVisible(post) {
+  if(ACTIVE_PLATFORM !== 'all' && post.platform !== ACTIVE_PLATFORM) return false;
+  if(ACTIVE_STATUS !== 'all' && post.status !== ACTIVE_STATUS) return false;
+  return true;
+}
+
+// ── Calendar render ───────────────────────────────────────────────────────
+function renderCalendar() {
+  const weekDates = getWeekDates();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Update week label
+  const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  document.getElementById('week-label').textContent =
+    `${fmt(weekDates[0])} — ${fmt(weekDates[6])}`;
+
+  // Get posts for this week
+  const weekPosts = {};
+  weekDates.forEach(d => {
+    const key = d.toISOString().split('T')[0];
+    weekPosts[key] = ALL_POSTS.filter(p => p.date === key);
+  });
+
+  const totalWeekPosts = Object.values(weekPosts).flat().length;
+
+  if(ALL_POSTS.length === 0) {
+    document.getElementById('calendar-container').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <div class="empty-title">No content calendars yet</div>
+        <div class="empty-sub">
+          Run the product onboarding pipeline to auto-generate your 30-day content calendar.
+          Quinn will build 128+ posts using Hormozi, Gary Vee, and Kamil frameworks.
+        </div>
+        <a href="index.html"><button class="btn btn-primary">Go to Command Center</button></a>
+      </div>`;
+    return;
+  }
+
+  // Build the week grid
+  let html = `<div class="week-grid">
+    <div class="corner-label" style="background:var(--navy3)"></div>`;
+
+  // Day headers
+  weekDates.forEach(d => {
+    const dateKey = d.toISOString().split('T')[0];
+    const isToday = d.getTime() === today.getTime();
+    const dayPosts = weekPosts[dateKey] || [];
+    const count = dayPosts.length;
+    html += `<div class="day-header${isToday?' today':''}">
+      <div class="day-name">${DAY_NAMES[d.getDay()]}</div>
+      <div class="day-num">${d.getDate()}</div>
+      ${count ? `<div style="font-size:10px;color:var(--muted);margin-top:2px">${count} posts</div>` : ''}
+    </div>`;
+  });
+
+  // Time slots
+  const timeSlots = ['07:00','12:00','20:00'];
+  const timeLabels = {'07:00':'7 AM','12:00':'12 PM','20:00':'8 PM'};
+
+  timeSlots.forEach(slot => {
+    html += `<div class="time-label">${timeLabels[slot]}</div>`;
+    weekDates.forEach(d => {
+      const dateKey = d.toISOString().split('T')[0];
+      const slotPosts = (weekPosts[dateKey] || []).filter(p => p.time === slot);
+      html += `<div class="day-cell">`;
+      slotPosts.forEach(post => {
+        if(!postVisible(post)) return;
+        const icon = PLATFORM_ICONS[post.platform] || '';
+        const statusClass = `status-${post.status}`;
+        const preview = (post.script || post.caption || '').split('\n')[0].slice(0,60);
+        const hookBadge = post.jab_hook === 'right_hook'
+          ? '<span style="color:var(--gold);font-size:9px;font-weight:800">🎯 HOOK</span>'
+          : '<span style="color:var(--teal);font-size:9px">jab</span>';
+        html += `<div class="post-card ${post.platform}" onclick="openPost(${post.id})">
+          <div class="post-platform">
+            <span>${icon} ${post.platform.toUpperCase()}</span>
+            <span style="display:flex;align-items:center;gap:4px">
+              <span class="status-dot ${statusClass}"></span>
+              ${hookBadge}
+            </span>
+          </div>
+          <div class="post-type">${post.content_type?.replace(/_/g,' ')}</div>
+          <div class="post-preview">${preview}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+  });
+
+  html += `</div>`;
+
+  // Week summary below grid
+  const weekTotal = Object.values(weekPosts).flat().length;
+  const wTT = Object.values(weekPosts).flat().filter(p=>p.platform==='tiktok').length;
+  const wIG = Object.values(weekPosts).flat().filter(p=>p.platform==='instagram').length;
+  const wYT = Object.values(weekPosts).flat().filter(p=>p.platform==='youtube').length;
+  html += `<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:12px">
+      <span style="color:var(--muted)">This week:</span>
+      <strong style="margin-left:8px">${weekTotal} posts</strong>
+      <span style="margin-left:12px;color:var(--tiktok)">🎵 ${wTT}</span>
+      <span style="margin-left:8px;color:var(--instagram)">📷 ${wIG}</span>
+      <span style="margin-left:8px;color:var(--youtube)">▶ ${wYT}</span>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:12px;color:var(--muted)">
+      Framework: <span style="color:var(--purple);font-weight:700">Hormozi × Gary Vee × Kamil</span>
+      &nbsp;|&nbsp; Cadence: <span style="color:var(--teal)">3 jabs : 1 right hook</span>
+    </div>
+  </div>`;
+
+  document.getElementById('calendar-container').innerHTML = html;
+}
+
+// ── Post detail modal ─────────────────────────────────────────────────────
+function openPost(postId) {
+  CURRENT_POST = ALL_POSTS.find(p => p.id === postId);
+  if(!CURRENT_POST) return;
+
+  const p = CURRENT_POST;
+  const icon = PLATFORM_ICONS[p.platform] || '';
+
+  // Platform badge
+  const badgeEl = document.getElementById('modal-platform-badge');
+  badgeEl.className = `platform-badge badge-${p.platform}`;
+  badgeEl.textContent = `${icon} ${p.platform.toUpperCase()}`;
+
+  document.getElementById('modal-date').textContent = `📅 ${p.date}`;
+  document.getElementById('modal-time').textContent = `🕐 ${p.time} CT`;
+  document.getElementById('modal-product').textContent = p.product || '—';
+  document.getElementById('modal-framework').textContent = p.framework || '';
+  document.getElementById('modal-script').textContent = p.script || p.caption || '—';
+
+  // Status badge
+  const sb = document.getElementById('modal-status-badge');
+  sb.className = `status-badge sb-${p.status}`;
+  sb.textContent = p.status?.toUpperCase();
+
+  // Hashtags
+  const htEl = document.getElementById('modal-hashtags');
+  htEl.innerHTML = (p.hashtags || []).map(h => `<span class="hashtag">${h}</span>`).join('');
+
+  // Comment bait
+  if(p.comment_bait) {
+    document.getElementById('modal-comment-wrap').style.display = '';
+    document.getElementById('modal-comment').textContent = p.comment_bait;
+  } else {
+    document.getElementById('modal-comment-wrap').style.display = 'none';
+  }
+
+  // Dispatch button
+  const btn = document.getElementById('modal-dispatch-btn');
+  if(p.status === 'sent') {
+    btn.textContent = '✅ Already Sent';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  } else {
+    btn.textContent = '✅ Mark as Sent';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+
+  document.getElementById('post-modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if(e.target.id === 'post-modal') closePostModal();
+}
+function closePostModal() {
+  document.getElementById('post-modal').classList.remove('open');
+  CURRENT_POST = null;
+}
+
+function markSent() {
+  if(!CURRENT_POST) return;
+  CURRENT_POST.status = 'sent';
+  updateStats();
+  renderCalendar();
+  closePostModal();
+}
+
+// ── Dispatch ──────────────────────────────────────────────────────────────
+async function dispatchDue() {
+  const btn = document.querySelector('.btn-teal');
+  btn.textContent = '⏳ Dispatching...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${ENGINE_BASE}/api/engine/calendar/dispatch`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({dry_run: false}),
+      signal: AbortSignal.timeout(15000),
+    });
+    const data = await res.json();
+    btn.textContent = `✅ ${data.dispatched} Dispatched`;
+    setTimeout(() => {
+      btn.textContent = '⚡ Dispatch Due Posts';
+      btn.disabled = false;
+      refreshCalendar();
+    }, 3000);
+  } catch(e) {
+    btn.textContent = '⚠ Engine Offline';
+    setTimeout(() => { btn.textContent = '⚡ Dispatch Due Posts'; btn.disabled = false; }, 3000);
+  }
+}
+</script>
+</body>
+</html>

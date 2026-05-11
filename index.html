@@ -38,6 +38,8 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 .dot-red{background:var(--red)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .date-badge{font-size:12px;color:var(--muted);background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:5px 12px}
+.calendar-nav-btn{padding:7px 16px;border-radius:8px;border:1px solid rgba(255,0,80,.4);background:rgba(255,0,80,.1);color:#ff0050;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.calendar-nav-btn:hover{background:rgba(255,0,80,.2);border-color:#ff0050}
 .nav-tabs{background:var(--navy2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:2px;overflow-x:auto}
 .nav-tab{padding:14px 22px;font-size:14px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
 .nav-tab:hover{color:var(--text)}.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
@@ -238,6 +240,7 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
     </div>
   </div>
   <div class="header-right">
+    <a href="calendar.html" class="calendar-nav-btn">📅 Content Calendar</a>
     <div class="status-pill pill-gold" id="metrics-status-pill"><div class="dot dot-gold"></div>Loading…</div>
     <div class="status-pill pill-gold"><div class="dot dot-gold"></div>Agents: Scaffolded</div>
     <div class="date-badge" id="date-badge">—</div>
@@ -1601,6 +1604,10 @@ function pushStage(from, toPage) {
     .then(function(data) {
       var preview = JSON.stringify(data).substring(0, 120);
       setStageStatus(statusId, 'done', '[DONE] ' + preview);
+      // When pushing from decision -> shop, fire the onboarding pipeline
+      if (from === 'decision') {
+        triggerOnboardingPipeline(statusId);
+      }
       if (toPage) {
         var tab = document.querySelector('[onclick*="showPage(\'' + toPage + '\'"]');
         showPage(toPage, tab);
@@ -1611,7 +1618,99 @@ function pushStage(from, toPage) {
     });
 }
 
+// ── Onboarding Pipeline trigger ───────────────────────────
+function triggerOnboardingPipeline(parentStatusId, productData) {
+  var obStatusId = 'onboarding-pipeline-status';
+  var obEl = document.getElementById(obStatusId);
+  if (obEl) {
+    obEl.style.display = 'flex';
+    obEl.className = 'onboarding-status running';
+    obEl.innerHTML = '<span class="ob-dot"></span><span>Onboarding pipeline running&hellip; (Zendrop pull, internet scrape, Quinn copy, Prometheus manifest)</span>';
+  }
+  var payload = productData ? JSON.stringify(productData) : JSON.stringify({});
+  fetch('/api/engine/onboard-product', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: payload,
+    signal: AbortSignal.timeout(10000)
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (obEl) {
+        obEl.className = 'onboarding-status running';
+        obEl.innerHTML = '<span class="ob-dot"></span><span>⚙️ Onboarding running in background — ' +
+          (d.message || 'pipeline started') +
+          '. Check <code>data/product_collateral/</code> for output.</span>';
+      }
+      pollOnboardingStatus();
+    })
+    .catch(function(e) {
+      if (obEl) {
+        obEl.className = 'onboarding-status error';
+        obEl.innerHTML = '<span>⚠️ Onboarding trigger failed: ' + (e.message || 'engine offline') + '</span>';
+      }
+    });
+}
+
+var _obPollInterval = null;
+function pollOnboardingStatus() {
+  if (_obPollInterval) clearInterval(_obPollInterval);
+  _obPollInterval = setInterval(function() {
+    fetch('/api/engine/onboard-product/status', { signal: AbortSignal.timeout(3000) })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var ob    = d.onboarding || {};
+        var obEl  = document.getElementById('onboarding-pipeline-status');
+        var jobs  = ob.jobs || {};
+        var count = Object.keys(jobs).length;
+        var done  = Object.values(jobs).filter(function(v) { return v === 'complete'; }).length;
+        if (ob.status === 'done' || ob.status === 'idle') {
+          clearInterval(_obPollInterval);
+          if (obEl && count > 0) {
+            obEl.className = 'onboarding-status done';
+            obEl.innerHTML = '✅ Onboarding complete — ' + done + '/' + count +
+              ' products ready. <a href="#" onclick="showPage(\'shop\',null);return false;" style="color:var(--teal)">View Shop &rarr;</a>';
+          }
+        } else if (ob.status === 'error') {
+          clearInterval(_obPollInterval);
+          if (obEl) {
+            obEl.className = 'onboarding-status error';
+            obEl.innerHTML = '⚠️ Onboarding error — check onboarding.log in data/product_collateral/';
+          }
+        } else if (obEl && count > 0) {
+          obEl.innerHTML = '<span class="ob-dot"></span><span>⚙️ Onboarding: ' + done + '/' + count + ' complete&hellip;</span>';
+        }
+      })
+      .catch(function() { /* engine offline */ });
+  }, 4000);
+}
+
 </script>
+
+<!-- ═══════════════ ONBOARDING STATUS BANNER ═══════════════ -->
+<style>
+#onboarding-pipeline-status{
+  display:none;position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
+  z-index:9998;max-width:640px;width:calc(100% - 48px);
+  border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;
+  align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,.4);
+  transition:background .3s;
+}
+#onboarding-pipeline-status.running{
+  background:rgba(26,108,246,.18);border:1px solid rgba(26,108,246,.4);color:#a8c8ff;
+}
+#onboarding-pipeline-status.done{
+  background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);color:#86efac;
+}
+#onboarding-pipeline-status.error{
+  background:rgba(232,65,62,.15);border:1px solid rgba(232,65,62,.35);color:#fca5a5;
+}
+.ob-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  background:var(--blue);animation:pulse 1.4s infinite;
+}
+</style>
+<div id="onboarding-pipeline-status"></div>
 
 <!-- ═══════════════ CHAT WIDGET ═══════════════ -->
 <style>
