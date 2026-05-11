@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipStack — Content Review</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --panel: #12121a; --border: #1e1e2e;
+    --accent: #7c3aed; --accent2: #06b6d4;
+    --green: #10b981; --yellow: #f59e0b; --red: #ef4444;
+    --text: #e2e8f0; --muted: #64748b;
+    --tt: #ff2d55; --ig: #c13584; --yt: #ff0000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  .nav { background: var(--panel); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+  .nav-logo { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+  .nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; padding: 6px 12px; border-radius: 6px; }
+  .nav a:hover, .nav a.active { background: var(--border); color: var(--text); }
+  .nav-spacer { flex: 1; }
+
+  .page { padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-title { font-size: 1.5rem; font-weight: 700; }
+
+  /* SCORE RING */
+  .score-ring { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; font-size: 1rem; font-weight: 800; border: 3px solid; flex-shrink: 0; }
+  .score-ring.pass   { border-color: var(--green); color: var(--green); background: rgba(16,185,129,0.1); }
+  .score-ring.review { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,0.1); }
+  .score-ring.fail   { border-color: var(--red); color: var(--red); background: rgba(239,68,68,0.1); }
+
+  /* SUMMARY BAR */
+  .summary-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .scard { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+  .scard-val { font-size: 1.6rem; font-weight: 800; }
+  .scard-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+  /* FILTERS + CONTROLS */
+  .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .filter-btn { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--text); background: rgba(124,58,237,0.15); }
+  .filter-btn.pass.active { border-color: var(--green); color: var(--green); background: rgba(16,185,129,0.1); }
+  .filter-btn.review.active { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,0.1); }
+  .filter-btn.fail.active { border-color: var(--red); color: var(--red); background: rgba(239,68,68,0.1); }
+  .spacer { flex: 1; }
+  .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #6d28d9; }
+  .btn-sm { padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 600; }
+  .btn-approve { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .btn-approve:hover { background: rgba(16,185,129,0.25); }
+  .btn-reject  { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-reject:hover { background: rgba(239,68,68,0.2); }
+  .btn-view { background: var(--border); color: var(--text); }
+
+  /* CONTENT CARDS */
+  .content-grid { display: flex; flex-direction: column; gap: 12px; }
+
+  .content-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 16px;
+    align-items: start;
+    transition: border-color 0.15s;
+  }
+  .content-card:hover { border-color: rgba(124,58,237,0.4); }
+  .content-card.approved-card { border-left: 3px solid var(--green); }
+  .content-card.rejected-card { border-left: 3px solid var(--red); opacity: 0.6; }
+
+  .card-body { min-width: 0; }
+  .card-meta { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .platform-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+  .platform-badge.tiktok    { background: rgba(255,45,85,0.15); color: var(--tt); }
+  .platform-badge.instagram { background: rgba(193,53,132,0.15); color: var(--ig); }
+  .platform-badge.youtube   { background: rgba(255,0,0,0.15); color: var(--yt); }
+  .platform-badge.ad_hook   { background: rgba(124,58,237,0.15); color: var(--accent); }
+  .type-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; background: var(--border); color: var(--muted); }
+  .verdict-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+  .verdict-badge.PASS   { background: rgba(16,185,129,0.15); color: var(--green); }
+  .verdict-badge.REVIEW { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .verdict-badge.FAIL   { background: rgba(239,68,68,0.15); color: var(--red); }
+
+  .card-text { font-size: 0.85rem; line-height: 1.5; color: var(--text); margin-bottom: 10px; white-space: pre-wrap; }
+  .card-text.collapsed { max-height: 3.5em; overflow: hidden; }
+
+  .score-bars { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .score-bar { display: flex; align-items: center; gap: 4px; font-size: 0.68rem; }
+  .score-bar-label { color: var(--muted); width: 70px; }
+  .score-bar-track { width: 60px; height: 4px; background: var(--border); border-radius: 2px; }
+  .score-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+  .score-bar-val { color: var(--text); font-weight: 600; width: 24px; }
+
+  .weak-areas { margin-bottom: 10px; }
+  .weak-item { font-size: 0.72rem; color: var(--yellow); padding: 2px 0; }
+  .weak-item::before { content: "⚠ "; }
+
+  .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* MODAL */
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+  .modal-backdrop.open { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: 560px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
+
+  /* PHONE PREVIEW */
+  .phone-frame {
+    width: 260px; min-height: 460px; background: #000; border-radius: 36px;
+    border: 6px solid #222; padding: 20px 14px; margin: 0 auto 16px;
+    position: relative; overflow: hidden;
+  }
+  .phone-screen { background: #000; min-height: 400px; position: relative; border-radius: 8px; overflow: hidden; }
+  .phone-gradient { position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(transparent, rgba(0,0,0,0.8)); }
+  .phone-content { position: absolute; bottom: 12px; left: 12px; right: 12px; }
+  .phone-caption { font-size: 0.8rem; color: white; line-height: 1.4; white-space: pre-wrap; }
+  .phone-username { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  .phone-actions { position: absolute; right: 8px; bottom: 60px; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+  .phone-action-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .phone-action-icon { font-size: 1.4rem; }
+  .phone-action-count { font-size: 0.6rem; color: white; }
+  .phone-hashtags { font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+
+  /* LOAD PRODUCT */
+  .load-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px; }
+  .load-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; width: 260px; margin-right: 8px; }
+  .load-input:focus { outline: none; border-color: var(--accent); }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty .icon { font-size: 3rem; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-logo">⚡ ShipStack</span>
+  <a href="index.html">Dashboard</a>
+  <a href="calendar.html">Calendar</a>
+  <a href="profiles.html">Profiles</a>
+  <a href="content_review.html" class="active">Content Review</a>
+  <span class="nav-spacer"></span>
+  <span id="engineStatus" style="font-size:0.75rem;color:var(--muted)">● Connecting…</span>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Content Review</div>
+      <div style="color:var(--muted);font-size:0.85rem;margin-top:2px">QA scores, previews, and approval queue before anything goes out</div>
+    </div>
+  </div>
+
+  <!-- LOAD PRODUCT -->
+  <div class="load-panel">
+    <div style="font-weight:600;margin-bottom:12px;">Load QA Results for a Product</div>
+    <input class="load-input" id="slugInput" placeholder="Product slug (e.g. glow_serum)" />
+    <button class="btn btn-primary" onclick="loadProduct()">Load</button>
+    <div style="font-size:0.75rem;color:var(--muted);margin-top:8px">
+      Run <code>python agents/content_pipeline.py &lt;slug&gt;</code> first to generate QA results.
+    </div>
+  </div>
+
+  <!-- SUMMARY BAR -->
+  <div class="summary-bar" id="summaryBar" style="display:none">
+    <div class="scard"><div class="scard-val" id="sTotal">0</div><div class="scard-label">Total Pieces</div></div>
+    <div class="scard"><div class="scard-val" id="sPass" style="color:var(--green)">0</div><div class="scard-label">✅ Pass</div></div>
+    <div class="scard"><div class="scard-val" id="sReview" style="color:var(--yellow)">0</div><div class="scard-label">👀 Needs Review</div></div>
+    <div class="scard"><div class="scard-val" id="sFail" style="color:var(--red)">0</div><div class="scard-label">❌ Failed QA</div></div>
+    <div class="scard"><div class="scard-val" id="sPassRate">0%</div><div class="scard-label">Pass Rate</div></div>
+    <div class="scard"><div class="scard-val" id="sAvgScore">0</div><div class="scard-label">Avg Score /50</div></div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls" id="controls" style="display:none">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn pass" onclick="setFilter('PASS',this)">✅ Pass</button>
+    <button class="filter-btn review" onclick="setFilter('REVIEW',this)">👀 Review</button>
+    <button class="filter-btn fail" onclick="setFilter('FAIL',this)">❌ Failed</button>
+    <button class="filter-btn" onclick="setFilter('tiktok',this)">🎵 TikTok</button>
+    <button class="filter-btn" onclick="setFilter('instagram',this)">📸 Instagram</button>
+    <button class="filter-btn" onclick="setFilter('youtube',this)">📺 YouTube</button>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" onclick="approveAll('PASS')">Approve All Passed</button>
+  </div>
+
+  <!-- CONTENT GRID -->
+  <div class="content-grid" id="contentGrid">
+    <div class="empty">
+      <div class="icon">🔍</div>
+      <div>Enter a product slug above to load QA results.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHONE PREVIEW MODAL -->
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal">
+    <h3>📱 Post Preview</h3>
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:400px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:3rem;opacity:0.3">📦</span>
+        </div>
+        <div class="phone-gradient"></div>
+        <div class="phone-content">
+          <div class="phone-username" id="previewUsername">@your_account</div>
+          <div class="phone-caption" id="previewCaption">Caption will appear here</div>
+          <div class="phone-hashtags" id="previewHashtags"></div>
+        </div>
+        <div class="phone-actions">
+          <div class="phone-action-btn"><div class="phone-action-icon">❤️</div><div class="phone-action-count">0</div></div>
+          <div class="phone-action-btn"><div class="phone-action-icon">💬</div><div class="phone-action-count">0</div></div>
+          <div class="phone-action-btn"><div class="phone-action-icon">↗️</div><div class="phone-action-count">0</div></div>
+          <div class="phone-action-btn"><div class="phone-action-icon">🔖</div><div class="phone-action-count">0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="previewScores" style="margin-bottom:16px;"></div>
+
+    <div id="previewWeak" style="margin-bottom:16px;"></div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm btn-approve" onclick="approveFromModal()" style="flex:1">✅ Approve & Schedule</button>
+      <button class="btn btn-sm btn-reject" onclick="rejectFromModal()">❌ Reject</button>
+      <button class="btn btn-sm btn-view" onclick="closeModals()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ENGINE = 'http://localhost:8080';
+let allItems = [];
+let currentFilter = 'all';
+let activeItemId = null;
+let currentSlug = '';
+
+// ── Load product QA results ───────────────────────────────────────────────────
+async function loadProduct() {
+  const slug = document.getElementById('slugInput').value.trim();
+  if (!slug) { alert('Enter a product slug'); return; }
+  currentSlug = slug;
+
+  // Try engine first
+  let data = null;
+  try {
+    const r = await fetch(`${ENGINE}/api/engine/content/qa-results/${slug}`);
+    if (r.ok) data = await r.json();
+  } catch {}
+
+  // Fallback: load from file directly
+  if (!data) {
+    try {
+      const r = await fetch(`../data/product_collateral/${slug}/qa_results.json`);
+      if (r.ok) data = await r.json();
+    } catch {}
+  }
+
+  if (!data) {
+    alert(`No QA results found for "${slug}".\nRun: python agents/content_pipeline.py ${slug}`);
+    return;
+  }
+
+  processResults(data, slug);
+}
+
+function processResults(data, slug) {
+  allItems = [];
+  let totalPass = 0, totalReview = 0, totalFail = 0, totalScore = 0;
+
+  const platformMap = {tiktok:'tiktok', instagram:'instagram', youtube:'youtube', ad_hooks:'ad_hook'};
+
+  for (const [key, result] of Object.entries(data)) {
+    const platform = platformMap[key] || key;
+    ['pass','review','fail'].forEach(bucket => {
+      (result[bucket] || []).forEach((item, idx) => {
+        const qa = item.qa || {};
+        allItems.push({
+          id: `${key}_${bucket}_${idx}`,
+          platform,
+          content_type: key,
+          verdict: qa.verdict || bucket.toUpperCase(),
+          score: qa.total_score || item.qa_score || 0,
+          text: item.final_text || item.script || item.caption || item.description || item.hook || '',
+          weak_areas: qa.weak_areas || [],
+          scores: qa.scores || {},
+          approved: bucket === 'pass',
+        });
+        if (bucket==='pass') totalPass++;
+        else if (bucket==='review') totalReview++;
+        else totalFail++;
+        totalScore += qa.total_score || 0;
+      });
+    });
+  }
+
+  const total = allItems.length;
+  const avgScore = total ? (totalScore / total).toFixed(1) : 0;
+
+  // Update summary
+  document.getElementById('summaryBar').style.display = '';
+  document.getElementById('controls').style.display = '';
+  document.getElementById('sTotal').textContent = total.toLocaleString();
+  document.getElementById('sPass').textContent = totalPass.toLocaleString();
+  document.getElementById('sReview').textContent = totalReview.toLocaleString();
+  document.getElementById('sFail').textContent = totalFail.toLocaleString();
+  document.getElementById('sPassRate').textContent = total ? Math.round((totalPass+totalReview)/total*100)+'%' : '0%';
+  document.getElementById('sAvgScore').textContent = avgScore;
+
+  renderCards();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderCards() {
+  const grid = document.getElementById('contentGrid');
+  let filtered = allItems;
+
+  if (currentFilter === 'PASS')      filtered = allItems.filter(i => i.verdict === 'PASS');
+  else if (currentFilter === 'REVIEW') filtered = allItems.filter(i => i.verdict === 'REVIEW');
+  else if (currentFilter === 'FAIL')   filtered = allItems.filter(i => i.verdict === 'FAIL');
+  else if (['tiktok','instagram','youtube'].includes(currentFilter))
+    filtered = allItems.filter(i => i.platform === currentFilter);
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty"><div class="icon">🔍</div><div>No content matches this filter.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.slice(0, 200).map(item => cardHTML(item)).join('');
+}
+
+function cardHTML(item) {
+  const ringClass = item.verdict === 'PASS' ? 'pass' : item.verdict === 'REVIEW' ? 'review' : 'fail';
+  const scoreColor = item.score >= 40 ? 'var(--green)' : item.score >= 30 ? 'var(--yellow)' : 'var(--red)';
+  const previewText = item.text.slice(0, 180) + (item.text.length > 180 ? '…' : '');
+  const platformEmoji = {tiktok:'🎵',instagram:'📸',youtube:'📺',ad_hook:'⚡'}[item.platform]||'📱';
+
+  const dims = item.scores;
+  const bars = ['hook','value','cta','platform_fit','conversion'].map(k => {
+    const d = dims[k] || {};
+    const pct = ((d.score||0)/10*100).toFixed(0);
+    const col = (d.score||0) >= 7 ? 'var(--green)' : (d.score||0) >= 4 ? 'var(--yellow)' : 'var(--red)';
+    const label = {hook:'Hook',value:'Value',cta:'CTA',platform_fit:'Platform',conversion:'Convert'}[k]||k;
+    return `<div class="score-bar">
+      <div class="score-bar-label">${label}</div>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="score-bar-val">${(d.score||0).toFixed(1)}</div>
+    </div>`;
+  }).join('');
+
+  const weakHtml = item.weak_areas.length
+    ? item.weak_areas.slice(0,2).map(w => `<div class="weak-item">${w}</div>`).join('')
+    : '';
+
+  const cardClass = item.approved ? 'approved-card' : '';
+
+  return `<div class="content-card ${cardClass}" id="card-${item.id}">
+    <div class="score-ring ${ringClass}">${item.score}</div>
+    <div class="card-body">
+      <div class="card-meta">
+        <span class="platform-badge ${item.platform}">${platformEmoji} ${item.platform}</span>
+        <span class="verdict-badge ${item.verdict}">${item.verdict}</span>
+        ${item.approved ? '<span style="font-size:0.7rem;color:var(--green)">✅ Approved</span>' : ''}
+      </div>
+      <div class="card-text collapsed" id="text-${item.id}">${escHtml(previewText)}</div>
+      <div class="score-bars">${bars}</div>
+      ${weakHtml ? `<div class="weak-areas">${weakHtml}</div>` : ''}
+      <div class="card-actions">
+        <button class="btn btn-sm btn-view" onclick="openPreview('${item.id}')">📱 Preview</button>
+        <button class="btn btn-sm btn-approve" onclick="approveItem('${item.id}')">✅ Approve</button>
+        <button class="btn btn-sm btn-reject" onclick="rejectItem('${item.id}')">❌ Reject</button>
+        <button class="btn btn-sm btn-view" onclick="toggleText('${item.id}')">⬇ More</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Preview modal ─────────────────────────────────────────────────────────────
+function openPreview(itemId) {
+  activeItemId = itemId;
+  const item = allItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  const caption = item.text;
+  const hashtags = (caption.match(/#\w+/g) || []).join(' ');
+  const captionClean = caption.replace(/#\w+/g, '').trim();
+
+  document.getElementById('previewCaption').textContent = captionClean.slice(0, 200);
+  document.getElementById('previewHashtags').textContent = hashtags;
+  document.getElementById('previewUsername').textContent = `@your_${item.platform}_account`;
+
+  // Score bars in modal
+  const dims = item.scores;
+  let barsHtml = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">';
+  ['hook','value','cta','platform_fit','conversion'].forEach(k => {
+    const d = dims[k] || {};
+    const col = (d.score||0) >= 7 ? 'var(--green)' : (d.score||0) >= 4 ? 'var(--yellow)' : 'var(--red)';
+    const label = {hook:'Hook',value:'Value',cta:'CTA',platform_fit:'Platform',conversion:'Convert'}[k]||k;
+    barsHtml += `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;text-align:center;">
+      <div style="font-size:0.65rem;color:var(--muted)">${label}</div>
+      <div style="font-size:1rem;font-weight:800;color:${col}">${(d.score||0).toFixed(1)}</div>
+    </div>`;
+  });
+  barsHtml += `<div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;text-align:center;">
+    <div style="font-size:0.65rem;color:var(--muted)">TOTAL</div>
+    <div style="font-size:1rem;font-weight:800;color:var(--accent2)">${item.score}/50</div>
+  </div></div>`;
+  document.getElementById('previewScores').innerHTML = barsHtml;
+
+  // Weak areas
+  const weakHtml = item.weak_areas.length
+    ? '<div style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px;font-size:0.75rem;">' +
+      '<div style="color:var(--yellow);font-weight:600;margin-bottom:4px;">Issues to fix:</div>' +
+      item.weak_areas.map(w => `<div style="color:var(--muted);padding:2px 0">⚠ ${w}</div>`).join('') +
+      '</div>'
+    : '<div style="color:var(--green);font-size:0.8rem;">✅ No issues found</div>';
+  document.getElementById('previewWeak').innerHTML = weakHtml;
+
+  document.getElementById('previewModal').classList.add('open');
+}
+
+function approveFromModal() {
+  if (activeItemId) approveItem(activeItemId);
+  closeModals();
+}
+function rejectFromModal() {
+  if (activeItemId) rejectItem(activeItemId);
+  closeModals();
+}
+
+function approveItem(itemId) {
+  const item = allItems.find(i => i.id === itemId);
+  if (item) { item.approved = true; item.verdict = 'PASS'; }
+  renderCards();
+}
+
+function rejectItem(itemId) {
+  const item = allItems.find(i => i.id === itemId);
+  if (item) { item.approved = false; item.verdict = 'FAIL'; }
+  renderCards();
+}
+
+function approveAll(verdict) {
+  allItems.filter(i => i.verdict === verdict).forEach(i => { i.approved = true; });
+  renderCards();
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+function toggleText(id) {
+  const el = document.getElementById('text-'+id);
+  if (el) el.classList.toggle('collapsed');
+}
+
+function closeModals() {
+  document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open'));
+  activeItemId = null;
+}
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModals(); });
+});
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Engine health ─────────────────────────────────────────────────────────────
+async function checkEngine() {
+  try {
+    const r = await fetch(ENGINE+'/api/engine/status', {signal: AbortSignal.timeout(2000)});
+    document.getElementById('engineStatus').textContent = r.ok ? '● Engine Online' : '● Engine Offline';
+    document.getElementById('engineStatus').style.color = r.ok ? '#10b981' : '#ef4444';
+  } catch {
+    document.getElementById('engineStatus').textContent = '● Engine Offline';
+    document.getElementById('engineStatus').style.color = '#ef4444';
+  }
+}
+checkEngine();
+</script>
+</body>
+</html>

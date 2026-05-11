@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipStack — Profile Manager</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --panel: #12121a;
+    --border: #1e1e2e;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --tt: #ff2d55;
+    --ig: #c13584;
+    --yt: #ff0000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* NAV */
+  .nav { background: var(--panel); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+  .nav-logo { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+  .nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; padding: 6px 12px; border-radius: 6px; }
+  .nav a:hover, .nav a.active { background: var(--border); color: var(--text); }
+  .nav-spacer { flex: 1; }
+
+  /* LAYOUT */
+  .page { padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-title { font-size: 1.5rem; font-weight: 700; }
+
+  /* STATS BAR */
+  .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .stat-value { font-size: 1.5rem; font-weight: 700; }
+  .stat-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  /* FILTERS */
+  .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-btn { background: var(--panel); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: all 0.15s; }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--text); background: rgba(124,58,237,0.15); }
+  .filter-btn.tt.active { border-color: var(--tt); background: rgba(255,45,85,0.12); color: var(--tt); }
+  .filter-btn.ig.active { border-color: var(--ig); background: rgba(193,53,132,0.12); color: var(--ig); }
+  .filter-btn.yt.active { border-color: var(--yt); background: rgba(255,0,0,0.12); color: var(--yt); }
+
+  /* PROFILE GRID */
+  .profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+  .profile-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    transition: border-color 0.15s;
+  }
+  .profile-card:hover { border-color: var(--accent); }
+  .profile-card.tt { border-top: 3px solid var(--tt); }
+  .profile-card.ig { border-top: 3px solid var(--ig); }
+  .profile-card.yt { border-top: 3px solid var(--yt); }
+
+  .profile-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .profile-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: 700; background: var(--border);
+    flex-shrink: 0;
+  }
+  .profile-info { flex: 1; min-width: 0; }
+  .profile-username { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .profile-platform { font-size: 0.75rem; color: var(--muted); }
+  .profile-niche { display: inline-block; background: var(--border); border-radius: 4px; padding: 2px 8px; font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+
+  .status-badge { position: absolute; top: 16px; right: 16px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+  .status-badge.active    { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .status-badge.warming_up { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+  .status-badge.paused    { background: rgba(100,116,139,0.15); color: var(--muted); border: 1px solid rgba(100,116,139,0.3); }
+  .status-badge.flagged   { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+  .profile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .pstat { text-align: center; }
+  .pstat-value { font-size: 1rem; font-weight: 700; }
+  .pstat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+
+  .profile-last { font-size: 0.75rem; color: var(--muted); margin-bottom: 14px; }
+  .profile-calendar { font-size: 0.75rem; color: var(--accent2); margin-bottom: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .profile-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.15s; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #6d28d9; }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-secondary:hover { background: #2a2a3a; }
+  .btn-danger { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn-green { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+  .btn-green:hover { background: rgba(16,185,129,0.2); }
+
+  /* ADD PROFILE BUTTON */
+  .btn-add { background: var(--accent); color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.875rem; font-weight: 600; }
+  .btn-add:hover { background: #6d28d9; }
+
+  /* ADD PROFILE CARD */
+  .add-card {
+    background: var(--panel);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .add-card:hover { border-color: var(--accent); }
+  .add-card-icon { font-size: 2rem; margin-bottom: 8px; color: var(--muted); }
+  .add-card-text { color: var(--muted); font-size: 0.875rem; }
+
+  /* MODAL */
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal-backdrop.open { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: 420px; max-width: 95vw; }
+  .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+  .form-input, .form-select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 0.875rem; }
+  .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+  /* SPIN MODAL */
+  .spin-info { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 0.8rem; line-height: 1.6; color: var(--muted); }
+  .spin-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .spin-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .spin-table td:last-child { text-align: right; font-weight: 700; color: var(--accent2); }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+  /* PLATFORM ICONS */
+  .platform-icon { font-size: 1.1rem; }
+  .platform-icon.tiktok::before { content: '🎵'; }
+  .platform-icon.instagram::before { content: '📸'; }
+  .platform-icon.youtube::before { content: '📺'; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-logo">⚡ ShipStack</span>
+  <a href="index.html">Dashboard</a>
+  <a href="calendar.html">Calendar</a>
+  <a href="profiles.html" class="active">Profiles</a>
+  <span class="nav-spacer"></span>
+  <span id="engineStatus" style="font-size:0.75rem;color:var(--muted)">● Connecting…</span>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Social Profiles</div>
+      <div style="color:var(--muted);font-size:0.85rem;margin-top:2px">Manage your accounts across TikTok, Instagram & YouTube</div>
+    </div>
+    <button class="btn-add" onclick="openAddModal()">+ Add Profile</button>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <div class="stat-label">Total Profiles</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Followers</div>
+      <div class="stat-value" id="statFollowers">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active</div>
+      <div class="stat-value" id="statActive" style="color:var(--green)">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">TikTok</div>
+      <div class="stat-value" id="statTT" style="color:var(--tt)">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Instagram</div>
+      <div class="stat-value" id="statIG" style="color:var(--ig)">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">YouTube</div>
+      <div class="stat-value" id="statYT" style="color:var(--yt)">0</div>
+    </div>
+  </div>
+
+  <!-- SPIN SUMMARY (shown after spinning) -->
+  <div id="spinSummary" style="display:none;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;">
+    <div style="font-weight:700;margin-bottom:8px;">⚡ Last Spin Results</div>
+    <div id="spinSummaryContent" style="font-size:0.85rem;color:var(--muted);"></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterProfiles('all', this)">All</button>
+    <button class="filter-btn tt" onclick="filterProfiles('tiktok', this)">🎵 TikTok</button>
+    <button class="filter-btn ig" onclick="filterProfiles('instagram', this)">📸 Instagram</button>
+    <button class="filter-btn yt" onclick="filterProfiles('youtube', this)">📺 YouTube</button>
+    <button class="filter-btn" onclick="filterProfiles('active', this)">✅ Active</button>
+    <button class="filter-btn" onclick="filterProfiles('warming_up', this)">🔄 Warming Up</button>
+    <button class="filter-btn" onclick="filterProfiles('paused', this)">⏸ Paused</button>
+    <button class="filter-btn" onclick="filterProfiles('flagged', this)">🚩 Flagged</button>
+  </div>
+
+  <!-- PROFILE GRID -->
+  <div class="profiles-grid" id="profilesGrid">
+    <div class="empty-state" style="grid-column:1/-1">
+      <div class="icon">📱</div>
+      <div>No profiles yet. Add your first account to get started.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PROFILE MODAL -->
+<div class="modal-backdrop" id="addModal">
+  <div class="modal">
+    <h3>Add Social Profile</h3>
+    <div class="form-group">
+      <label class="form-label">Platform</label>
+      <select class="form-select" id="addPlatform">
+        <option value="tiktok">🎵 TikTok</option>
+        <option value="instagram">📸 Instagram</option>
+        <option value="youtube">📺 YouTube</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username (without @)</label>
+      <input class="form-input" id="addUsername" placeholder="e.g. beautyfinds2026" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Niche</label>
+      <select class="form-select" id="addNiche">
+        <option value="beauty">Beauty</option>
+        <option value="fitness">Fitness</option>
+        <option value="home">Home & Living</option>
+        <option value="tech">Tech</option>
+        <option value="pet">Pets</option>
+        <option value="fashion">Fashion</option>
+        <option value="default">General</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Proxy (optional)</label>
+      <input class="form-input" id="addProxy" placeholder="e.g. 192.168.1.100:3128" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="addNotes" placeholder="Any notes about this account" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="submitAddProfile()" style="flex:1">Add Profile</button>
+      <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSIGN CALENDAR MODAL -->
+<div class="modal-backdrop" id="calendarModal">
+  <div class="modal">
+    <h3>Assign Content Calendar</h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Select a product calendar to assign to this profile.</p>
+    <div class="form-group">
+      <label class="form-label">Product Slug</label>
+      <input class="form-input" id="calendarSlug" placeholder="e.g. glow_serum" />
+    </div>
+    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">
+      Calendar path: <code style="color:var(--accent2)">data/product_collateral/&lt;slug&gt;/content_calendar.json</code>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="submitAssignCalendar()" style="flex:1">Assign</button>
+      <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPIN MODAL -->
+<div class="modal-backdrop" id="spinModal">
+  <div class="modal" style="width:500px">
+    <h3>⚡ Spin Content for Profile</h3>
+    <div class="spin-info">
+      Spins Quinn's output into hundreds of unique pieces using your local Ollama model (free).
+      Content is saved to <code>data/product_collateral/&lt;slug&gt;/spins.json</code>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Product Slug</label>
+      <input class="form-input" id="spinSlug" placeholder="e.g. glow_serum" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Number of Profiles</label>
+      <input class="form-input" type="number" id="spinProfileCount" value="1" min="1" max="50" />
+    </div>
+    <table class="spin-table">
+      <tr><td>TikTok scripts (3 base × 50)</td><td id="spinCalcTT">150</td></tr>
+      <tr><td>Instagram captions (3 base × 40)</td><td id="spinCalcIG">120</td></tr>
+      <tr><td>YouTube descriptions (2 base × 30)</td><td id="spinCalcYT">60</td></tr>
+      <tr><td>Ad hooks (5 base × 20)</td><td>100</td></tr>
+      <tr><td><strong>Unique pieces</strong></td><td id="spinCalcUnique"><strong>430</strong></td></tr>
+      <tr><td><strong>Total posts (×profiles)</strong></td><td id="spinCalcTotal"><strong>430</strong></td></tr>
+    </table>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="submitSpin()" style="flex:1">Start Spinning</button>
+      <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ENGINE = 'http://localhost:8080';
+let allProfiles = [];
+let currentFilter = 'all';
+let activeProfileId = null;
+
+// ── API ───────────────────────────────────────────────────────────────────────
+async function apiGet(path) {
+  try {
+    const r = await fetch(ENGINE + path);
+    return r.ok ? r.json() : null;
+  } catch { return null; }
+}
+
+async function apiPost(path, body) {
+  try {
+    const r = await fetch(ENGINE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    return r.ok ? r.json() : null;
+  } catch { return null; }
+}
+
+// ── Load profiles ─────────────────────────────────────────────────────────────
+async function loadProfiles() {
+  const data = await apiGet('/api/engine/profiles');
+  if (data) {
+    document.getElementById('engineStatus').textContent = '● Engine Online';
+    document.getElementById('engineStatus').style.color = '#10b981';
+    allProfiles = data.profiles || [];
+    updateStats(data);
+  } else {
+    // Load from local JSON as fallback
+    try {
+      const r = await fetch('../data/profiles/profiles.json');
+      const d = await r.json();
+      allProfiles = d.profiles || [];
+    } catch {}
+    document.getElementById('engineStatus').textContent = '● Engine Offline';
+    document.getElementById('engineStatus').style.color = '#ef4444';
+  }
+  renderProfiles();
+}
+
+function updateStats(data) {
+  document.getElementById('statTotal').textContent = data.total_profiles || allProfiles.length;
+  document.getElementById('statFollowers').textContent = fmtNum(data.total_followers || 0);
+  const bp = data.by_platform || {};
+  const bs = data.by_status || {};
+  document.getElementById('statTT').textContent = bp.tiktok || 0;
+  document.getElementById('statIG').textContent = bp.instagram || 0;
+  document.getElementById('statYT').textContent = bp.youtube || 0;
+  document.getElementById('statActive').textContent = bs.active || 0;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderProfiles() {
+  const grid = document.getElementById('profilesGrid');
+  let filtered = allProfiles;
+
+  if (currentFilter !== 'all') {
+    if (['tiktok','instagram','youtube'].includes(currentFilter)) {
+      filtered = allProfiles.filter(p => p.platform === currentFilter);
+    } else {
+      filtered = allProfiles.filter(p => p.status === currentFilter);
+    }
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="icon">📱</div>
+      <div>${allProfiles.length === 0 ? 'No profiles yet. Add your first account.' : 'No profiles match this filter.'}</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => profileCard(p)).join('');
+
+  // Add the "+" card at end
+  grid.innerHTML += `<div class="add-card" onclick="openAddModal()">
+    <div class="add-card-icon">➕</div>
+    <div class="add-card-text">Add Profile</div>
+  </div>`;
+
+  // Recalc stats from local data if engine offline
+  const bp = {}, bs = {};
+  allProfiles.forEach(p => {
+    bp[p.platform] = (bp[p.platform]||0)+1;
+    bs[p.status] = (bs[p.status]||0)+1;
+  });
+  document.getElementById('statTotal').textContent = allProfiles.length;
+  document.getElementById('statFollowers').textContent = fmtNum(allProfiles.reduce((s,p)=>s+(p.followers||0),0));
+  document.getElementById('statTT').textContent = bp.tiktok||0;
+  document.getElementById('statIG').textContent = bp.instagram||0;
+  document.getElementById('statYT').textContent = bp.youtube||0;
+  document.getElementById('statActive').textContent = bs.active||0;
+}
+
+function profileCard(p) {
+  const platformClass = p.platform;
+  const statusClass = p.status;
+  const statusLabel = p.status.replace('_',' ');
+  const avatarLetter = (p.username || '?')[0].toUpperCase();
+  const platformEmoji = {tiktok:'🎵',instagram:'📸',youtube:'📺'}[p.platform] || '📱';
+  const platformColor = {tiktok:'var(--tt)',instagram:'var(--ig)',youtube:'var(--yt)'}[p.platform] || 'var(--accent)';
+  const lastPosted = p.last_posted ? new Date(p.last_posted).toLocaleDateString() : 'Never';
+  const calendarText = p.assigned_calendar
+    ? '📅 ' + p.assigned_calendar.split(/[\\/]/).slice(-2).join('/')
+    : 'No calendar assigned';
+
+  return `<div class="profile-card ${platformClass}" id="card-${p.id}">
+    <div class="status-badge ${statusClass}">${statusLabel}</div>
+    <div class="profile-top">
+      <div class="profile-avatar" style="background:${platformColor}22;color:${platformColor}">${avatarLetter}</div>
+      <div class="profile-info">
+        <div class="profile-username">${platformEmoji} @${p.username}</div>
+        <div class="profile-platform">${p.platform}</div>
+        <span class="profile-niche">${p.niche}</span>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="pstat"><div class="pstat-value">${fmtNum(p.followers||0)}</div><div class="pstat-label">Followers</div></div>
+      <div class="pstat"><div class="pstat-value">${fmtNum(p.posts||0)}</div><div class="pstat-label">Posts</div></div>
+      <div class="pstat"><div class="pstat-value">${p.following||0}</div><div class="pstat-label">Following</div></div>
+    </div>
+    <div class="profile-last">Last posted: ${lastPosted}</div>
+    <div class="profile-calendar" title="${p.assigned_calendar||''}">${calendarText}</div>
+    <div class="profile-actions">
+      <button class="btn btn-secondary" onclick="openAssignCalendar('${p.id}')">📅 Assign</button>
+      <button class="btn btn-green" onclick="openSpinModal('${p.id}')">⚡ Spin</button>
+      <button class="btn btn-secondary" onclick="cycleStatus('${p.id}', '${p.status}')">
+        ${p.status === 'active' ? '⏸ Pause' : '▶ Activate'}
+      </button>
+    </div>
+  </div>`;
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function filterProfiles(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProfiles();
+}
+
+// ── Add Profile ───────────────────────────────────────────────────────────────
+function openAddModal() {
+  document.getElementById('addModal').classList.add('open');
+}
+
+async function submitAddProfile() {
+  const platform  = document.getElementById('addPlatform').value;
+  const username  = document.getElementById('addUsername').value.trim().replace('@','');
+  const niche     = document.getElementById('addNiche').value;
+  const proxy     = document.getElementById('addProxy').value.trim();
+  const notes     = document.getElementById('addNotes').value.trim();
+
+  if (!username) { alert('Username is required'); return; }
+
+  const body = { platform, username, niche, proxy: proxy || null, notes };
+  const result = await apiPost('/api/engine/profiles/add', body);
+
+  if (result) {
+    closeModals();
+    await loadProfiles();
+  } else {
+    // Offline: add locally for display
+    const mockProfile = {
+      id: platform[0]+platform[1]+'_'+Math.random().toString(36).slice(2,8),
+      platform, username, niche, proxy, notes,
+      followers: 0, following: 0, posts: 0,
+      status: 'warming_up', last_posted: null,
+      assigned_calendar: null,
+      created: new Date().toISOString(),
+    };
+    allProfiles.push(mockProfile);
+    closeModals();
+    renderProfiles();
+  }
+}
+
+// ── Assign Calendar ───────────────────────────────────────────────────────────
+function openAssignCalendar(profileId) {
+  activeProfileId = profileId;
+  document.getElementById('calendarModal').classList.add('open');
+}
+
+async function submitAssignCalendar() {
+  const slug = document.getElementById('calendarSlug').value.trim();
+  if (!slug) { alert('Product slug required'); return; }
+
+  const calPath = `data/product_collateral/${slug}/content_calendar.json`;
+  const result = await apiPost(`/api/engine/profiles/${activeProfileId}/assign-calendar`, { calendar_path: calPath });
+
+  const profile = allProfiles.find(p => p.id === activeProfileId);
+  if (profile) profile.assigned_calendar = calPath;
+  closeModals();
+  renderProfiles();
+}
+
+// ── Spin ──────────────────────────────────────────────────────────────────────
+function openSpinModal(profileId) {
+  activeProfileId = profileId;
+  document.getElementById('spinModal').classList.add('open');
+  updateSpinCalc();
+}
+
+function updateSpinCalc() {
+  const profiles = parseInt(document.getElementById('spinProfileCount').value) || 1;
+  const unique = 430;
+  const total = (150 + 120 + 60) * profiles + 100;
+  document.getElementById('spinCalcTT').textContent = (150 * profiles).toLocaleString();
+  document.getElementById('spinCalcIG').textContent = (120 * profiles).toLocaleString();
+  document.getElementById('spinCalcYT').textContent = (60 * profiles).toLocaleString();
+  document.getElementById('spinCalcUnique').innerHTML = `<strong>${unique.toLocaleString()}</strong>`;
+  document.getElementById('spinCalcTotal').innerHTML = `<strong>${total.toLocaleString()}</strong>`;
+}
+document.getElementById('spinProfileCount')?.addEventListener('input', updateSpinCalc);
+
+async function submitSpin() {
+  const slug = document.getElementById('spinSlug').value.trim();
+  const profileCount = parseInt(document.getElementById('spinProfileCount').value) || 1;
+  if (!slug) { alert('Product slug required'); return; }
+
+  closeModals();
+  const result = await apiPost('/api/engine/content/spin', { product_slug: slug, profile_count: profileCount });
+
+  const summary = document.getElementById('spinSummary');
+  const content = document.getElementById('spinSummaryContent');
+  summary.style.display = 'block';
+
+  if (result) {
+    content.innerHTML = `
+      <strong>${result.product}</strong> — ${result.totals?.unique_pieces?.toLocaleString() || 430} unique pieces |
+      ${result.totals?.total_posts_with_profiles?.toLocaleString() || (430*profileCount).toLocaleString()} total posts across ${profileCount} profiles
+    `;
+  } else {
+    content.innerHTML = `Spin queued for <strong>${slug}</strong> × ${profileCount} profiles (~${(430*profileCount).toLocaleString()} posts). Check engine logs.`;
+  }
+}
+
+// ── Status toggle ─────────────────────────────────────────────────────────────
+async function cycleStatus(profileId, currentStatus) {
+  const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+  const result = await apiPost(`/api/engine/profiles/${profileId}/status`, { status: newStatus });
+  const profile = allProfiles.find(p => p.id === profileId);
+  if (profile) profile.status = newStatus;
+  renderProfiles();
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function closeModals() {
+  document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open'));
+  activeProfileId = null;
+}
+document.querySelectorAll('.modal-backdrop').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModals(); });
+});
+
+function fmtNum(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'K';
+  return n.toString();
+}
+
+// ── Engine health ─────────────────────────────────────────────────────────────
+async function checkEngine() {
+  try {
+    const r = await fetch(ENGINE + '/api/engine/status', { signal: AbortSignal.timeout(2000) });
+    if (r.ok) {
+      document.getElementById('engineStatus').textContent = '● Engine Online';
+      document.getElementById('engineStatus').style.color = '#10b981';
+    }
+  } catch {
+    document.getElementById('engineStatus').textContent = '● Engine Offline';
+    document.getElementById('engineStatus').style.color = '#ef4444';
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadProfiles();
+checkEngine();
+setInterval(loadProfiles, 30000);
+</script>
+</body>
+</html>
