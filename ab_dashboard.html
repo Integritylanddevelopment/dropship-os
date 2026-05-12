@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipStack — A/B Intelligence</title>
+<style>
+  :root {
+    --bg:#0a0a0f;--panel:#12121a;--border:#1e1e2e;
+    --accent:#7c3aed;--accent2:#06b6d4;--accent3:#f59e0b;
+    --green:#10b981;--yellow:#f59e0b;--red:#ef4444;--blue:#3b82f6;
+    --text:#e2e8f0;--muted:#64748b;
+    --tt:#ff2d55;--ig:#c13584;--yt:#ff0000;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;}
+  .nav{background:var(--panel);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:16px;}
+  .nav-logo{font-size:1.2rem;font-weight:800;color:var(--accent);}
+  .nav a{color:var(--muted);text-decoration:none;font-size:0.875rem;padding:6px 12px;border-radius:6px;}
+  .nav a:hover,.nav a.active{background:var(--border);color:var(--text);}
+  .nav-spacer{flex:1;}
+  .page{padding:24px;max-width:1400px;margin:0 auto;}
+  h2{font-size:1.4rem;font-weight:700;margin-bottom:4px;}
+  .sub{color:var(--muted);font-size:0.85rem;margin-bottom:24px;}
+
+  /* STAT GRID */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px;}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;}
+  .stat-val{font-size:1.6rem;font-weight:800;}
+  .stat-lbl{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+
+  /* SECTION */
+  .section{margin-bottom:32px;}
+  .section-title{font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+  /* AVATAR LEADERBOARD */
+  .leaderboard{display:flex;flex-direction:column;gap:8px;}
+  .lb-row{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:grid;grid-template-columns:auto 1fr auto auto auto;gap:12px;align-items:center;}
+  .lb-rank{font-size:1.1rem;font-weight:800;color:var(--muted);width:24px;}
+  .lb-rank.gold{color:#f59e0b;}
+  .lb-rank.silver{color:#94a3b8;}
+  .lb-rank.bronze{color:#a16207;}
+  .lb-name{font-weight:600;}
+  .lb-bar-wrap{height:6px;background:var(--border);border-radius:3px;min-width:80px;}
+  .lb-bar{height:100%;border-radius:3px;background:var(--accent);}
+  .lb-val{font-size:0.85rem;font-weight:700;color:var(--accent2);min-width:60px;text-align:right;}
+  .lb-sub{font-size:0.72rem;color:var(--muted);min-width:60px;text-align:right;}
+
+  /* TESTS TABLE */
+  .tests-table{width:100%;border-collapse:collapse;}
+  .tests-table th{text-align:left;font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:8px 12px;border-bottom:1px solid var(--border);}
+  .tests-table td{padding:10px 12px;border-bottom:1px solid rgba(30,30,46,0.5);font-size:0.82rem;vertical-align:top;}
+  .tests-table tr:hover td{background:rgba(124,58,237,0.04);}
+
+  /* VARIANT MINI-BARS */
+  .variant-row{display:flex;gap:6px;align-items:center;margin-bottom:3px;}
+  .variant-label{font-size:0.68rem;font-weight:700;width:18px;color:var(--muted);}
+  .variant-bar-wrap{flex:1;height:4px;background:var(--border);border-radius:2px;}
+  .variant-bar{height:100%;border-radius:2px;}
+  .variant-val{font-size:0.68rem;color:var(--text);min-width:36px;text-align:right;}
+
+  /* BADGES */
+  .badge{padding:2px 8px;border-radius:4px;font-size:0.68rem;font-weight:700;}
+  .badge-pass{background:rgba(16,185,129,.15);color:var(--green);}
+  .badge-active{background:rgba(59,130,246,.15);color:var(--blue);}
+  .badge-concluded{background:rgba(124,58,237,.15);color:var(--accent);}
+  .platform-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
+
+  /* EMOTION GRID */
+  .emotion-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+  .emotion-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+  .emotion-icon{font-size:1.5rem;margin-bottom:4px;}
+  .emotion-name{font-size:0.75rem;font-weight:700;text-transform:capitalize;margin-bottom:2px;}
+  .emotion-ctr{font-size:1rem;font-weight:800;color:var(--accent2);}
+  .emotion-wins{font-size:0.68rem;color:var(--muted);}
+
+  /* TRAFFIC SOURCES */
+  .source-list{display:flex;flex-direction:column;gap:8px;}
+  .source-row{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+  .source-name{font-weight:600;font-size:0.85rem;min-width:120px;}
+  .source-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;}
+  .source-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+  .source-stats{font-size:0.75rem;color:var(--muted);text-align:right;min-width:100px;}
+
+  /* FORMULAS */
+  .formula-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;}
+  .formula-hook{font-weight:600;font-size:0.9rem;color:var(--accent2);margin-bottom:6px;}
+  .formula-cta{font-size:0.8rem;color:var(--muted);}
+  .formula-badge{font-size:0.68rem;background:rgba(16,185,129,.1);color:var(--green);padding:2px 8px;border-radius:4px;margin-left:8px;}
+
+  /* LEARNING STATUS */
+  .learning-status{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;gap:20px;align-items:center;margin-bottom:28px;}
+  .ls-icon{font-size:2rem;}
+  .ls-body{}
+  .ls-title{font-weight:700;font-size:0.95rem;}
+  .ls-sub{font-size:0.8rem;color:var(--muted);}
+  .pulse{animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+  /* RECORD PERFORMANCE FORM */
+  .record-form{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:28px;}
+  .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px;}
+  .form-input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:0.8rem;width:100%;}
+  .form-input:focus{outline:none;border-color:var(--accent);}
+  .form-label{font-size:0.7rem;color:var(--muted);margin-bottom:4px;display:block;}
+  .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:0.8rem;font-weight:600;}
+  .btn-primary{background:var(--accent);color:white;}
+  .btn-primary:hover{background:#6d28d9;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-logo">⚡ ShipStack</span>
+  <a href="index.html">Dashboard</a>
+  <a href="calendar.html">Calendar</a>
+  <a href="profiles.html">Profiles</a>
+  <a href="content_review.html">Review</a>
+  <a href="ab_dashboard.html" class="active">A/B Intelligence</a>
+  <span class="nav-spacer"></span>
+  <span id="engineStatus" style="font-size:.75rem;color:var(--muted)">● Connecting…</span>
+</nav>
+
+<div class="page">
+  <h2>A/B Intelligence</h2>
+  <div class="sub">What's winning, who's buying, what to double down on — learning from every post</div>
+
+  <!-- LEARNING STATUS -->
+  <div class="learning-status" id="learningStatus">
+    <div class="ls-icon pulse">🧠</div>
+    <div class="ls-body">
+      <div class="ls-title" id="lsTitle">Collecting data…</div>
+      <div class="ls-sub" id="lsSub">Run content pipeline and record performance metrics to activate learning</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <div style="font-size:1.4rem;font-weight:800;color:var(--accent2)" id="lsTestCount">0</div>
+      <div style="font-size:0.68rem;color:var(--muted)">Tests Analyzed</div>
+    </div>
+  </div>
+
+  <!-- STAT GRID -->
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-val" id="sTests">0</div><div class="stat-lbl">Total Tests</div></div>
+    <div class="stat"><div class="stat-val" id="sActive" style="color:var(--blue)">0</div><div class="stat-lbl">Active</div></div>
+    <div class="stat"><div class="stat-val" id="sConcluded" style="color:var(--green)">0</div><div class="stat-lbl">Concluded</div></div>
+    <div class="stat"><div class="stat-val" id="sAvgLift" style="color:var(--accent2)">—</div><div class="stat-lbl">Avg Lift %</div></div>
+    <div class="stat"><div class="stat-val" id="sWinRate">—</div><div class="stat-lbl">Best Avatar Win Rate</div></div>
+    <div class="stat"><div class="stat-val" id="sFormulas" style="color:var(--yellow)">0</div><div class="stat-lbl">Winning Formulas</div></div>
+  </div>
+
+  <!-- AVATAR LEADERBOARD -->
+  <div class="section">
+    <div class="section-title">🏆 Avatar Leaderboard <span style="font-size:0.75rem;font-weight:400;color:var(--muted)">Who converts best?</span></div>
+    <div class="leaderboard" id="avatarLeaderboard">
+      <div style="color:var(--muted);font-size:0.85rem;padding:12px">No avatar data yet — run A/B tests to populate.</div>
+    </div>
+  </div>
+
+  <!-- EMOTION PERFORMANCE -->
+  <div class="section">
+    <div class="section-title">💡 Emotion Triggers <span style="font-size:0.75rem;font-weight:400;color:var(--muted)">Which emotions drive clicks?</span></div>
+    <div class="emotion-grid" id="emotionGrid">
+      <div style="color:var(--muted);font-size:0.85rem;padding:12px">No emotion data yet.</div>
+    </div>
+  </div>
+
+  <!-- TRAFFIC SOURCES -->
+  <div class="section">
+    <div class="section-title">📡 Traffic Sources <span style="font-size:0.75rem;font-weight:400;color:var(--muted)">Where are buyers coming from?</span></div>
+    <div class="source-list" id="sourceList">
+      <div style="color:var(--muted);font-size:0.85rem;padding:12px">Record performance data with traffic_source to populate.</div>
+    </div>
+  </div>
+
+  <!-- WINNING FORMULAS -->
+  <div class="section">
+    <div class="section-title">⚡ AI-Generated Winning Formulas <span style="font-size:0.75rem;font-weight:400;color:var(--muted)">Updated every 10 test wins</span></div>
+    <div id="formulasList">
+      <div style="color:var(--muted);font-size:0.85rem;padding:12px">Formulas generate after 10+ test wins are accumulated.</div>
+    </div>
+  </div>
+
+  <!-- RECORD PERFORMANCE (manual) -->
+  <div class="section">
+    <div class="section-title">📊 Record Post Performance</div>
+    <div class="record-form">
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">
+        Paste from TikTok/Instagram analytics. This feeds the learning engine.
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Test ID</label><input class="form-input" id="rfTestId" placeholder="ab_xxxxxxxx" /></div>
+        <div><label class="form-label">Variant (A/B/C/D)</label><input class="form-input" id="rfVariant" placeholder="A" /></div>
+        <div><label class="form-label">Impressions</label><input class="form-input" type="number" id="rfImpressions" placeholder="0" /></div>
+        <div><label class="form-label">Clicks</label><input class="form-input" type="number" id="rfClicks" placeholder="0" /></div>
+        <div><label class="form-label">Saves</label><input class="form-input" type="number" id="rfSaves" placeholder="0" /></div>
+        <div><label class="form-label">Shares</label><input class="form-input" type="number" id="rfShares" placeholder="0" /></div>
+        <div><label class="form-label">Link Clicks</label><input class="form-input" type="number" id="rfLinkClicks" placeholder="0" /></div>
+        <div><label class="form-label">Conversions</label><input class="form-input" type="number" id="rfConversions" placeholder="0" /></div>
+        <div><label class="form-label">Revenue $</label><input class="form-input" type="number" id="rfRevenue" placeholder="0.00" /></div>
+        <div><label class="form-label">Traffic Source</label><input class="form-input" id="rfSource" placeholder="tiktok_fyp" /></div>
+      </div>
+      <button class="btn btn-primary" onclick="submitPerformance()">Submit to Learning Engine</button>
+      <span id="rfResult" style="font-size:0.8rem;color:var(--green);margin-left:12px;"></span>
+    </div>
+  </div>
+
+  <!-- ACTIVE TESTS -->
+  <div class="section">
+    <div class="section-title">🔬 Active A/B Tests</div>
+    <table class="tests-table">
+      <thead>
+        <tr>
+          <th>Test ID</th>
+          <th>Platform</th>
+          <th>Status</th>
+          <th>Variants Performance</th>
+          <th>Winner</th>
+        </tr>
+      </thead>
+      <tbody id="testsBody">
+        <tr><td colspan="5" style="color:var(--muted);padding:20px">No tests yet. Run content_pipeline.py then ab_testing.py to create tests.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const ENGINE = 'http://localhost:8080';
+const EMOTIONS = {fomo:'😱',curiosity:'🤔',social_proof:'⭐',aspiration:'✨',humor:'😂',authority:'🎓',value:'💰',neutral:'😐'};
+const PLATFORM_COLORS = {tiktok:'var(--tt)',instagram:'var(--ig)',youtube:'var(--yt)',ad_hook:'var(--accent)'};
+
+async function apiGet(path) {
+  try {
+    const r = await fetch(ENGINE+path);
+    return r.ok ? r.json() : null;
+  } catch { return null; }
+}
+async function apiPost(path, body) {
+  try {
+    const r = await fetch(ENGINE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    return r.ok ? r.json() : null;
+  } catch { return null; }
+}
+
+async function loadDashboard() {
+  const [abData, learnData] = await Promise.all([
+    apiGet('/api/engine/ab/dashboard'),
+    apiGet('/api/engine/learning/status'),
+  ]);
+
+  if (learnData) renderLearningStatus(learnData);
+  if (abData) renderABData(abData);
+
+  // Try loading learning report for deeper insights
+  const report = await apiGet('/api/engine/learning/report');
+  if (report) renderReport(report);
+
+  // Fallback: load from files
+  if (!abData && !learnData) {
+    await loadFromFiles();
+  }
+}
+
+async function loadFromFiles() {
+  // master_knowledge.json is now stored in SQLite — must use engine API
+  // winning_formulas.json is still written to disk by learning_engine.py for spinner injection
+  // but we read it through the engine learning/status endpoint
+  console.warn('[AB Dashboard] Engine offline — data stored in SQLite, not readable from file. Start shipstack_engine.py.');
+  try {
+    const r = await fetch('../data/learning/winning_formulas.json');
+    if (r.ok) {
+      const data = await r.json();
+      renderFormulas(data.formulas || []);
+    }
+  } catch {}
+}
+
+function renderLearningStatus(data) {
+  const count = data.total_winners_ingested || 0;
+  document.getElementById('lsTestCount').textContent = count;
+  document.getElementById('lsTitle').textContent =
+    count >= 10 ? '🧠 Learning Active — formulas updating automatically' :
+    count >= 3  ? '📊 Warming Up — collecting test data' :
+    '🌱 Collecting First Data Points';
+  document.getElementById('lsSub').textContent =
+    count >= 10 ? `${count} winners analyzed · ${data.hook_patterns_learned || 0} hook patterns · ${data.winning_formulas || 0} formulas active` :
+    `${count}/10 winners needed to activate formula generation`;
+  document.getElementById('sFormulas').textContent = data.winning_formulas || 0;
+}
+
+function renderABData(data) {
+  document.getElementById('sTests').textContent = (data.total_tests || 0).toLocaleString();
+  document.getElementById('sActive').textContent = (data.active_tests || 0).toLocaleString();
+  document.getElementById('sConcluded').textContent = (data.concluded_tests || 0).toLocaleString();
+
+  // Avatar leaderboard
+  const avatarWins = data.avatar_win_rates || {};
+  renderAvatarLeaderboard(Object.entries(avatarWins).map(([k,v]) => ({avatar:k, wins:v})));
+
+  // Tests table
+  renderTestsTable(data.active_tests_detail || []);
+
+  // Recent winners lift
+  const winners = data.recent_winners || [];
+  if (winners.length) {
+    const lifts = winners.filter(w => w.winner?.lift_pct).map(w => w.winner.lift_pct);
+    if (lifts.length) {
+      const avg = (lifts.reduce((a,b)=>a+b,0)/lifts.length).toFixed(1);
+      document.getElementById('sAvgLift').textContent = `+${avg}%`;
+    }
+  }
+}
+
+function renderMasterKnowledge(data) {
+  // Avatar performance
+  const avPerf = data.avatar_performance || {};
+  const avList = Object.entries(avPerf).map(([k,v]) => ({
+    avatar: k,
+    wins: v.wins || 0,
+    avg_ctr: v.count ? (v.ctr_sum/v.count).toFixed(2) : 0,
+  })).sort((a,b) => b.wins - a.wins);
+  renderAvatarLeaderboard(avList);
+
+  // Emotions
+  const emPerf = data.emotions || {};
+  const emList = Object.entries(emPerf).map(([k,v]) => ({
+    emotion: k,
+    wins: v.wins || 0,
+    avg_ctr: v.count ? (v.ctr_sum/v.count).toFixed(2) : 0,
+  })).sort((a,b) => b.avg_ctr - a.avg_ctr);
+  renderEmotions(emList);
+
+  // Traffic sources
+  const ts = data.traffic_sources || {};
+  const tsList = Object.entries(ts).map(([k,v]) => ({
+    source: k, ...v,
+    ctr: v.clicks && v.impressions ? (v.clicks/v.impressions*100).toFixed(2) : 0,
+    conv_rate: v.conversions && v.clicks ? (v.conversions/v.clicks*100).toFixed(2) : 0,
+  })).sort((a,b) => (b.revenue||0) - (a.revenue||0));
+  renderSources(tsList);
+
+  // Learning status
+  renderLearningStatus({
+    total_winners_ingested: data.total_winners_ingested || 0,
+    hook_patterns_learned: Object.keys(data.hook_patterns || {}).length,
+    winning_formulas: (data.winning_formulas || []).length,
+  });
+
+  if (data.winning_formulas?.length) renderFormulas(data.winning_formulas);
+}
+
+function renderReport(report) {
+  renderAvatarLeaderboard(report.top_performing_avatars || []);
+  renderEmotions(report.top_emotions || []);
+  renderSources(report.top_traffic_sources || []);
+  renderFormulas(report.winning_formulas || []);
+}
+
+function renderAvatarLeaderboard(avatars) {
+  const el = document.getElementById('avatarLeaderboard');
+  if (!avatars.length) return;
+  const maxVal = Math.max(...avatars.map(a => a.wins || a.avg_ctr || 1));
+  const ranks = ['🥇','🥈','🥉'];
+  const rankClasses = ['gold','silver','bronze'];
+  el.innerHTML = avatars.slice(0,6).map((a,i) => {
+    const val = a.wins || a.avg_ctr || 0;
+    const pct = (val / maxVal * 100).toFixed(0);
+    const displayVal = a.avg_ctr ? `${a.avg_ctr}% CTR` : `${a.wins} wins`;
+    return `<div class="lb-row">
+      <div class="lb-rank ${rankClasses[i]||''}">${ranks[i]||i+1}</div>
+      <div class="lb-name">${formatAvatarName(a.avatar)}</div>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${pct}%"></div></div>
+      <div class="lb-val">${displayVal}</div>
+      <div class="lb-sub">${a.win_rate ? a.win_rate+'% win rate' : ''}</div>
+    </div>`;
+  }).join('');
+  if (avatars[0]) {
+    document.getElementById('sWinRate').textContent = avatars[0].win_rate ? avatars[0].win_rate+'%' : '—';
+  }
+}
+
+function renderEmotions(emotions) {
+  const el = document.getElementById('emotionGrid');
+  if (!emotions.length) return;
+  el.innerHTML = emotions.map(e => `<div class="emotion-card">
+    <div class="emotion-icon">${EMOTIONS[e.emotion]||'💡'}</div>
+    <div class="emotion-name">${e.emotion}</div>
+    <div class="emotion-ctr">${e.avg_ctr||0}%</div>
+    <div class="emotion-wins">${e.wins||0} wins</div>
+  </div>`).join('');
+}
+
+function renderSources(sources) {
+  const el = document.getElementById('sourceList');
+  if (!sources.length) return;
+  const maxClicks = Math.max(...sources.map(s => s.clicks||0), 1);
+  el.innerHTML = sources.map(s => `<div class="source-row">
+    <div class="source-name">📡 ${s.source}</div>
+    <div class="source-bar-wrap"><div class="source-bar" style="width:${(s.clicks||0)/maxClicks*100}%"></div></div>
+    <div class="source-stats">
+      <div>${(s.clicks||0).toLocaleString()} clicks · ${s.ctr||0}% CTR</div>
+      <div>${s.conversions||0} conv · $${(s.revenue||0).toFixed(2)}</div>
+    </div>
+  </div>`).join('');
+}
+
+function renderFormulas(formulas) {
+  const el = document.getElementById('formulasList');
+  if (!formulas.length) return;
+  el.innerHTML = formulas.map((f,i) => `<div class="formula-card">
+    <div class="formula-hook">
+      Formula ${i+1}: "${f.hook||'—'}"
+      <span class="formula-badge">AI Generated</span>
+    </div>
+    <div class="formula-cta">CTA: ${f.cta||'—'} · Emotion: ${f.emotion||'—'}</div>
+    ${f.based_on_tests ? `<div style="font-size:0.68rem;color:var(--muted);margin-top:4px">Based on ${f.based_on_tests} test wins</div>` : ''}
+  </div>`).join('');
+}
+
+function renderTestsTable(tests) {
+  const tbody = document.getElementById('testsBody');
+  if (!tests.length) return;
+  tbody.innerHTML = tests.slice(0,20).map(t => {
+    const variants = t.variants || [];
+    const maxCtr = Math.max(...variants.map(v => v.ctr||0), 0.01);
+    const varBars = variants.map(v => `<div class="variant-row">
+      <div class="variant-label">${v.label}</div>
+      <div class="variant-bar-wrap"><div class="variant-bar" style="width:${(v.ctr||0)/maxCtr*100}%;background:${v.label==='A'?'var(--muted)':'var(--accent)'}"></div></div>
+      <div class="variant-val">${(v.ctr||0).toFixed(2)}%</div>
+    </div>`).join('');
+    const w = t.winner;
+    const winnerHtml = w ? `<span style="color:var(--green);font-size:0.75rem">Var ${w.winner_label} +${w.lift_pct}%</span>` : '<span style="color:var(--muted);font-size:0.75rem">—</span>';
+    const plat = t.platform || '';
+    const col = PLATFORM_COLORS[plat] || 'var(--muted)';
+    return `<tr>
+      <td style="font-family:monospace;font-size:0.75rem">${t.test_id}</td>
+      <td><span class="platform-dot" style="background:${col}"></span>${plat}</td>
+      <td><span class="badge ${t.status==='active'?'badge-active':'badge-concluded'}">${t.status}</span></td>
+      <td>${varBars}</td>
+      <td>${winnerHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function submitPerformance() {
+  const testId    = document.getElementById('rfTestId').value.trim();
+  const variant   = document.getElementById('rfVariant').value.trim().toUpperCase();
+  const source    = document.getElementById('rfSource').value.trim();
+  if (!testId || !variant) { alert('Test ID and Variant required'); return; }
+
+  const body = {
+    test_id:      testId,
+    variant_label: variant,
+    impressions:  parseInt(document.getElementById('rfImpressions').value)||0,
+    clicks:       parseInt(document.getElementById('rfClicks').value)||0,
+    saves:        parseInt(document.getElementById('rfSaves').value)||0,
+    shares:       parseInt(document.getElementById('rfShares').value)||0,
+    link_clicks:  parseInt(document.getElementById('rfLinkClicks').value)||0,
+    conversions:  parseInt(document.getElementById('rfConversions').value)||0,
+    revenue:      parseFloat(document.getElementById('rfRevenue').value)||0,
+    traffic_source: source ? {[source]: parseInt(document.getElementById('rfImpressions').value)||0} : null,
+  };
+
+  const result = await apiPost('/api/engine/ab/record', body);
+  const msg = document.getElementById('rfResult');
+  if (result) {
+    msg.textContent = `✅ Recorded! CTR: ${result.variants?.find(v=>v.label===variant)?.ctr||'—'}%`;
+    msg.style.color = 'var(--green)';
+    setTimeout(loadDashboard, 1000);
+  } else {
+    msg.textContent = '⚠ Engine offline — metrics not saved';
+    msg.style.color = 'var(--yellow)';
+  }
+}
+
+function formatAvatarName(id) {
+  const names = {
+    gen_z_female:'Gen Z Girl',millennial_female:'Millennial Woman',
+    budget_shopper:'Budget Buyer',premium_buyer:'Premium Buyer',
+    busy_mom:'Busy Mom',fitness_focused:'Fitness / Health',
+    entrepreneur:'Entrepreneur',control:'Control (Base)',
+  };
+  return names[id] || id.replace(/_/g,' ');
+}
+
+async function checkEngine() {
+  try {
+    const r = await fetch(ENGINE+'/api/engine/status',{signal:AbortSignal.timeout(2000)});
+    document.getElementById('engineStatus').textContent = r.ok ? '● Engine Online' : '● Engine Offline';
+    document.getElementById('engineStatus').style.color = r.ok ? '#10b981' : '#ef4444';
+  } catch {
+    document.getElementById('engineStatus').textContent = '● Engine Offline';
+    document.getElementById('engineStatus').style.color = '#ef4444';
+  }
+}
+
+loadDashboard();
+checkEngine();
+setInterval(loadDashboard, 60000);
+</script>
+</body>
+</html>

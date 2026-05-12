@@ -355,13 +355,9 @@ async function loadProfiles() {
     allProfiles = data.profiles || [];
     updateStats(data);
   } else {
-    // Load from local JSON as fallback
-    try {
-      const r = await fetch('../data/profiles/profiles.json');
-      const d = await r.json();
-      allProfiles = d.profiles || [];
-    } catch {}
-    document.getElementById('engineStatus').textContent = '● Engine Offline';
+    // Engine offline — profiles now in SQLite, no JSON fallback
+    allProfiles = [];
+    document.getElementById('engineStatus').textContent = '● Engine Offline — Start shipstack_engine.py';
     document.getElementById('engineStatus').style.color = '#ef4444';
   }
   renderProfiles();

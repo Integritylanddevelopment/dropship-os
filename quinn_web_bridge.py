@@ -27,6 +27,7 @@ import logging
 import os
 import sys
 import traceback
+from pathlib import Path
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
@@ -464,6 +465,31 @@ class BridgeHandler(BaseHTTPRequestHandler):
             finally:
                 QDRANT_COLLECTIONS.clear()
                 QDRANT_COLLECTIONS.extend(original)
+            return
+
+        if self.path == "/fulfill":
+            # Triggered by Stripe webhook — run order monitor to fulfill the payment
+            if BRIDGE_SECRET:
+                auth = self.headers.get("Authorization", "")
+                if auth != f"Bearer {BRIDGE_SECRET}":
+                    self._json({"error": "Unauthorized"}, 401)
+                    return
+            import subprocess, sys
+            try:
+                result = subprocess.run(
+                    [sys.executable,
+                     str(Path(__file__).parent.parent / "run_dropship_os.py"),
+                     "--monitor"],
+                    capture_output=True, text=True, timeout=60,
+                    cwd=str(Path(__file__).parent.parent)
+                )
+                self._json({
+                    "status": "fulfilled",
+                    "stdout": result.stdout[-1000:],
+                    "returncode": result.returncode,
+                })
+            except Exception as e:
+                self._json({"error": str(e)}, 500)
             return
 
         if self.path != "/chat":

@@ -398,14 +398,14 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
             <div style="font-size:9px;color:var(--green);margin-top:2px;">Clip extraction ✓</div>
           </div>
           <div class="api-card">
-            <div class="api-name"><div class="api-dot pending"></div>ElevenLabs</div>
-            <div class="api-cost">~$5/mo · AI voiceover</div>
-            <div class="api-key-required">⚠ Add ELEVENLABS_API_KEY</div>
+            <div class="api-name"><div class="api-dot live"></div>ElevenLabs</div>
+            <div class="api-cost">~$5/mo · AI voiceover + music</div>
+            <div style="font-size:9px;color:var(--green);margin-top:2px;">Voiceover + background music ✓</div>
           </div>
           <div class="api-card">
-            <div class="api-name"><div class="api-dot pending"></div>Suno AI</div>
-            <div class="api-cost">$30/mo · background music</div>
-            <div class="api-key-required">⚠ Add SUNO_API_KEY</div>
+            <div class="api-name"><div class="api-dot live"></div>Runway ML Gen-4</div>
+            <div class="api-cost">AI video generation</div>
+            <div style="font-size:9px;color:var(--green);margin-top:2px;">Image-to-video ✓</div>
           </div>
           <div class="api-card">
             <div class="api-name"><div class="api-dot pending"></div>Seedance 2.0</div>
@@ -849,16 +849,32 @@ async function runPipeline() {
   if (useRealEngine) {
     document.getElementById('pipeline-status').textContent = '[LIVE] Prometheus Engine running — generating clips...';
     try {
+      // Parse niche: extract "Category: X" from meta text, fall back to full text
+      const rawMeta = document.getElementById('prodMeta')?.textContent || '';
+      const nicheMatch = rawMeta.match(/Category:\s*([^·\n]+)/i);
+      const niche = nicheMatch ? nicheMatch[1].trim() : (rawMeta.split('·')[0].trim() || 'general');
+
+      // Enable ElevenLabs voiceover + music if engine reports keys are present
+      let useVoiceover = false, useMusic = false;
+      try {
+        const sRes = await fetch('/api/prometheus?action=status', { signal: AbortSignal.timeout(3000) });
+        if (sRes.ok) {
+          const sData = await sRes.json();
+          useVoiceover = sData.prometheus_local?.tools?.elevenlabs === true;
+          useMusic     = sData.prometheus_local?.tools?.elevenlabs === true;
+        }
+      } catch(e) {}
+
       const res = await fetch('/api/prometheus', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           product: _pipelineProduct,
-          niche: document.getElementById('prodMeta')?.textContent || 'general',
+          niche,
           script: _pipelineScript,
           platforms,
-          music: false,
-          voiceover: false,
+          music: useMusic,
+          voiceover: useVoiceover,
         }),
         signal: AbortSignal.timeout(120000),
       });
@@ -1018,22 +1034,94 @@ function updateApprovalStats() {
 }
 
 // ============================================================
-// CALENDAR — Step 4
+// CALENDAR — Step 4  (30-day pre-loaded schedule)
 // ============================================================
+const SCHEDULE = [
+  // Week 1 — Pet Hair Remover launch blitz
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Pet Hair Remover', hook:'This glove removes MORE fur than a lint roller — watch' },
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'Pet Hair Remover', hook:'POV: your couch after ONE swipe of this glove #CleanTok' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Pet Hair Remover', hook:'Dog owners are obsessed with this $12 glove — here\'s why' },
+  { platform:'Instagram', icon:'I', color:'#c13584', product:'Pet Hair Remover', hook:'Before vs After: 30 seconds with this pet glove' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Pet Hair Remover', hook:'The grooming glove that went viral on TikTok — in stock' },
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'Pet Hair Remover', hook:'I bought every pet hair remover — this $12 one won #PetsOfTikTok' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Posture Corrector', hook:'Slouching is costing you money — fix it in 2 weeks' },
+  // Week 2 — Posture Corrector push
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'Posture Corrector', hook:'I wore a posture corrector for 14 days — my back changed' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Posture Corrector', hook:'Chiropractors don\'t want you to know this $18 fix exists' },
+  { platform:'Instagram', icon:'I', color:'#c13584', product:'Posture Corrector', hook:'Day 1 vs Day 14: posture corrector results that shocked me' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Posture Corrector', hook:'Work from home killing your back? Try this first' },
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'Posture Corrector', hook:'My posture after 6 hours desk work (with + without) #WorkFromHome' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Pet Hair Remover', hook:'Still using tape rollers? This glove is 10x better' },
+  { platform:'Instagram', icon:'I', color:'#c13584', product:'Posture Corrector', hook:'The $18 thing that fixed my text neck in 2 weeks' },
+  // Week 3 — Facial Roller + Resistance Bands
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Facial Roller', hook:'Gua sha vs ice roller — which one actually depuffs?' },
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'Facial Roller', hook:'5am facial routine with this $9 roller — worth it? #SkinTok' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Facial Roller', hook:'The jade roller dupe that works just as well for $9' },
+  { platform:'Instagram', icon:'I', color:'#c13584', product:'Facial Roller', hook:'Puffiness gone in 60 seconds — ice roller morning routine' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Resistance Bands', hook:'$14 bands that replace a $200 gym membership — here\'s how' },
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'Resistance Bands', hook:'Full body workout with only $14 resistance bands #GymTok' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Resistance Bands', hook:'Resistance band leg workout that actually builds muscle' },
+  // Week 4 — AB Roller + top performer reposts
+  { platform:'Instagram', icon:'I', color:'#c13584', product:'Resistance Bands', hook:'Home gym setup under $50 — resistance bands are the key' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'AB Roller', hook:'30-day ab roller challenge — what actually happened to my core' },
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'AB Roller', hook:'I did 50 ab roller reps every day for 30 days #FitnessTok' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'AB Roller', hook:'The $16 ab roller that fitness influencers swear by' },
+  { platform:'Instagram', icon:'I', color:'#c13584', product:'AB Roller', hook:'Plank vs ab roller — which builds core faster? Results inside' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Pet Hair Remover', hook:'Going viral again — the pet glove everyone\'s buying #fyp' },
+  { platform:'TikTok',    icon:'T', color:'#010101', product:'Pet Hair Remover', hook:'Week 4 and still the best $12 I\'ve spent as a dog owner' },
+  { platform:'Pinterest', icon:'P', color:'#e60023', product:'Posture Corrector', hook:'Month-end results: posture corrector 30-day transformation' },
+  { platform:'Instagram', icon:'I', color:'#c13584', product:'Pet Hair Remover', hook:'The CleanTok glove that sold out twice — finally back in stock' },
+];
+
+const PRODUCT_URLS = {
+  'Pet Hair Remover':   'https://dropship-os-gamma.vercel.app/pet-hair-remover',
+  'Posture Corrector':  'https://dropship-os-gamma.vercel.app/posture-corrector',
+  'Facial Roller':      'https://dropship-os-gamma.vercel.app/facial-roller',
+  'Resistance Bands':   'https://dropship-os-gamma.vercel.app/resistance-bands',
+  'AB Roller':          'https://dropship-os-gamma.vercel.app/ab-roller',
+};
+
 function buildCalendar() {
   const cal = document.getElementById('calDays');
   cal.innerHTML = '';
   const today = new Date();
-  const todayDate = today.getDate();
 
-  for (let d = 0; d < 7; d++) {
+  // Pad to start on Sunday
+  const startOffset = today.getDay();
+  for (let p = 0; p < startOffset; p++) {
+    const pad = document.createElement('div');
+    pad.style.background = 'transparent';
+    pad.style.border = 'none';
+    cal.appendChild(pad);
+  }
+
+  for (let d = 0; d < 30; d++) {
     const dt = new Date(today);
     dt.setDate(today.getDate() + d);
+    const item = SCHEDULE[d];
     const day = document.createElement('div');
     day.className = 'cal-day' + (d === 0 ? ' today' : '');
-    day.innerHTML = `<div class="cal-date">${dt.getDate()}</div>`;
+    day.style.cursor = 'pointer';
+    day.title = `${item.product}\n${item.hook}\nLink: ${PRODUCT_URLS[item.product]}`;
+    day.innerHTML = `
+      <div class="cal-date">${dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+      <div class="cal-post approved" style="background:rgba(${item.color === '#e60023' ? '230,0,35' : item.color === '#010101' ? '80,80,80' : '193,53,132'},.15);border-color:rgba(${item.color === '#e60023' ? '230,0,35' : item.color === '#010101' ? '80,80,80' : '193,53,132'},.4);color:${item.color === '#010101' ? '#aaa' : item.color};">
+        ${item.icon} ${item.platform}
+      </div>
+      <div style="font-size:9px;color:#7a9ab5;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${item.product}">${item.product}</div>
+      <div style="font-size:8px;color:#556;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${item.hook}">${item.hook.substring(0,38)}...</div>
+    `;
+    day.onclick = () => {
+      window.open(PRODUCT_URLS[item.product], '_blank');
+    };
     cal.appendChild(day);
   }
+
+  // Update header count
+  const sub = document.querySelector('#stage-4 .sec-sub span');
+  if (sub) sub.textContent = '30';
+  const metric = document.getElementById('metricPosts');
+  if (metric) metric.textContent = '30';
 }
 buildCalendar();
 
@@ -1157,6 +1245,30 @@ function pushToCalendar() {
     if(statusEl) statusEl.textContent = `[PKG] ${payload.product} queued — click "Build" to generate script`;
 
   }catch(e){}
+})();
+
+// ── Prometheus status check on page load ──────────────────────────────────
+(async function checkPrometheusOnLoad() {
+  const statusEl = document.getElementById('pipeline-status');
+  try {
+    const res = await fetch('/api/prometheus?action=status', { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) throw new Error('API error');
+    const s = await res.json();
+    const local = s.prometheus_local;
+    if (local?.online) {
+      const tools = local.tools || {};
+      const parts = ['[LIVE] Prometheus Engine online'];
+      if (tools.runway)     parts.push('Runway');
+      if (tools.elevenlabs) parts.push('ElevenLabs');
+      if (tools.ffmpeg)     parts.push('FFmpeg');
+      if (tools.whisper)    parts.push('Whisper');
+      if (statusEl) statusEl.textContent = parts.join(' · ') + ' — paste a product URL to begin';
+    } else {
+      if (statusEl) statusEl.textContent = 'Prometheus Engine offline — double-click START_PROMETHEUS.bat to start, or paste a URL to use Claude fallback';
+    }
+  } catch(e) {
+    if (statusEl) statusEl.textContent = 'Ready — paste a product URL or upload video to begin (start START_PROMETHEUS.bat for AI video)';
+  }
 })();
 </script>
 

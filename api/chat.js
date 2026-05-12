@@ -143,4 +143,16 @@ export default async function handler(req) {
       routed_via: 'direct',
     });
   } catch (e) {
-    return json({ error: `Anthropic unreachable: ${e.me
+    return json({ error: `Anthropic unreachable: ${e.message}`, source: 'error' }, 500);
+  }
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
+}
