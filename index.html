@@ -249,13 +249,12 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
 
 <!-- NAV TABS -->
 <div class="nav-tabs">
-  <button class="nav-tab" onclick="showPage('overview',this)">📊 Results</button>
-  <button class="nav-tab active" onclick="showPage('research',this)">🔬 Research</button>
-  <button class="nav-tab" onclick="showPage('decision',this)">🎯 Decision Engine</button>
-  <button class="nav-tab" onclick="showPage('shop',this)">🛒 Shop</button>
-  <button class="nav-tab" onclick="showPage('prometheus',this)">🔥 Prometheus</button>
-  <button class="nav-tab" onclick="showPage('agents',this)">🤖 Agents</button>
-  <button class="nav-tab" onclick="showPage('revenue',this)">💰 Revenue</button>
+  <button class="nav-tab active" onclick="showPage('overview',this)">&#x26A1; GO</button>
+  <button class="nav-tab" onclick="showPage('research',this)">&#x1F50E; Research Engine</button>
+  <button class="nav-tab" onclick="showPage('decision',this)">&#x1F3AF; Decision Engine</button>
+  <button class="nav-tab" onclick="showPage('shop',this)">&#x1F6D2; The Shop</button>
+  <button class="nav-tab" onclick="showPage('prometheus',this)">&#x1F525; Prometheus</button>
+  <button class="nav-tab" onclick="showPage('revenue',this)">&#x1F4B0; Revenue &amp; KPIs</button>
 </div>
 
 <div class="main">
@@ -274,14 +273,6 @@ body{background:var(--navy);color:var(--text);font-family:'Segoe UI',system-ui,s
   <div class="activity-log" id="overview-activity-log"></div>
 
   
-  <!-- LAUNCH BANNER -->
-  <div class="launch-banner">
-    <div class="launch-banner-text">
-      <div class="launch-banner-title">&#x26A1; Launch ShipStack AI</div>
-      <div class="launch-banner-sub">Start Quinn Bridge + ngrok tunnel to activate live chat on all pages. Takes ~30 seconds.</div>
-    </div>
-    <button class="btn-launch" onclick="openLaunchModal()">&#x1F680; Launch Stack</button>
-  </div>
 
   <div class="kpi-grid">
     <div class="kpi-card kpi-teal">
@@ -1574,7 +1565,7 @@ function setStageStatus(elId, state, msg) {
 function runStage(stage) {
   var ep = STAGE_ENDPOINTS[stage];
   if (!ep) ep = { method: 'POST', path: '/' + stage + '/run' };
-  setStageStatus(stage + '-status', 'running', '[RUNNING...]');
+  setStageStatus(stage + '-status', 'running', '[RUNNING] Querying intelligence stack...');
   startActivityLog(stage);
   var opts = { method: ep.method, headers: { 'Content-Type': 'application/json' } };
   if (ep.method === 'POST') opts.body = JSON.stringify({});
@@ -1582,13 +1573,110 @@ function runStage(stage) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
       stopActivityLog(stage);
-      var preview = JSON.stringify(data).substring(0, 120);
-      setStageStatus(stage + '-status', 'done', '[DONE] ' + preview);
+      handleStageResult(stage, data);
     })
     .catch(function(e) {
       stopActivityLog(stage);
-      setStageStatus(stage + '-status', 'error', '[ERROR] ' + (e.message || 'engine offline'));
+      setStageStatus(stage + '-status', 'error', '[ERROR] ' + (e.message || 'engine offline — start Quinn bridge or add ANTHROPIC_API_KEY'));
     });
+}
+
+// ── Handle stage results — render into page sections ──────────
+function handleStageResult(stage, data) {
+  var src = data.source || 'engine';
+  var msg = '[DONE] Source: ' + src;
+
+  if (stage === 'research') {
+    // Populate product list
+    if (data.products && data.products.length) {
+      _allProducts = data.products;
+      var list = document.getElementById('product-list');
+      if (list) list.innerHTML = data.products.map(function(p, i) {
+        var col = p.margin_pct >= 60 ? 'var(--teal)' : (p.margin_pct < 40 ? 'var(--red)' : 'var(--gold)');
+        return '<div class="prod-card"><div class="prod-card-top">' +
+          '<div class="prod-card-emoji">&#x1F4E6;</div>' +
+          '<div class="prod-card-info"><div class="prod-card-name">' + p.name + '</div>' +
+          '<div class="prod-card-meta">' + (p.niche || '') + (p.trending ? ' &middot; [TRENDING]' : '') + '</div></div>' +
+          '<div class="prod-card-margin" style="color:' + col + '">' + p.margin_pct + '%</div></div>' +
+          '<div class="prod-card-btns">' +
+          '<button class="btn-supplier" onclick="openSupplierWizard(' + i + ')">&#x1F3D7; Get Supplier</button>' +
+          '<button class="btn-push" onclick="openSupplierWizard(' + i + ',true)">&#x1F680; Push to Production</button>' +
+          '<a class="btn-prometheus" href="/content">&#x1F525; Prometheus</a>' +
+          (p.trending ? '<span class="prod-channel-badge">[TRENDING]</span>' : '') +
+          '</div></div>';
+      }).join('');
+      var topName = document.getElementById('prod-top-name');
+      if (topName) topName.textContent = data.products[0].niche || data.products[0].name;
+      var topMargin = document.getElementById('prod-top-margin');
+      if (topMargin) topMargin.textContent = '&#x25B2; ' + data.products[0].margin_pct + '% avg margin';
+      var cnt = document.getElementById('prod-count');
+      if (cnt) cnt.textContent = data.products.length;
+    }
+    // Populate channel bars
+    if (data.channels && data.channels.length) populateChannels({ channels: data.channels });
+    // Show AI intel card
+    if (data.product_intel) injectIntelCard('research-status', 'research-intel', data.product_intel, data.channel_intel);
+    msg = '[DONE] ' + (data.products || []).length + ' products | ' + (data.channels || []).length + ' channels | source: ' + src;
+  }
+
+  else if (stage === 'decision') {
+    var fakeM = {
+      top_combos: data.top_combos || [],
+      scale: data.scale || [],
+      test:  data.test  || [],
+      kill:  data.kill  || [],
+      summary: data.summary || {}
+    };
+    if (fakeM.top_combos.length || fakeM.scale.length) populateDecision(fakeM);
+    if (data.channels) populateChannels({ channels: data.channels });
+    if (data.products) {
+      _allProducts = data.products;
+      _allCombos = (fakeM.scale || []).concat(fakeM.test || []);
+    }
+    if (data.ai_recommendation) injectIntelCard('decision-status', 'decision-intel', data.ai_recommendation);
+    msg = '[DONE] ' + (data.top_combos || []).length + ' combos scored | source: ' + src;
+  }
+
+  else if (stage === 'shop') {
+    if (data.shop_intel) injectIntelCard('shop-status', 'shop-intel', data.shop_intel);
+    msg = '[DONE] Shop intelligence loaded | source: ' + src;
+  }
+
+  else if (stage === 'prometheus') {
+    if (data.scripts) injectIntelCard('prometheus-status', 'prometheus-intel', data.scripts);
+    msg = '[DONE] Scripts generated | source: ' + src;
+  }
+
+  else if (stage === 'revenue' || stage === 'overview') {
+    if (data.channels || data.products || data.revenue) {
+      buildTicker(data);
+      populateOverview(data);
+      populateRevenue(data);
+    }
+    if (data.message) msg = '[DONE] ' + data.message;
+    else msg = '[DONE] Revenue data refreshed | source: ' + src;
+  }
+
+  else {
+    msg = '[DONE] ' + (data.message || JSON.stringify(data).substring(0, 100));
+  }
+
+  setStageStatus(stage + '-status', 'done', msg);
+}
+
+// ── Inject AI intel card below a status bar ───────────────────
+function injectIntelCard(afterId, cardId, text1, text2) {
+  var afterEl = document.getElementById(afterId);
+  if (!afterEl) return;
+  var card = document.getElementById(cardId);
+  if (!card) {
+    card = document.createElement('div');
+    card.id = cardId;
+    card.style.cssText = 'margin-top:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:12px;line-height:1.7;color:var(--text);white-space:pre-wrap;max-height:220px;overflow-y:auto;';
+    afterEl.parentNode.insertBefore(card, afterEl.nextSibling);
+  }
+  card.style.display = 'block';
+  card.textContent = (text1 || '') + (text2 ? '\n\n--- CHANNEL INTEL ---\n' + text2 : '');
 }
 
 // ── PUSH button: forward results to next stage API ─────────
