@@ -54,7 +54,13 @@ export default async function handler(req) {
     return json({ error: 'Invalid JSON' }, 400);
   }
 
-  const { messages = [], context = '' } = body;
+  const { messages = [], message = '', context = '' } = body;
+
+  // Support both {message: "..."} (single string) and {messages: [...]} (array)
+  const effectiveMessages = messages.length > 0
+    ? messages
+    : (message ? [{ role: 'user', content: message }] : []);
+
   const quinnEndpoint = process.env.QUINN_ENDPOINT;
   const quinnSecret   = process.env.QUINN_BRIDGE_SECRET;
   const anthropicKey  = process.env.ANTHROPIC_API_KEY;
@@ -70,7 +76,7 @@ export default async function handler(req) {
       const quinnRes = await fetch(`${quinnEndpoint}/chat`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ messages, context }),
+        body: JSON.stringify({ messages: effectiveMessages, context }),
       });
 
       const data = await quinnRes.json();
@@ -118,7 +124,7 @@ export default async function handler(req) {
         model: 'claude-sonnet-4-6',
         max_tokens: 1024,
         system,
-        messages: messages.slice(-10),
+        messages: effectiveMessages.slice(-10),
       }),
     });
 
@@ -137,16 +143,4 @@ export default async function handler(req) {
       routed_via: 'direct',
     });
   } catch (e) {
-    return json({ error: `Anthropic unreachable: ${e.message}`, source: 'error' }, 500);
-  }
-}
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-  });
-}
+    return json({ error: `Anthropic unreachable: ${e.me
