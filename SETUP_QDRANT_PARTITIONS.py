@@ -25,12 +25,18 @@ Run:
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 
 import httpx
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
 
-QDRANT_URL = "http://127.0.0.1:6333"
+_QDRANT_HOST = os.getenv("QDRANT_HOST", "127.0.0.1")
+_QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
+QDRANT_URL = f"http://{_QDRANT_HOST}:{_QDRANT_PORT}"
 
 SOURCE_COLLECTION   = "general_knowledge"
 DROPSHIP_COLLECTION = "dropship_intel"
