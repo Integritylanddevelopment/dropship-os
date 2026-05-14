@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ShipStack AI — Command Center</title>
+<title>ShipStack AI &#8212; Command Center</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
@@ -25,7 +25,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
 
-/* ── Ticker ── */
+/* â”€â”€ Ticker â”€â”€ */
 .ticker-bar{background:#080c11;border-bottom:1px solid var(--border);padding:8px 0;overflow:hidden;white-space:nowrap}
 .ticker-inner{display:inline-block;animation:ticker 40s linear infinite}
 .ticker-inner:hover{animation-play-state:paused}
@@ -34,7 +34,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .tick-up{color:var(--teal)}.tick-down{color:var(--red)}.tick-neutral{color:var(--gold)}
 .tick-label{color:var(--muted);font-weight:400;margin-right:6px}
 
-/* ── Header ── */
+/* â”€â”€ Header â”€â”€ */
 .header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.4)}
 .logo-block{display:flex;align-items:center;gap:14px}
 .logo{width:44px;height:44px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.02em}
@@ -54,23 +54,23 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .cal-nav-btn{padding:7px 16px;border-radius:8px;border:1px solid rgba(255,0,80,.4);background:rgba(255,0,80,.1);color:#ff0050;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
 .cal-nav-btn:hover{background:rgba(255,0,80,.2);border-color:#ff0050}
 
-/* ── Nav tabs ── */
+/* â”€â”€ Nav tabs â”€â”€ */
 .nav-tabs{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:2px;overflow-x:auto;position:sticky;top:73px;z-index:99}
 .nav-tab{padding:14px 22px;font-size:14px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
 .nav-tab:hover{color:var(--text)}
-.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.nav-tab.active{color:var(--blue);background:rgba(26,108,246,.08);border-bottom:2px solid var(--blue)}
 
-/* ── Main layout ── */
+/* â”€â”€ Main layout â”€â”€ */
 .main{padding:24px 28px;max-width:1700px;margin:0 auto}
 .page{display:none}.page.active{display:block}
 .sec-header{margin-bottom:20px}
 .sec-title{font-size:24px;font-weight:800;margin-bottom:4px}
 .sec-sub{font-size:14px;color:var(--muted)}
 
-/* ── KPI grid ── */
+/* â”€â”€ KPI grid â”€â”€ */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-bottom:24px}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s;cursor:default}
-.kpi-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 4px 20px rgba(26,108,246,.15)}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s,box-shadow .2s;cursor:default}
+.kpi-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 0 0 1px var(--blue),0 4px 20px rgba(26,108,246,.15)}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .kpi-blue::before{background:var(--blue)}.kpi-teal::before{background:var(--teal)}
 .kpi-gold::before{background:var(--gold)}.kpi-red::before{background:var(--red)}
@@ -79,13 +79,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .kpi-value{font-size:36px;font-weight:800;line-height:1;margin-bottom:8px}
 .kpi-change{font-size:13px;color:var(--muted)}.kpi-change.up{color:var(--teal)}.kpi-change.down{color:var(--red)}
 
-/* ── Grid helpers ── */
+/* â”€â”€ Grid helpers â”€â”€ */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
 .grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
 @media(max-width:900px){.grid-2,.grid-3,.grid-2-1{grid-template-columns:1fr}}
 
-/* ── Cards ── */
+/* â”€â”€ Cards â”€â”€ */
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
 .card:last-child{margin-bottom:0}
 .card-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
@@ -97,14 +97,14 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .icon-purple{background:rgba(139,92,246,.2);color:var(--purple)}
 .icon-green{background:rgba(34,197,94,.2);color:var(--green)}
 
-/* ── Tables ── */
+/* â”€â”€ Tables â”€â”€ */
 .data-table{width:100%;border-collapse:collapse;font-size:14px}
 .data-table th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding:10px 12px;border-bottom:1px solid var(--border)}
 .data-table td{padding:12px;border-bottom:1px solid rgba(30,45,61,.6)}
 .data-table tr:last-child td{border-bottom:none}
 .data-table tr:hover td{background:rgba(26,108,246,.05)}
 
-/* ── Badges ── */
+/* â”€â”€ Badges â”€â”€ */
 .badge{display:inline-block;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700}
 .badge-green{background:rgba(34,197,94,.15);color:var(--teal)}
 .badge-gold{background:rgba(245,166,35,.15);color:var(--gold)}
@@ -115,7 +115,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .rank-num{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
 .rank-1{background:var(--gold);color:#000}.rank-2{background:#aaa;color:#000}.rank-3{background:#a0522d;color:#fff}
 
-/* ── Stage bar (GO + status) ── */
+/* â”€â”€ Stage bar (GO + status) â”€â”€ */
 .stage-bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0 0 16px 0;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px}
 .push-bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:24px 0 8px 0;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px}
 .btn-go{background:#00ff88;color:#0a0a0a;border:none;padding:10px 28px;font-weight:800;font-size:14px;cursor:pointer;border-radius:6px;letter-spacing:1px;transition:opacity .2s,transform .15s;white-space:nowrap}
@@ -131,7 +131,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .activity-log-entry{padding:2px 0;border-bottom:1px solid rgba(30,45,61,.4)}
 .activity-log-entry:last-child{border-bottom:none}
 
-/* ── Channel bars ── */
+/* â”€â”€ Channel bars â”€â”€ */
 .channel-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .channel-name{font-size:14px;font-weight:600;min-width:160px}
 .bar-track{flex:1;height:8px;background:rgba(30,45,61,.8);border-radius:4px;overflow:hidden}
@@ -139,7 +139,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .channel-cpm{font-size:12px;color:var(--muted);min-width:55px;text-align:right}
 .channel-score{font-size:12px;font-weight:700;min-width:36px;text-align:right}
 
-/* ── Product cards ── */
+/* â”€â”€ Product cards â”€â”€ */
 .prod-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:border-color .2s,box-shadow .2s}
 .prod-card:hover{border-color:rgba(26,108,246,.4);box-shadow:0 2px 12px rgba(0,0,0,.3)}
 .prod-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
@@ -157,7 +157,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .btn-prometheus:hover{background:rgba(245,158,11,.2);border-color:var(--gold)}
 .prod-channel-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(0,201,167,.12);color:var(--teal)}
 
-/* ── Layer rows (overview) ── */
+/* â”€â”€ Layer rows (overview) â”€â”€ */
 .layer-row{display:flex;align-items:flex-start;gap:16px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:border-color .2s}
 .layer-row:hover{border-color:var(--blue)}
 .layer-num{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
@@ -168,7 +168,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .layer-desc{font-size:13px;color:var(--muted);line-height:1.5}
 .layer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 
-/* ── Calendar ── */
+/* â”€â”€ Calendar â”€â”€ */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
 .cal-day-header{text-align:center;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:4px 0}
 .cal-cell{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;min-height:64px;font-size:10px;cursor:pointer;transition:border-color .2s}
@@ -181,7 +181,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .cp-ig{background:rgba(139,92,246,.2);color:var(--purple)}
 .cp-yt{background:rgba(245,166,35,.2);color:var(--gold)}
 
-/* ── Search ── */
+/* â”€â”€ Search â”€â”€ */
 .search-box{display:flex;gap:10px;margin-bottom:20px}
 .search-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
 .search-input:focus{border-color:var(--blue)}
@@ -192,7 +192,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .result-text{font-size:13px;line-height:1.6;color:var(--text)}
 .result-score{font-size:11px;color:var(--muted);margin-top:6px}
 
-/* ── Agent cards ── */
+/* â”€â”€ Agent cards â”€â”€ */
 .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
 .agent-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px}
 .agent-name{font-size:15px;font-weight:700;margin-bottom:5px}
@@ -202,7 +202,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .agent-tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
 .a-tag{font-size:10px;background:rgba(26,108,246,.15);color:var(--blue);border-radius:5px;padding:2px 7px;font-weight:600}
 
-/* ── Supplier modal ── */
+/* â”€â”€ Supplier modal â”€â”€ */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:min(540px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
@@ -228,7 +228,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .push-confirm{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:14px;margin-top:10px;display:none}
 .push-confirm.shown{display:block}
 
-/* ── Launch modal ── */
+/* â”€â”€ Launch modal â”€â”€ */
 .launch-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 .launch-modal-overlay.open{display:flex}
 .launch-modal{background:var(--bg2);border:1px solid rgba(26,108,246,.5);border-radius:20px;width:min(560px,95vw);padding:32px;box-shadow:0 32px 100px rgba(0,0,0,.7)}
@@ -240,7 +240,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .launch-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .launch-modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
 
-/* ── Onboarding status banner ── */
+/* â”€â”€ Onboarding status banner â”€â”€ */
 #onboarding-pipeline-status{
   display:none;position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
   z-index:9998;max-width:640px;width:calc(100% - 48px);
@@ -252,7 +252,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 #onboarding-pipeline-status.error{background:rgba(232,65,62,.15);border:1px solid rgba(232,65,62,.35);color:#fca5a5}
 .ob-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--blue);animation:pulse 1.4s infinite}
 
-/* ── Chat widget ── */
+/* â”€â”€ Chat widget â”€â”€ */
 #ai-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;cursor:pointer;box-shadow:0 4px 24px rgba(124,58,237,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
 #ai-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(124,58,237,.7)}
 #ai-chat-btn svg{width:26px;height:26px;fill:white}
@@ -277,36 +277,36 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 #ai-chat-send:hover{background:#6d28d9}
 #ai-chat-send:disabled{background:#374151;cursor:not-allowed}
 
-/* ── Scrollbar ── */
+/* â”€â”€ Scrollbar â”€â”€ */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted)}
 
-/* ── Misc utils ── */
+/* â”€â”€ Misc utils â”€â”€ */
 .divider{height:1px;background:var(--border);margin:20px 0}
 .mb-18{margin-bottom:18px}.mb-24{margin-bottom:24px}
 .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;margin-right:5px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 
-/* ── Collateral inputs ── */
+/* â”€â”€ Collateral inputs â”€â”€ */
 .collateral-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none;transition:border-color .2s}
 .collateral-input:focus{border-color:var(--blue)}
 .collateral-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;box-sizing:border-box;outline:none;resize:vertical;min-height:52px;font-family:inherit;transition:border-color .2s}
 .collateral-textarea:focus{border-color:var(--blue)}
 
-/* ── Launcher cards ── */
+/* â”€â”€ Launcher cards â”€â”€ */
 .launcher-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:24px}
 .launcher-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s;text-decoration:none;display:block;color:var(--text)}
-.launcher-card:hover{border-color:var(--blue);transform:translateY(-3px);background:var(--card2);box-shadow:0 4px 20px rgba(26,108,246,.15);text-decoration:none}
+.launcher-card:hover{border-color:var(--blue);transform:translateY(-3px);background:var(--card2);box-shadow:0 0 0 1px var(--blue),0 4px 20px rgba(26,108,246,.15);text-decoration:none}
 .launcher-icon{font-size:32px;margin-bottom:10px}
 .launcher-title{font-size:17px;font-weight:700;margin-bottom:4px}
 .launcher-desc{font-size:13px;color:var(--muted);line-height:1.6}
 .launcher-status{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700}
 .ls-live{color:var(--teal)}.ls-scaffold{color:var(--gold)}.ls-todo{color:var(--red)}
 
-/* ── Build list ── */
+/* â”€â”€ Build list â”€â”€ */
 .build-list{display:flex;flex-direction:column;gap:8px}
 .build-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-size:14px}
 .build-num{font-size:11px;font-weight:800;color:var(--muted);min-width:20px}
@@ -337,7 +337,6 @@ a:hover{text-decoration:underline}
   <div class="header-right">
     <a href="calendar.html" class="cal-nav-btn">&#x1F4C5; Content Calendar</a>
     <div class="status-pill pill-gold" id="metrics-status-pill"><div class="s-dot dot-gold"></div>Loading&#8230;</div>
-    <div class="status-pill pill-gold"><div class="s-dot dot-gold"></div>Agents: Scaffolded</div>
     <div class="date-badge" id="date-badge">&#8212;</div>
   </div>
 </div>
@@ -401,14 +400,19 @@ a:hover{text-decoration:underline}
     </div>
   </div>
 
-  <!-- Revenue KPI mirror -->
-  <div class="kpi-grid mb-24">
-    <div class="kpi-card kpi-teal"><div class="kpi-label">Revenue Today</div><div class="kpi-value" id="ov-rev-today">&#8212;</div><div class="kpi-change up" id="ov-rev-today-sub">Stripe live</div></div>
-    <div class="kpi-card kpi-gold"><div class="kpi-label">Revenue This Month</div><div class="kpi-value" id="ov-rev-month">&#8212;</div><div class="kpi-change" id="ov-rev-month-sub">Stripe live</div></div>
-    <div class="kpi-card kpi-blue"><div class="kpi-label">Total Orders</div><div class="kpi-value" id="ov-rev-orders">&#8212;</div><div class="kpi-change up" id="ov-rev-orders-sub">All time</div></div>
-    <div class="kpi-card kpi-purple"><div class="kpi-label">Avg Order Value</div><div class="kpi-value" id="ov-rev-aov">&#8212;</div><div class="kpi-change up">per order</div></div>
-    <div class="kpi-card kpi-teal"><div class="kpi-label">Best ROAS Channel</div><div class="kpi-value" id="ov-rev-best-roas">&#8212;</div><div class="kpi-change up" id="ov-rev-best-roas-sub">Decision engine</div></div>
-    <div class="kpi-card kpi-gold"><div class="kpi-label">Best Margin Product</div><div class="kpi-value" id="ov-rev-best-margin">&#8212;</div><div class="kpi-change up" id="ov-rev-best-margin-sub">highest %</div></div>
+  <!-- Hidden revenue KPI mirrors — IDs kept for JS compatibility -->
+  <div style="display:none">
+    <span id="ov-rev-today"></span>
+    <span id="ov-rev-today-sub"></span>
+    <span id="ov-rev-month"></span>
+    <span id="ov-rev-month-sub"></span>
+    <span id="ov-rev-orders"></span>
+    <span id="ov-rev-orders-sub"></span>
+    <span id="ov-rev-aov"></span>
+    <span id="ov-rev-best-roas"></span>
+    <span id="ov-rev-best-roas-sub"></span>
+    <span id="ov-rev-best-margin"></span>
+    <span id="ov-rev-best-margin-sub"></span>
   </div>
 
   <div class="grid-2-1">
@@ -1032,13 +1036,13 @@ a:hover{text-decoration:underline}
 
 </div><!-- /main -->
 <script>
-// ── Date badge ──────────────────────────────────────────────────
+// â”€â”€ Date badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function(){
   var d = new Date();
   document.getElementById('date-badge').textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 })();
 
-// ── Tab navigation ──────────────────────────────────────────────
+// â”€â”€ Tab navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
@@ -1047,7 +1051,7 @@ function showPage(id, btn) {
   if (btn) btn.classList.add('active');
 }
 
-// ── Add collateral slot ─────────────────────────────────────────
+// â”€â”€ Add collateral slot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function addCollateralSlot() {
   var list = document.getElementById('shop-collateral-list');
   var addBtn = list.querySelector('[onclick="addCollateralSlot()"]').parentElement;
@@ -1077,7 +1081,7 @@ function addCollateralSlot() {
   list.insertBefore(slot, addBtn);
 }
 
-// ── Calendar ────────────────────────────────────────────────────
+// â”€â”€ Calendar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function buildCal() {
   var grid = document.getElementById('cal-week');
   var today = new Date();
@@ -1096,7 +1100,7 @@ function addCollateralSlot() {
   }
 })();
 
-// ── Channel emoji map ──────────────────────────────────────────
+// â”€â”€ Channel emoji map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var CH_EMOJI = {
   tiktok_organic: '&#x1F3B5;', pinterest_organic: '&#x1F4CC;', youtube_shorts: '&#x25B6;',
   reddit_organic: '&#x1F916;', instagram_reels: '&#x1F4F8;', x_twitter: '&#x1F426;',
@@ -1113,7 +1117,7 @@ function nicheEmoji(niche) {
   return map[(niche || '').toLowerCase()] || '&#x1F4E6;';
 }
 
-// ── Helpers ────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function fmtUSD(v) { return v === null || v === undefined ? '&#8212;' : '$' + Number(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 function fmtNum(v) { return v === null || v === undefined ? '&#8212;' : Number(v).toLocaleString(); }
 function fmtPct(v) { return v === null || v === undefined ? '&#8212;' : v + '%'; }
@@ -1125,7 +1129,7 @@ function scoreColor(s) {
   return 'var(--red)';
 }
 
-// ── Ticker bar ─────────────────────────────────────────────────
+// â”€â”€ Ticker bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildTicker(m) {
   var channels = m.channels || [];
   var top = m.top_combos || [];
@@ -1148,7 +1152,7 @@ function buildTicker(m) {
   document.getElementById('ticker-inner').innerHTML = html || '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Run decision_engine.py to populate</span></span>';
 }
 
-// ── Overview KPIs ──────────────────────────────────────────────
+// â”€â”€ Overview KPIs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function populateOverview(m) {
   var rev = m.revenue || {};
   document.getElementById('kpi-revenue').innerHTML = fmtUSD(rev.today_usd);
@@ -1197,19 +1201,19 @@ function populateOverview(m) {
   }
 }
 
-// ── Decision Engine ────────────────────────────────────────────
+// â”€â”€ Decision Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function populateDecision(m) {
   var tc = m.top_combos || [];
   var kill = m.kill || [];
   function combo(c, fb) { return c ? (c.product || '&#8212;') + ' \xd7 ' + (c.channel_label || c.channel || '&#8212;') : fb; }
   document.getElementById('de-rank1-combo').innerHTML = combo(tc[0], '&#8212;');
-  document.getElementById('de-rank1-score').textContent = tc[0] ? 'Score ' + tc[0].score + ' — SCALE NOW' : 'Run engine';
+  document.getElementById('de-rank1-score').textContent = tc[0] ? 'Score ' + tc[0].score + ' —SCALE NOW' : 'Run engine';
   document.getElementById('de-rank2-combo').innerHTML = combo(tc[1], '&#8212;');
-  document.getElementById('de-rank2-score').textContent = tc[1] ? 'Score ' + tc[1].score + ' — SCALE' : 'Run engine';
+  document.getElementById('de-rank2-score').textContent = tc[1] ? 'Score ' + tc[1].score + ' —SCALE' : 'Run engine';
   document.getElementById('de-rank3-combo').innerHTML = combo(tc[2], '&#8212;');
-  document.getElementById('de-rank3-score').textContent = tc[2] ? 'Score ' + tc[2].score + ' — TEST' : 'Run engine';
+  document.getElementById('de-rank3-score').textContent = tc[2] ? 'Score ' + tc[2].score + ' —TEST' : 'Run engine';
   document.getElementById('de-kill-combo').innerHTML = combo(kill[0], '&#8212;');
-  document.getElementById('de-kill-score').textContent = kill[0] ? 'Score ' + kill[0].score + ' — CUT' : 'Run engine';
+  document.getElementById('de-kill-score').textContent = kill[0] ? 'Score ' + kill[0].score + ' —CUT' : 'Run engine';
   if (m.generated_at) document.getElementById('de-table-updated').textContent = 'Updated: ' + new Date(m.generated_at).toLocaleDateString();
   var all = (m.scale || []).concat(m.test || []).concat(kill).slice(0, 10);
   if (!all.length) return;
@@ -1231,7 +1235,7 @@ function populateDecision(m) {
   }).join('');
 }
 
-// ── Channels ───────────────────────────────────────────────────
+// â”€â”€ Channels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function populateChannels(m) {
   var channels = (m.channels || []).sort(function(a,b){ return a.cpm - b.cpm; });
   if (!channels.length) return;
@@ -1250,7 +1254,7 @@ function populateChannels(m) {
   }).join('');
 }
 
-// ── Products ───────────────────────────────────────────────────
+// â”€â”€ Products â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var _allProducts = [];
 var _allCombos = [];
 
@@ -1292,7 +1296,7 @@ function populateProducts(m) {
   }).join('');
 }
 
-// ── Memory ─────────────────────────────────────────────────────
+// â”€â”€ Memory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function populateMemory(m) {
   var q = m.qdrant || {};
   var el;
@@ -1305,7 +1309,7 @@ function populateMemory(m) {
   el = document.getElementById('memory-sub'); if(el) el.textContent = 'Semantic search across ' + fmtNum(total || null) + ' vectors in Qdrant. Start Quinn bridge + ngrok to activate.';
 }
 
-// ── Status pill ─────────────────────────────────────────────────
+// â”€â”€ Status pill â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setStatusPill(src) {
   var pill = document.getElementById('metrics-status-pill');
   if (src.stripe === 'live' && src.qdrant === 'live') {
@@ -1313,14 +1317,14 @@ function setStatusPill(src) {
     pill.innerHTML = '<div class="s-dot dot-green"></div>All Systems Live';
   } else if (src.decisions !== 'unavailable') {
     pill.className = 'status-pill pill-gold';
-    pill.innerHTML = '<div class="s-dot dot-gold"></div>Partial — Run Engine';
+    pill.innerHTML = '<div class="s-dot dot-gold"></div>Partial —Run Engine';
   } else {
     pill.className = 'status-pill pill-red';
     pill.innerHTML = '<div class="s-dot dot-red"></div>Metrics Offline';
   }
 }
 
-// ── Revenue ────────────────────────────────────────────────────
+// â”€â”€ Revenue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function populateRevenue(m) {
   var rev = m.revenue || {};
   var channels = (m.channels || []).sort(function(a,b){ return a.cpm - b.cpm; });
@@ -1396,7 +1400,7 @@ function populateRevenue(m) {
     var status = document.getElementById('api-status-' + key);
     if (!dot || !status) return;
     dot.style.background = connected ? 'var(--green)' : 'var(--muted)';
-    status.textContent = 'Status: ' + (connected ? 'Connected' : 'Not connected — add key to .env');
+    status.textContent = 'Status: ' + (connected ? 'Connected' : 'Not connected —add key to .env');
     status.style.color = connected ? 'var(--green)' : 'var(--muted)';
   }
   setApiDot('stripe', src2.stripe === 'live');
@@ -1409,7 +1413,7 @@ function populateRevenue(m) {
     .catch(function(){ setApiDot('prometheus', false); });
 }
 
-// ── Load metrics ───────────────────────────────────────────────
+// â”€â”€ Load metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadMetrics() {
   try {
     var res = await fetch('/api/metrics');
@@ -1426,8 +1430,8 @@ async function loadMetrics() {
   } catch(e) {
     console.warn('Metrics load failed:', e.message);
     document.getElementById('ticker-inner').innerHTML =
-      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline — run decision_engine.py + Quinn bridge</span></span>' +
-      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline — run decision_engine.py + Quinn bridge</span></span>';
+      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline —run decision_engine.py + Quinn bridge</span></span>' +
+      '<span class="tick-item"><span class="tick-label">METRICS</span><span class="tick-neutral">Offline —run decision_engine.py + Quinn bridge</span></span>';
     var pill = document.getElementById('metrics-status-pill');
     pill.className = 'status-pill pill-red';
     pill.innerHTML = '<div class="s-dot dot-red"></div>Metrics Offline';
@@ -1436,7 +1440,7 @@ async function loadMetrics() {
 loadMetrics();
 setInterval(loadMetrics, 60000);
 
-// ── Memory search ──────────────────────────────────────────────
+// â”€â”€ Memory search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function runSearch() {
   var query = document.getElementById('search-input').value.trim();
   if (!query) return;
@@ -1456,12 +1460,12 @@ async function runSearch() {
       return;
     }
     resultsDiv.innerHTML = results.map(function(r) {
-      return '<div class="result-card"><div class="result-source">' + (r.project || 'general') + ' \xb7 ' + (r.section || '—') + '</div>' +
+      return '<div class="result-card"><div class="result-source">' + (r.project || 'general') + ' \xb7 ' + (r.section || 'â€”') + '</div>' +
         '<div class="result-text">' + r.text + '</div>' +
         '<div class="result-score">Score: ' + (r.score || 0).toFixed(3) + ' \xb7 ' + (r.source || '') + '</div></div>';
     }).join('');
     if (data.source === 'claude_fallback') {
-      resultsDiv.insertAdjacentHTML('afterbegin', '<div style="color:var(--gold);font-size:11px;padding:4px 8px;margin-bottom:8px;background:rgba(245,166,35,.08);border-radius:4px">[AI FALLBACK] Quinn bridge offline — answering via Claude AI</div>');
+      resultsDiv.insertAdjacentHTML('afterbegin', '<div style="color:var(--gold);font-size:11px;padding:4px 8px;margin-bottom:8px;background:rgba(245,166,35,.08);border-radius:4px">[AI FALLBACK] Quinn bridge offline —answering via Claude AI</div>');
     }
   } catch(e) {
     resultsDiv.innerHTML = '<div class="result-card" style="border-color:var(--red)"><div class="result-source" style="color:var(--red)">Search Error</div><div class="result-text">Memory search failed: ' + e.message + '<br><br>Set ANTHROPIC_API_KEY in Vercel env vars for AI fallback.</div></div>';
@@ -1469,7 +1473,7 @@ async function runSearch() {
 }
 document.getElementById('search-input').addEventListener('keydown', function(e){ if(e.key === 'Enter') runSearch(); });
 
-// ── Supplier Wizard ─────────────────────────────────────────────
+// â”€â”€ Supplier Wizard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var _wizardProduct = null;
 var SUPPLIER_URLS = {
   zendrop: 'https://zendrop.com/products?search=',
@@ -1480,7 +1484,7 @@ var SUPPLIER_URLS = {
 
 function openSupplierWizard(productIndex, scrollToPush) {
   var p = _allProducts[productIndex];
-  if (!p) { alert('Product data not loaded — run decision_engine.py first'); return; }
+  if (!p) { alert('Product data not loaded —run decision_engine.py first'); return; }
   _wizardProduct = p;
   document.getElementById('modal-product-name').textContent = p.name;
   document.getElementById('modal-product-name2').textContent = p.name;
@@ -1553,21 +1557,21 @@ async function pushToProduction(supplierKey) {
     if (resp.ok) {
       var d = await resp.json();
       if (d.script || d.result) {
-        if (pc) pc.innerHTML = '&#x2705; [DONE] Running in Prometheus Engine — <a href="/content" style="color:var(--teal)">Open Prometheus Studio &#8594;</a>';
+        if (pc) pc.innerHTML = '&#x2705; [DONE] Running in Prometheus Engine —<a href="/content" style="color:var(--teal)">Open Prometheus Studio &#8594;</a>';
       } else if (d.source === 'claude_script') {
-        if (pc) pc.innerHTML = '&#x2705; [AI SCRIPT] Script ready — <a href="/content" style="color:var(--teal)">Open Prometheus Studio &#8594;</a>';
+        if (pc) pc.innerHTML = '&#x2705; [AI SCRIPT] Script ready —<a href="/content" style="color:var(--teal)">Open Prometheus Studio &#8594;</a>';
       } else {
-        if (pc) pc.innerHTML = '&#x26A1; [QUEUED] Prometheus offline — queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';
+        if (pc) pc.innerHTML = '&#x26A1; [QUEUED] Prometheus offline —queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';
       }
     } else {
-      if (pc) pc.innerHTML = '&#x26A1; [QUEUED] Prometheus offline — queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';
+      if (pc) pc.innerHTML = '&#x26A1; [QUEUED] Prometheus offline —queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';
     }
   } catch(err) {
-    if (pc) pc.innerHTML = '&#x26A1; [QUEUED] Prometheus offline — queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';
+    if (pc) pc.innerHTML = '&#x26A1; [QUEUED] Prometheus offline —queued locally. <a href="/content" style="color:var(--teal)">Open Studio &#8594;</a>';
   }
 }
 
-// ── Stage endpoint map ─────────────────────────────────────────
+// â”€â”€ Stage endpoint map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var STAGE_ENDPOINTS = {
   research:   { method: 'POST', path: '/api/engine/research/run' },
   decision:   { method: 'POST', path: '/api/engine/decision/run' },
@@ -1585,7 +1589,7 @@ var PUSH_ENDPOINTS = {
   agents:     { next: 'revenue',    method: 'GET',  path: '/api/engine/revenue/stats' }
 };
 
-// ── Activity log polling ───────────────────────────────────────
+// â”€â”€ Activity log polling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var _activityPollers = {};
 function startActivityLog(stage) {
   var logEl = document.getElementById(stage + '-activity-log');
@@ -1608,7 +1612,7 @@ function stopActivityLog(stage) {
   if (_activityPollers[stage]) { clearInterval(_activityPollers[stage]); delete _activityPollers[stage]; }
 }
 
-// ── Set stage-status display ───────────────────────────────────
+// â”€â”€ Set stage-status display â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setStageStatus(elId, state, msg) {
   var el = document.getElementById(elId);
   if (!el) return;
@@ -1616,7 +1620,7 @@ function setStageStatus(elId, state, msg) {
   el.textContent = msg;
 }
 
-// ── runStage ────────────────────────────────────────────────────
+// â”€â”€ runStage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function runStage(stage) {
   var ep = STAGE_ENDPOINTS[stage] || { method: 'POST', path: '/api/engine/' + stage + '/run' };
   setStageStatus(stage + '-status', 'running', '[RUNNING] Querying intelligence stack...');
@@ -1631,11 +1635,11 @@ function runStage(stage) {
     })
     .catch(function(e) {
       stopActivityLog(stage);
-      setStageStatus(stage + '-status', 'error', '[ERROR] ' + (e.message || 'engine offline — start Quinn bridge or add ANTHROPIC_API_KEY'));
+      setStageStatus(stage + '-status', 'error', '[ERROR] ' + (e.message || 'engine offline —start Quinn bridge or add ANTHROPIC_API_KEY'));
     });
 }
 
-// ── Handle stage results ────────────────────────────────────────
+// â”€â”€ Handle stage results â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function handleStageResult(stage, data) {
   var src = data.source || 'engine';
   var msg = '[DONE] Source: ' + src;
@@ -1712,7 +1716,7 @@ function handleStageResult(stage, data) {
   setStageStatus(stage + '-status', 'done', msg);
 }
 
-// ── Inject AI intel card ────────────────────────────────────────
+// â”€â”€ Inject AI intel card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function injectIntelCard(afterId, cardId, text1, text2) {
   var afterEl = document.getElementById(afterId);
   if (!afterEl) return;
@@ -1727,7 +1731,7 @@ function injectIntelCard(afterId, cardId, text1, text2) {
   card.textContent = (text1 || '') + (text2 ? '\n\n--- CHANNEL INTEL ---\n' + text2 : '');
 }
 
-// ── pushStage ───────────────────────────────────────────────────
+// â”€â”€ pushStage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function pushStage(from, toPage) {
   var ep = PUSH_ENDPOINTS[from];
   if (!ep) return;
@@ -1751,7 +1755,7 @@ function pushStage(from, toPage) {
     });
 }
 
-// ── Onboarding pipeline ─────────────────────────────────────────
+// â”€â”€ Onboarding pipeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function triggerOnboardingPipeline(parentStatusId, productData) {
   var obEl = document.getElementById('onboarding-pipeline-status');
   if (obEl) {
@@ -1769,7 +1773,7 @@ function triggerOnboardingPipeline(parentStatusId, productData) {
     .then(function(d) {
       if (obEl) {
         obEl.className = 'onboarding-status running';
-        obEl.innerHTML = '<span class="ob-dot"></span><span>Onboarding running in background — ' + (d.message || 'pipeline started') + '. Check data/product_collateral/ for output.</span>';
+        obEl.innerHTML = '<span class="ob-dot"></span><span>Onboarding running in background —' + (d.message || 'pipeline started') + '. Check data/product_collateral/ for output.</span>';
       }
       pollOnboardingStatus();
     })
@@ -1797,13 +1801,13 @@ function pollOnboardingStatus() {
           clearInterval(_obPollInterval);
           if (obEl && count > 0) {
             obEl.className = 'onboarding-status done';
-            obEl.innerHTML = '&#x2705; Onboarding complete — ' + done + '/' + count + ' products ready. <a href="#" onclick="showPage(\'shop\',null);return false;" style="color:var(--teal)">View Shop &#8594;</a>';
+            obEl.innerHTML = '&#x2705; Onboarding complete —' + done + '/' + count + ' products ready. <a href="#" onclick="showPage(\'shop\',null);return false;" style="color:var(--teal)">View Shop &#8594;</a>';
           }
         } else if (ob.status === 'error') {
           clearInterval(_obPollInterval);
           if (obEl) {
             obEl.className = 'onboarding-status error';
-            obEl.innerHTML = 'Onboarding error — check onboarding.log in data/product_collateral/';
+            obEl.innerHTML = 'Onboarding error —check onboarding.log in data/product_collateral/';
           }
         } else if (obEl && count > 0) {
           obEl.innerHTML = '<span class="ob-dot"></span><span>Onboarding: ' + done + '/' + count + ' complete&#8230;</span>';
@@ -1813,7 +1817,7 @@ function pollOnboardingStatus() {
   }, 4000);
 }
 
-// ── Default page on load ────────────────────────────────────────
+// â”€â”€ Default page on load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.addEventListener('DOMContentLoaded', function() {
   var researchTab = document.querySelector('[onclick*="showPage(\'research\'"]');
   showPage('research', researchTab);
@@ -1821,7 +1825,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (launchModal) launchModal.addEventListener('click', function(e){ if(e.target === this) closeLaunchModal(); });
 });
 
-// ── Launch modal ────────────────────────────────────────────────
+// â”€â”€ Launch modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openLaunchModal() { document.getElementById('launch-modal').classList.add('open'); }
 function closeLaunchModal() { document.getElementById('launch-modal').classList.remove('open'); }
 </script>
@@ -1998,3 +2002,4 @@ function closeLaunchModal() { document.getElementById('launch-modal').classList.
 </script>
 </body>
 </html>
+
