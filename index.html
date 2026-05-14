@@ -1532,17 +1532,101 @@ function copyLink(inputId) {
     if (btn) { var orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = orig; }, 1800); }
   }).catch(function(){ el.select(); document.execCommand('copy'); });
 }
-function openSupplier(key) {
+// Auto-search supplier — calls /api/supplier, shows real listings inline
+async function openSupplier(key) {
   if (!_wizardProduct) return;
-  window.open(SUPPLIER_URLS[key] + encodeURIComponent(_wizardProduct.name), '_blank');
+  var card = document.getElementById('sc-' + key);
+  if (!card) return;
+  var resultsDiv = card.querySelector('.supplier-results');
+  if (!resultsDiv) {
+    resultsDiv = document.createElement('div');
+    resultsDiv.className = 'supplier-results';
+    resultsDiv.style.cssText = 'margin-top:12px;';
+    card.insertBefore(resultsDiv, card.querySelector('.push-confirm'));
+  }
+  resultsDiv.innerHTML = '<div style="color:var(--gold);font-size:12px">[SEARCHING] Finding ' + _wizardProduct.name + ' on ' + key + '&#8230;</div>';
+
+  try {
+    var resp = await fetch('/api/supplier?product=' + encodeURIComponent(_wizardProduct.name) + '&supplier=' + key, {signal: AbortSignal.timeout(10000)});
+    var data = await resp.json();
+    var results = data.results || [];
+
+    if (!results.length) {
+      resultsDiv.innerHTML = '<div style="color:var(--muted);font-size:12px">[NO RESULTS] Nothing found — try a different supplier.</div>';
+      return;
+    }
+
+    // Store best result for push-to-production
+    _wizardProduct['supplier_url_' + key] = results[0].url;
+    _wizardProduct['supplier_image_' + key] = results[0].image;
+    _wizardProduct['supplier_price_' + key] = results[0].price;
+
+    // Update link input with real URL
+    var linkInput = document.getElementById('link-' + key);
+    if (linkInput) linkInput.value = results[0].url;
+
+    var html = '<div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px">[FOUND] ' + results.length + ' listing' + (results.length > 1 ? 's' : '') + ' — top match:</div>';
+    results.slice(0, 3).forEach(function(r, i) {
+      html += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:border-color .2s" '
+        + 'onmouseover="this.style.borderColor=\'var(--teal)\'" onmouseout="this.style.borderColor=\'var(--border)\'" '
+        + 'onclick="selectSupplierResult(\'' + key + '\',' + i + ')">'
+        + '<div style="display:flex;gap:10px;align-items:center">'
+        + (r.image ? '<img src="' + r.image + '" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display=\'none\'">' : '')
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.title || _wizardProduct.name) + '</div>'
+        + (r.price ? '<div style="font-size:11px;color:var(--green);margin-top:2px">' + r.price + ' cost</div>' : '')
+        + (r.sales ? '<div style="font-size:10px;color:var(--muted);margin-top:1px">' + r.sales + '</div>' : '')
+        + '<div style="font-size:10px;color:var(--blue);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + r.url + '</div>'
+        + '</div>'
+        + (i === 0 ? '<div style="font-size:10px;color:var(--teal);font-weight:700;flex-shrink:0">[SELECTED]</div>' : '')
+        + '</div></div>';
+    });
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:6px">Click a listing to select it, then Push to Production &#8594;</div>';
+    resultsDiv.innerHTML = html;
+
+    // Store results for selection
+    if (!window._supplierResults) window._supplierResults = {};
+    window._supplierResults[key] = results;
+
+  } catch(err) {
+    resultsDiv.innerHTML = '<div style="color:var(--muted);font-size:12px">[ERROR] Search failed — check connection. <a href="' + SUPPLIER_URLS[key] + encodeURIComponent(_wizardProduct.name) + '" target="_blank" style="color:var(--blue)">Search manually &#8594;</a></div>';
+  }
+}
+
+function selectSupplierResult(key, index) {
+  if (!window._supplierResults || !window._supplierResults[key]) return;
+  var results = window._supplierResults[key];
+  var r = results[index];
+  if (!r) return;
+  _wizardProduct['supplier_url_' + key] = r.url;
+  _wizardProduct['supplier_image_' + key] = r.image;
+  _wizardProduct['supplier_price_' + key] = r.price;
+  var linkInput = document.getElementById('link-' + key);
+  if (linkInput) linkInput.value = r.url;
+  // Update [SELECTED] badges
+  var card = document.getElementById('sc-' + key);
+  if (card) {
+    card.querySelectorAll('.supplier-results > div > div').forEach(function(row, i) {
+      var badge = row.querySelector('div[style*="SELECTED"]');
+      if (badge) badge.textContent = '';
+      if (i === index) {
+        var badge2 = row.querySelector('div:last-child');
+        if (badge2) badge2.textContent = '[SELECTED]';
+      }
+    });
+  }
 }
 async function pushToProduction(supplierKey) {
   if (!_wizardProduct) return;
   var pc = document.getElementById('pc-' + supplierKey);
   if (pc) { pc.classList.add('shown'); pc.innerHTML = '<span style="color:var(--gold)">[QUEUING] Sending to Prometheus&#8230;</span>'; }
+  var supplierUrl = _wizardProduct['supplier_url_' + supplierKey] || null;
+  var supplierImage = _wizardProduct['supplier_image_' + supplierKey] || null;
+  var supplierPrice = _wizardProduct['supplier_price_' + supplierKey] || null;
   var payload = {
     product: _wizardProduct.name, niche: _wizardProduct.niche, margin: _wizardProduct.margin_pct,
-    supplier: supplierKey, timestamp: new Date().toISOString(),
+    supplier: supplierKey, supplier_url: supplierUrl, supplier_image: supplierImage, supplier_price: supplierPrice,
+    timestamp: new Date().toISOString(),
     bestCombo: _allCombos.find(function(c){ return c.product === _wizardProduct.name; }) || null
   };
   try { sessionStorage.setItem('prometheus_queued_product', JSON.stringify(payload)); } catch(e) {}
@@ -1552,7 +1636,7 @@ async function pushToProduction(supplierKey) {
     var resp = await fetch('/api/prometheus', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({action: 'generate_script', product: _wizardProduct.name, niche: _wizardProduct.niche, platforms: platforms})
+      body: JSON.stringify({action: 'generate_script', product: _wizardProduct.name, niche: _wizardProduct.niche, platforms: platforms, supplier_url: supplierUrl, image_url: supplierImage})
     });
     if (resp.ok) {
       var d = await resp.json();
