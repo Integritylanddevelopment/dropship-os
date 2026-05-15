@@ -110,7 +110,7 @@ async function forwardToLocal(path, method, body) {
   const endpoint = process.env.QUINN_ENDPOINT;
   if (!endpoint) return null;
 
-  // Prometheus engine runs on port 8766
+  // Prometheus engine runs on the port defined by PROMETHEUS_ENGINE_PORT env var.
   // We route through Quinn bridge which proxies to it
   const prometheusUrl = `${endpoint}/prometheus${path}`;
   const secret = process.env.QUINN_BRIDGE_SECRET;
@@ -143,10 +143,12 @@ async function probeLocalEngine() {
 // ── Generate script via Claude API ───────────────────────────
 async function generateScriptViaClaude(product, niche) {
   const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) return null;
+  const fallbackUrl = process.env.FALLBACK_API_URL;
+  const fallbackModel = process.env.FALLBACK_MODEL;
+  if (!key || !fallbackUrl || !fallbackModel) return null;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(fallbackUrl, {
       method: 'POST',
       headers: {
         'x-api-key': key,
@@ -154,7 +156,7 @@ async function generateScriptViaClaude(product, niche) {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: fallbackModel,
         max_tokens: 400,
         messages: [{
           role: 'user',

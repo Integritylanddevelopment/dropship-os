@@ -1,0 +1,19 @@
+{
+  "name": "shipstack-ai",
+  "version": "1.0.0",
+  "description": "ShipStack AI — Quinn-first drop shipping intelligence platform",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod",
+    "lint": "node --experimental-vm-modules node_modules/.bin/eslint api/*.js api/_*.js",
+    "env:check": "node -e \"const r=['QUINN_ENDPOINT','QUINN_BRIDGE_SECRET','ANTHROPIC_API_KEY','FALLBACK_ENABLED','FALLBACK_API_URL','FALLBACK_MODEL','APP_PRIMARY_PROFILE'];const m=r.filter(k=>!process.env[k]);if(m.length){console.error('[ERROR] Missing env vars:',m.join(', '));process.exit(1);}console.log('[OK] All required env vars present.')\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "vercel": "^39.0.0"
+  }
+}

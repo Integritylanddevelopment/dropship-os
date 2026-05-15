@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Quinn Knowledge Center</title>
+<style>
+:root {
+  --bg: #0d0d14;
+  --surface: #13131f;
+  --card: #1a1a2e;
+  --border: #2a2a4a;
+  --accent: #7c3aed;
+  --accent2: #a855f7;
+  --accent3: #06b6d4;
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --dim: #94a3b8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  padding: 16px;
+}
+.header {
+  background: linear-gradient(135deg, #1a0533 0%, #0f172a 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.header-left h1 { font-size: 22px; font-weight: 700; background: linear-gradient(90deg, #a855f7, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header-left .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.status-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--green);
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-card .num { font-size: 28px; font-weight: 700; color: var(--accent2); }
+.stat-card .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.section-title {
+  font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.project-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.project-card:hover { border-color: var(--accent); }
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 10px 10px 0 0;
+}
+.project-card.ship::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+.project-card.local::before { background: linear-gradient(90deg, #06b6d4, #0ea5e9); }
+.project-card.land::before { background: linear-gradient(90deg, #10b981, #059669); }
+.project-card.gen::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.project-card.family::before { background: linear-gradient(90deg, #ec4899, #db2777); }
+.project-card.thunder::before { background: linear-gradient(90deg, #f97316, #ea580c); }
+.project-card.consig::before { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
+.project-card.agents::before { background: linear-gradient(90deg, #14b8a6, #0d9488); }
+.project-card.grand::before { background: linear-gradient(90deg, #64748b, #475569); }
+
+.project-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.project-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.project-id { font-size: 10px; color: var(--muted); font-family: monospace; margin-top: 2px; }
+.project-badge {
+  font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+  background: rgba(124,58,237,0.2); color: var(--accent2); border: 1px solid rgba(124,58,237,0.3);
+  white-space: nowrap;
+}
+.project-badge.live { background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.3); }
+.project-badge.active { background: rgba(245,158,11,0.15); color: var(--yellow); border-color: rgba(245,158,11,0.3); }
+
+.project-desc { font-size: 12px; color: var(--dim); line-height: 1.5; margin-bottom: 10px; }
+.project-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.tag { font-size: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+.project-url { font-size: 11px; color: var(--accent3); text-decoration: none; word-break: break-all; }
+.project-url:hover { text-decoration: underline; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+/* Search */
+.search-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.search-input {
+  flex: 1; min-width: 200px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 14px;
+}
+.search-input:focus { outline: none; border-color: var(--accent); }
+.project-select {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 14px;
+}
+.project-select:focus { outline: none; border-color: var(--accent); }
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover:not(:disabled) { background: var(--accent2); }
+.btn-secondary { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+.btn-cyan { background: rgba(6,182,212,0.15); color: var(--accent3); border: 1px solid rgba(6,182,212,0.3); }
+.btn-cyan:hover:not(:disabled) { background: rgba(6,182,212,0.25); }
+
+.result-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  min-height: 60px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--dim);
+}
+.result-box.loading { color: var(--muted); font-style: italic; }
+.result-box.error { color: var(--red); border-color: rgba(239,68,68,0.3); }
+.result-box.success { color: var(--text); }
+
+/* Log */
+.log-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  font-family: monospace;
+  line-height: 1.8;
+  max-height: 240px;
+  overflow-y: auto;
+  color: var(--dim);
+}
+.log-box .log-ok { color: var(--green); }
+.log-box .log-warn { color: var(--yellow); }
+.log-box .log-err { color: var(--red); }
+.log-box .log-info { color: var(--accent3); }
+
+/* Add context */
+textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 80px;
+}
+textarea:focus { outline: none; border-color: var(--accent); }
+label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; margin-top: 12px; }
+
+/* Extraction summary */
+.extraction-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.ex-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+.ex-item .ex-label { color: var(--muted); font-size: 11px; }
+.ex-item .ex-value { color: var(--text); font-weight: 600; margin-top: 2px; }
+
+@media (max-width: 600px) {
+  .projects-grid { grid-template-columns: 1fr; }
+  .extraction-grid { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Quinn Knowledge Center</h1>
+    <div class="sub">Global knowledge extraction &amp; project intelligence hub &mdash; ShipStack AI</div>
+  </div>
+  <div class="status-pill">
+    <div class="dot"></div>
+    <span id="statusText">Connecting...</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="num">11</div>
+    <div class="lbl">Quinn Projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">125</div>
+    <div class="lbl">Sessions Tracked</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">16</div>
+    <div class="lbl">Artifacts Indexed</div>
+  </div>
+  <div class="stat-card">
+    <div class="num" id="lastSync">2026-05-13</div>
+    <div class="lbl">Last Sync</div>
+  </div>
+</div>
+
+<!-- Projects -->
+<div class="section-title">Active Projects</div>
+<div class="projects-grid">
+
+  <div class="project-card ship">
+    <div class="project-header">
+      <div>
+        <div class="project-name">ShipStack AI</div>
+        <div class="project-id">ship_stack_ai</div>
+      </div>
+      <span class="project-badge live">LIVE</span>
+    </div>
+    <div class="project-desc">AI dropshipping intelligence platform. 10 phases complete. Vercel deployed. Prometheus video pipeline + Pinterest/TikTok auto-posting + decision engine.</div>
+    <div class="project-tags">
+      <span class="tag">Vercel</span><span class="tag">Zendrop</span><span class="tag">Stripe</span><span class="tag">Pinterest</span><span class="tag">Prometheus</span><span class="tag">Quinn Bridge</span>
+    </div>
+    <a class="project-url" href="https://dropship-os-gamma.vercel.app" target="_blank">dropship-os-gamma.vercel.app</a>
+  </div>
+
+  <div class="project-card local">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Local AI Stack</div>
+        <div class="project-id">local_ai_stack</div>
+      </div>
+      <span class="project-badge live">RUNNING</span>
+    </div>
+    <div class="project-desc">Quinn-proxy powered local AI infrastructure. Ollama + Qdrant + ChromaDB + Context Injection. Dashboard at localhost:8888.</div>
+    <div class="project-tags">
+      <span class="tag">Ollama :11434</span><span class="tag">Qdrant :6333</span><span class="tag">Dashboard :8888</span><span class="tag">Bridge :8765</span>
+    </div>
+    <a class="project-url" href="http://localhost:8888" target="_blank">localhost:8888</a>
+  </div>
+
+  <div class="project-card land">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Ohia Lani Mauka</div>
+        <div class="project-id">ohia_lani_mauka</div>
+      </div>
+      <span class="project-badge active">ACTIVE</span>
+    </div>
+    <div class="project-desc">30 Hawaii land lots (Ocean View, Big Island). $500 down / $500/month x 5 years. DNS sabotage investigation re: Josh Novak ongoing.</div>
+    <div class="project-tags">
+      <span class="tag">Real Estate</span><span class="tag">Buildium</span><span class="tag">LeadConnector</span><span class="tag">Meta Ads</span><span class="tag">Investigation</span>
+    </div>
+  </div>
+
+  <div class="project-card gen">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Generator Partners</div>
+        <div class="project-id">generator_partners</div>
+      </div>
+      <span class="project-badge active">ACTIVE</span>
+    </div>
+    <div class="project-desc">Accounting ops for Generator Partners LLC. Sage Intacct + QBO + bill.com + Paycom. Active HR forensic investigation. jessica_daily AI assistant operational.</div>
+    <div class="project-tags">
+      <span class="tag">Sage Intacct</span><span class="tag">QuickBooks</span><span class="tag">Paycom</span><span class="tag">Forensics</span>
+    </div>
+  </div>
+
+  <div class="project-card family">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Family History</div>
+        <div class="project-id">family_history</div>
+      </div>
+      <span class="project-badge">RESEARCH</span>
+    </div>
+    <div class="project-desc">Genealogy research. Forman/Proff/Schwellenbach lines. Jessica Starr identity confirmed. Heidi biological origin under investigation. 3 Qdrant partitions.</div>
+    <div class="project-tags">
+      <span class="tag">Ancestry.com</span><span class="tag">DNA</span><span class="tag">Oral History</span><span class="tag">Written Records</span>
+    </div>
+  </div>
+
+  <div class="project-card thunder">
+    <div class="project-header">
+      <div>
+        <div class="project-name">4305 Thunder Rd</div>
+        <div class="project-id">thunder_rd_4305</div>
+      </div>
+      <span class="project-badge active">DEVELOPMENT</span>
+    </div>
+    <div class="project-desc">Land development project. Integrity Land Development (Alex Alexander). 4 legal docs: Texas lease, ROFR option, memorandums (April 2026).</div>
+    <div class="project-tags">
+      <span class="tag">Texas Lease</span><span class="tag">ROFR</span><span class="tag">Notary</span><span class="tag">Land Dev</span>
+    </div>
+  </div>
+
+  <div class="project-card consig">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Consigliere App</div>
+        <div class="project-id">consigliere_app</div>
+      </div>
+      <span class="project-badge live">LIVE</span>
+    </div>
+    <div class="project-desc">Strategy and advisory platform. Business, legal, real estate, negotiation advice. Deployed on Vercel.</div>
+    <div class="project-tags">
+      <span class="tag">Strategy</span><span class="tag">Advisory</span><span class="tag">Vercel</span>
+    </div>
+    <a class="project-url" href="https://conselleri-app.vercel.app" target="_blank">conselleri-app.vercel.app</a>
+  </div>
+
+  <div class="project-card agents">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Agent Factory</div>
+        <div class="project-id">agent_factory</div>
+      </div>
+      <span class="project-badge">BUILDING</span>
+    </div>
+    <div class="project-desc">Platform for building and deploying AI agents. Each agent has name, role, base model, system prompt, capabilities. Logged via Quinn.</div>
+    <div class="project-tags">
+      <span class="tag">Claude</span><span class="tag">Ollama</span><span class="tag">Agents</span>
+    </div>
+  </div>
+
+  <div class="project-card agents">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Quinn Agents</div>
+        <div class="project-id">quinn_agents</div>
+      </div>
+      <span class="project-badge">BUILDING</span>
+    </div>
+    <div class="project-desc">Orchestration platform for Quinn-powered AI agents. Specializations, task queues, execution logs.</div>
+    <div class="project-tags">
+      <span class="tag">Orchestration</span><span class="tag">MCP</span><span class="tag">Routing</span>
+    </div>
+  </div>
+
+  <div class="project-card grand">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Grand Prix Social</div>
+        <div class="project-id">grand_prix_social</div>
+      </div>
+      <span class="project-badge">PLANNED</span>
+    </div>
+    <div class="project-desc">Social media / marketing project. Context file exists in Quinn projects directory.</div>
+    <div class="project-tags">
+      <span class="tag">Social</span><span class="tag">Marketing</span>
+    </div>
+  </div>
+
+  <div class="project-card ship">
+    <div class="project-header">
+      <div>
+        <div class="project-name">Quinn Stack</div>
+        <div class="project-id">quinn_stack</div>
+      </div>
+      <span class="project-badge live">RUNNING</span>
+    </div>
+    <div class="project-desc">Quinn local AI stack documentation. Port registry, SOPs, architecture. Vercel deployment via vercel_api_deploy.js (NOT CLI). 125 Cowork sessions tracked.</div>
+    <div class="project-tags">
+      <span class="tag">ChromaDB</span><span class="tag">Qdrant</span><span class="tag">Interceptor</span><span class="tag">Context</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Extraction Summary -->
+<div class="card">
+  <div class="section-title">Extraction Summary (2026-05-13)</div>
+  <div class="extraction-grid">
+    <div class="ex-item">
+      <div class="ex-label">Cowork Sessions Tracked</div>
+      <div class="ex-value">125 sessions (cowork_session_tracker.json)</div>
+    </div>
+    <div class="ex-item">
+      <div class="ex-label">Session Export Summaries</div>
+      <div class="ex-value">11 text summaries (session_exports/)</div>
+    </div>
+    <div class="ex-item">
+      <div class="ex-label">Cowork Artifacts Indexed</div>
+      <div class="ex-value">16 artifacts (C:\Users\integ\Documents\Claude\Artifacts\)</div>
+    </div>
+    <div class="ex-item">
+      <div class="ex-label">Quinn Project Files Read</div>
+      <div class="ex-value">25 .md + .json files (projects/ directory)</div>
+    </div>
+    <div class="ex-item">
+      <div class="ex-label">Projects Loaded / Updated</div>
+      <div class="ex-value">8 projects enriched with new context</div>
+    </div>
+    <div class="ex-item">
+      <div class="ex-label">Claude.ai Non-Cowork Chats</div>
+      <div class="ex-value">No exported JSON found &mdash; IndexedDB is binary LevelDB</div>
+    </div>
+    <div class="ex-item">
+      <div class="ex-label">Ingest Script</div>
+      <div class="ex-value">RUN_INGEST.bat / INGEST_ANTHROPIC.bat</div>
+    </div>
+    <div class="ex-item">
+      <div class="ex-label">Qdrant Collections</div>
+      <div class="ex-value">general_knowledge, commandcore_memory, dropship_intel, strategy_books + 3 family_history partitions</div>
+    </div>
+  </div>
+</div>
+
+<!-- Re-sync -->
+<div class="card">
+  <div class="section-title">Re-sync Quinn Knowledge</div>
+  <p style="font-size:13px;color:var(--dim);margin-bottom:14px;">Manually trigger a Quinn re-index or add new context to any project.</p>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+    <button class="btn btn-primary" onclick="triggerReindex()">Reindex ChromaDB</button>
+    <button class="btn btn-cyan" onclick="checkStatus()">Check Quinn Status</button>
+    <button class="btn btn-secondary" onclick="clearLog()">Clear Log</button>
+  </div>
+
+  <div class="log-box" id="logBox">
+    <span class="log-info">[INIT] Quinn Knowledge Center loaded &mdash; 2026-05-13</span><br>
+    <span class="log-ok">[OK] 11 projects registered in Quinn</span><br>
+    <span class="log-ok">[OK] 125 Cowork sessions tracked</span><br>
+    <span class="log-ok">[OK] 16 artifacts indexed</span><br>
+    <span class="log-ok">[OK] ship_stack_ai: system_status + architecture loaded</span><br>
+    <span class="log-ok">[OK] local_ai_stack: architecture loaded</span><br>
+    <span class="log-ok">[OK] ohia_lani_mauka: overview + DNS investigation loaded</span><br>
+    <span class="log-ok">[OK] generator_partners: accounting ops + forensic findings loaded</span><br>
+    <span class="log-ok">[OK] family_history: Forman/Proff/Schwellenbach research loaded</span><br>
+    <span class="log-ok">[OK] thunder_rd_4305: legal docs overview loaded</span><br>
+    <span class="log-ok">[OK] cowork_colink: global summary (all 11 projects) loaded</span><br>
+    <span class="log-warn">[WARN] Claude.ai non-Cowork exports: none found (IndexedDB is binary)</span><br>
+    <span class="log-warn">[WARN] Reindex timed out &mdash; running in background (normal)</span><br>
+    <span class="log-info">[INFO] To ingest Cowork sessions: run INGEST_ANTHROPIC.bat</span><br>
+    <span class="log-info">[INFO] To ingest all buckets: run RUN_INGEST.bat</span>
+  </div>
+</div>
+
+<!-- Search Quinn -->
+<div class="card">
+  <div class="section-title">Search Quinn Knowledge Base</div>
+  <div class="search-row">
+    <input class="search-input" id="searchQuery" placeholder="Search across all Quinn projects..." onkeydown="if(event.key==='Enter')searchQuinn()">
+    <select class="project-select" id="searchProject">
+      <option value="">All Projects</option>
+      <option value="ship_stack_ai">ShipStack AI</option>
+      <option value="local_ai_stack">Local AI Stack</option>
+      <option value="ohia_lani_mauka">Ohia Lani Mauka</option>
+      <option value="generator_partners">Generator Partners</option>
+      <option value="family_history">Family History</option>
+      <option value="thunder_rd_4305">Thunder Rd 4305</option>
+      <option value="consigliere_app">Consigliere App</option>
+      <option value="agent_factory">Agent Factory</option>
+      <option value="quinn_agents">Quinn Agents</option>
+      <option value="quinn_stack">Quinn Stack</option>
+      <option value="cowork_colink">Cowork CoLink</option>
+    </select>
+    <button class="btn btn-primary" id="searchBtn" onclick="searchQuinn()">Search</button>
+  </div>
+  <div class="result-box loading" id="searchResult">Enter a query above to search Quinn&rsquo;s knowledge base&hellip;</div>
+</div>
+
+<!-- Add Context -->
+<div class="card">
+  <div class="section-title">Add Context to Quinn</div>
+  <label>Project</label>
+  <select class="project-select" id="addProject" style="width:100%">
+    <option value="ship_stack_ai">ShipStack AI</option>
+    <option value="local_ai_stack">Local AI Stack</option>
+    <option value="ohia_lani_mauka">Ohia Lani Mauka</option>
+    <option value="generator_partners">Generator Partners</option>
+    <option value="family_history">Family History</option>
+    <option value="thunder_rd_4305">Thunder Rd 4305</option>
+    <option value="consigliere_app">Consigliere App</option>
+    <option value="agent_factory">Agent Factory</option>
+    <option value="quinn_agents">Quinn Agents</option>
+    <option value="quinn_stack">Quinn Stack</option>
+    <option value="cowork_colink">Cowork CoLink</option>
+  </select>
+  <label>Section</label>
+  <input class="search-input" id="addSection" style="width:100%" placeholder="e.g. decisions, notes, contacts, sops..." value="notes">
+  <label>Content</label>
+  <textarea id="addContent" placeholder="Paste knowledge, decisions, session summaries, contacts, or any context to add to this project..."></textarea>
+  <button class="btn btn-primary" id="addBtn" onclick="addContext()" style="margin-top:12px;width:100%">Save to Quinn</button>
+  <div class="result-box" id="addResult" style="display:none;margin-top:10px;"></div>
+</div>
+
+<!-- Quinn Command Center Chat Box -->
+<div class="card" id="quinn-chatbox-card">
+  <div class="section-title">Quinn Command Center Chat
+    <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px;">LOCAL QUINN ONLY &mdash; no external providers &mdash; fails closed if bridge is down</span>
+  </div>
+
+  <div id="qcc-history" style="min-height:240px;max-height:420px;overflow-y:auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;">
+    <div style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0;">
+      [QUINN READY] Primary router active. Type a message to start.
+    </div>
+  </div>
+
+  <div id="qcc-status" style="font-size:11px;color:var(--muted);margin-bottom:6px;min-height:16px;"></div>
+
+  <div class="search-row" style="align-items:flex-end;">
+    <textarea id="qcc-input" placeholder="Ask Quinn..." style="flex:1;min-height:64px;resize:vertical;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;" onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();qccSend();}"></textarea>
+    <button class="btn btn-primary" id="qcc-btn" onclick="qccSend()" style="align-self:flex-end;margin-left:8px;">Send</button>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-top:4px;">Ctrl+Enter to send</div>
+</div>
+
+<!-- Chat Quinn (Cowork MCP bridge) -->
+<div class="card">
+  <div class="section-title">Ask Quinn</div>
+  <div class="search-row">
+    <input class="search-input" id="chatQuery" placeholder="Ask Quinn anything about your projects..." onkeydown="if(event.key==='Enter')chatQuinn()">
+    <button class="btn btn-primary" id="chatBtn" onclick="chatQuinn()">Ask</button>
+  </div>
+  <div class="result-box loading" id="chatResult">Ask Quinn anything &mdash; it knows your full project context&hellip;</div>
+</div>
+
+<script>
+// Quinn MCP tool caller via Cowork bridge
+async function callTool(tool, params) {
+  if (window.cowork && window.cowork.callMcpTool) {
+    return await window.cowork.callMcpTool(tool, params);
+  }
+  throw new Error('Cowork bridge not available. This page must be opened inside Claude Cowork.');
+}
+
+function parseQuinnResult(r) {
+  try {
+    const d = JSON.parse(r?.result || '{}');
+    return d;
+  } catch(e) {
+    return { raw: r?.result || '' };
+  }
+}
+
+function log(msg, type = 'info') {
+  const box = document.getElementById('logBox');
+  const cls = type === 'ok' ? 'log-ok' : type === 'warn' ? 'log-warn' : type === 'err' ? 'log-err' : 'log-info';
+  const ts = new Date().toTimeString().slice(0,8);
+  box.innerHTML += `<br><span class="${cls}">[${ts}] ${msg}</span>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('logBox').innerHTML = '<span class="log-info">[CLEARED] Log cleared</span>';
+}
+
+async function init() {
+  try {
+    const r = await callTool('mcp__quinn__quinn_status', {});
+    const d = parseQuinnResult(r);
+    const projects = d.available_projects || [];
+    document.getElementById('statusText').textContent =
+      `Quinn online &mdash; ${projects.length} projects &mdash; Ollama ${d.ollama?.status || '?'}`;
+    log(`Quinn status: Ollama ${d.ollama?.status}, ChromaDB ${d.chromadb?.status}, active project: ${d.active_project}`, 'ok');
+  } catch(e) {
+    document.getElementById('statusText').textContent = 'Quinn offline or Cowork bridge unavailable';
+    log('Quinn connection failed: ' + e.message, 'err');
+  }
+}
+
+async function checkStatus() {
+  log('Checking Quinn status...', 'info');
+  try {
+    const r = await callTool('mcp__quinn__quinn_status', {});
+    const d = parseQuinnResult(r);
+    log(`Ollama: ${d.ollama?.status} | Models: ${(d.ollama?.models||[]).join(', ')}`, 'ok');
+    log(`ChromaDB: ${d.chromadb?.status} | Anthropic key: ${d.anthropic_key?.status}`, 'ok');
+    log(`Active project: ${d.active_project} | Projects: ${(d.available_projects||[]).join(', ')}`, 'info');
+  } catch(e) {
+    log('Status check failed: ' + e.message, 'err');
+  }
+}
+
+async function triggerReindex() {
+  log('Triggering Quinn reindex (may take 10-30s)...', 'info');
+  try {
+    const r = await callTool('mcp__quinn__quinn_reindex', {});
+    log('Reindex complete: ' + JSON.stringify(parseQuinnResult(r)), 'ok');
+    document.getElementById('lastSync').textContent = new Date().toISOString().slice(0,10);
+  } catch(e) {
+    if (e.message && e.message.includes('timeout')) {
+      log('Reindex timed out (running in background - normal for large KB)', 'warn');
+    } else {
+      log('Reindex error: ' + e.message, 'err');
+    }
+  }
+}
+
+async function searchQuinn() {
+  const query = document.getElementById('searchQuery').value.trim();
+  const project = document.getElementById('searchProject').value;
+  if (!query) return;
+
+  const btn = document.getElementById('searchBtn');
+  const box = document.getElementById('searchResult');
+  btn.disabled = true; btn.textContent = 'Searching...';
+  box.className = 'result-box loading';
+  box.textContent = 'Searching Quinn knowledge base...';
+
+  log(`Searching: "${query}"${project ? ' in ' + project : ' (all projects)'}`, 'info');
+
+  try {
+    const params = { params: { query, top_k: 5 } };
+    if (project) params.params.project = project;
+    const r = await callTool('mcp__quinn__quinn_search', params);
+    const d = parseQuinnResult(r);
+    const results = d.results || [];
+    if (results.length === 0) {
+      box.className = 'result-box';
+      box.textContent = 'No results found. Try a different query or check if reindex is complete.';
+      log('No results found', 'warn');
+    } else {
+      box.className = 'result-box success';
+      box.textContent = results.map((res, i) =>
+        `[${i+1}] Project: ${res.project} | Score: ${(res.score||0).toFixed(3)}\n${res.text}\n`
+      ).join('\n---\n');
+      log(`Found ${results.length} results`, 'ok');
+    }
+  } catch(e) {
+    box.className = 'result-box error';
+    box.textContent = 'Search error: ' + e.message;
+    log('Search failed: ' + e.message, 'err');
+  }
+  btn.disabled = false; btn.textContent = 'Search';
+}
+
+async function addContext() {
+  const project = document.getElementById('addProject').value;
+  const section = document.getElementById('addSection').value.trim() || 'notes';
+  const content = document.getElementById('addContent').value.trim();
+  if (!content) return;
+
+  const btn = document.getElementById('addBtn');
+  const box = document.getElementById('addResult');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  box.style.display = 'block';
+  box.className = 'result-box loading';
+  box.textContent = 'Setting project and saving context...';
+
+  log(`Adding context to ${project}/${section} (${content.length} chars)...`, 'info');
+
+  try {
+    await callTool('mcp__quinn__quinn_set_project', { params: { project } });
+    const r = await callTool('mcp__quinn__quinn_add_context', { params: { content, section } });
+    const d = parseQuinnResult(r);
+    box.className = 'result-box success';
+    box.textContent = `Saved to Quinn:\nProject: ${d.project || project}\nSection: ${d.section || section}\nStatus: ${d.status || 'ok'}\n\nHint: ${d.hint || 'Call reindex to make searchable.'}`;
+    document.getElementById('addContent').value = '';
+    log(`Saved to ${project}/${section}`, 'ok');
+  } catch(e) {
+    box.className = 'result-box error';
+    box.textContent = 'Error: ' + e.message;
+    log('Save failed: ' + e.message, 'err');
+  }
+  btn.disabled = false; btn.textContent = 'Save to Quinn';
+}
+
+async function chatQuinn() {
+  const msg = document.getElementById('chatQuery').value.trim();
+  if (!msg) return;
+
+  const btn = document.getElementById('chatBtn');
+  const box = document.getElementById('chatResult');
+  btn.disabled = true; btn.textContent = 'Thinking...';
+  box.className = 'result-box loading';
+  box.textContent = 'Quinn is thinking...';
+
+  log(`Chat: "${msg.slice(0,60)}..."`, 'info');
+
+  try {
+    const r = await callTool('mcp__quinn__quinn_chat', { params: { message: msg } });
+    const d = parseQuinnResult(r);
+    box.className = 'result-box success';
+    box.textContent = (d.response || d.result || JSON.stringify(d)) +
+      (d.source ? `\n\n[Source: ${d.source}${d.model ? ' / ' + d.model : ''}]` : '');
+    log(`Quinn response (${d.source || 'unknown'}): ${(d.response||'').slice(0,80)}...`, 'ok');
+  } catch(e) {
+    box.className = 'result-box error';
+    box.textContent = 'Error: ' + e.message;
+    log('Chat failed: ' + e.message, 'err');
+  }
+  btn.disabled = false; btn.textContent = 'Ask';
+}
+
+// ── Quinn Command Center Chat Box ─────────────────────────────
+// LOCAL QUINN ONLY. Routes to /api/quinn/local-chat.
+// NO fallback. NO Anthropic. NO OpenAI. Fails closed.
+
+const qccMessages = [];  // conversation history (user + assistant only)
+
+function qccAppend(role, content, meta) {
+  const history = document.getElementById('qcc-history');
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
+
+  const label = document.createElement('div');
+  label.style.cssText = 'font-size:11px;color:var(--muted);';
+  label.textContent = role === 'user' ? 'You' : 'Quinn [LOCAL]';
+  if (meta) label.textContent += ' | ' + meta;
+
+  const bubble = document.createElement('div');
+  bubble.style.cssText = role === 'user'
+    ? 'background:var(--accent);color:#fff;border-radius:8px 8px 2px 8px;padding:8px 12px;max-width:80%;align-self:flex-end;font-size:14px;white-space:pre-wrap;'
+    : 'background:var(--card);border:1px solid var(--border);border-radius:8px 8px 8px 2px;padding:8px 12px;max-width:90%;align-self:flex-start;font-size:14px;white-space:pre-wrap;';
+  bubble.textContent = content;
+
+  wrap.appendChild(label);
+  wrap.appendChild(bubble);
+  history.appendChild(wrap);
+  history.scrollTop = history.scrollHeight;
+}
+
+function qccSetStatus(msg, color) {
+  const el = document.getElementById('qcc-status');
+  el.textContent = msg;
+  el.style.color = color || 'var(--muted)';
+}
+
+async function qccSend() {
+  const input = document.getElementById('qcc-input');
+  const btn = document.getElementById('qcc-btn');
+  const text = input.value.trim();
+  if (!text) return;
+
+  qccMessages.push({ role: 'user', content: text });
+  qccAppend('user', text);
+  input.value = '';
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  qccSetStatus('[ROUTING] Local Quinn only...', 'var(--yellow)');
+
+  try {
+    const res = await fetch('/api/quinn/local-chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Quinn-Lock': 'local-only',
+      },
+      body: JSON.stringify({ messages: qccMessages, context: 'quinn-command-center' }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      // Fail closed — show error, no retry to external providers.
+      const hint = data.hint || '';
+      throw new Error((data.error || `HTTP ${res.status}`) + (hint ? '\n' + hint : ''));
+    }
+
+    const content = data.content || data.message || '[No response returned]';
+    const meta = (data.source || 'local_ollama') + (data.qdrant_hits ? ' | ' + data.qdrant_hits + ' hits' : '');
+
+    qccMessages.push({ role: 'assistant', content });
+    qccAppend('assistant', content, meta);
+    qccSetStatus('[OK] Local Quinn responded | fallbackTriggered: false', 'var(--green)');
+  } catch (e) {
+    // Fail closed — no routing elsewhere.
+    qccSetStatus('[OFFLINE] Local Quinn unavailable. fallbackTriggered: false. Start START_QUINN_BRIDGE.bat.', 'var(--red)');
+    qccAppend('assistant', '[LOCAL QUINN OFFLINE]\n\n' + e.message + '\n\nNo fallback is active for this chat. Start the Quinn bridge to continue.', 'ERROR');
+    log('Quinn local-chat error: ' + e.message, 'err');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send';
+}
+
+init();
+</script>
+</body>
+</html>

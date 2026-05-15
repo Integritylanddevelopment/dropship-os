@@ -4,8 +4,10 @@
 // NO EMOJIS -- plain text labels only
 
 const QUINN_ENDPOINT = process.env.QUINN_ENDPOINT || '';
-const QUINN_SECRET   = process.env.QUINN_BRIDGE_SECRET || 'dropship-os-quinn-2026-alex';
+const QUINN_SECRET   = process.env.QUINN_BRIDGE_SECRET || '';
 const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
+const FALLBACK_URL   = process.env.FALLBACK_API_URL || '';
+const FALLBACK_MODEL = process.env.FALLBACK_MODEL || '';
 const ENGINE_URL     = process.env.SHIPSTACK_ENGINE_URL || '';
 
 // ── Intelligence: Quinn first, Anthropic fallback ─────────────────────────────
@@ -27,10 +29,10 @@ async function ask(query) {
   }
   if (ANTHROPIC_KEY) {
     try {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
+      const r = await fetch(FALLBACK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 900,
+        body: JSON.stringify({ model: FALLBACK_MODEL, max_tokens: 900,
           messages: [{ role: 'user', content: query }] }),
         signal: AbortSignal.timeout(15000)
       });

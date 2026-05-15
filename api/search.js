@@ -66,10 +66,12 @@ export default async function handler(req) {
     }
   }
 
-  // ── Route 2: Claude fallback — answer from training knowledge ─
-  if (anthropicKey) {
+  // ── Route 2: Fallback — answer from configured fallback provider ─
+  const fallbackUrl = process.env.FALLBACK_API_URL;
+  const fallbackModel = process.env.FALLBACK_MODEL;
+  if (anthropicKey && fallbackUrl && fallbackModel) {
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch(fallbackUrl, {
         method: 'POST',
         headers: {
           'x-api-key': anthropicKey,
@@ -77,7 +79,7 @@ export default async function handler(req) {
           'content-type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
+          model: fallbackModel,
           max_tokens: 600,
           messages: [{
             role: 'user',
