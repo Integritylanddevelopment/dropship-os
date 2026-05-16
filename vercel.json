@@ -1,6 +1,7 @@
 {
   "devCommand": "npx serve . --listen 3000 --no-clipboard",
   "rewrites": [
+    { "source": "/api/health",            "destination": "/api/health" },
     { "source": "/api/quinn/local-chat",  "destination": "/api/quinn/local-chat" },
     { "source": "/api/webhook",           "destination": "/api/webhook" },
     { "source": "/api/supplier",          "destination": "/api/supplier" },
