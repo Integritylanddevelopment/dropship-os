@@ -505,7 +505,7 @@ a:hover{text-decoration:underline}
         </div>
         <div class="card-title" style="margin-top:0;margin-bottom:12px"><i class="card-icon icon-teal">&#x1F3C6;</i>Top Product Opportunities</div>
         <div id="product-list">
-          <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Run <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">python decision_engine.py</code> to load real products</div>
+          <div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Run [RUN RESEARCH] above to load products from AI</div>
         </div>
       </div>
       <div class="card">
@@ -902,7 +902,7 @@ a:hover{text-decoration:underline}
     </div>
     <div class="card">
       <div class="card-title"><i class="card-icon icon-gold">&#x1F4E6;</i>Margin by Product</div>
-      <div id="revenue-product-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Loading product data&#8230;</div></div>
+      <div id="revenue-product-list"><div style="color:var(--muted);font-size:13px;padding:12px 0">Run [RUN RESEARCH] to populate product data</div></div>
     </div>
   </div>
 
@@ -1272,7 +1272,10 @@ function populateProducts(m) {
   var cntEl = document.getElementById('prod-count');
   if (cntEl) cntEl.innerHTML = fmtNum(products.length || null);
   var list = document.getElementById('product-list');
-  if (!products.length) return;
+  if (!products.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px">Run [RUN RESEARCH] above to load products from AI</div>';
+    return;
+  }
   list.innerHTML = products.slice(0, 8).map(function(p, i) {
     var col = p.margin_pct >= 60 ? 'var(--teal)' : (p.margin_pct < 40 ? 'var(--red)' : 'var(--gold)');
     var bestCombo = _allCombos.find(function(c){ return c.product === p.name; });

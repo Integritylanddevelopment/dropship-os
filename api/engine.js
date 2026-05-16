@@ -89,12 +89,12 @@ async function stageResearch() {
   ]);
   const prodData = parseAIJson(prodRes.text, {});
   const chanData = parseAIJson(chanRes.text, {});
-  const products = (prodData.products && prodData.products.length) ? prodData.products : DEFAULT_PRODUCTS;
-  const channels = (chanData.channels && chanData.channels.length) ? chanData.channels : DEFAULT_CHANNELS;
+  const products = (prodData.products && prodData.products.length) ? prodData.products : [];
+  const channels = (chanData.channels && chanData.channels.length) ? chanData.channels : [];
   return {
     stage: 'research', status: 'done', source: prodRes.source,
     products, channels,
-    top_combos: DEFAULT_COMBOS.slice(0, 3),
+    top_combos: [],
     timestamp: new Date().toISOString()
   };
 }
@@ -103,16 +103,11 @@ async function stageDecision() {
   const intel = await ask(
     'Gary Vee + Hormozi + Kamil Sattar dropshipping strategy 2025: top 3 product x channel combos to max volume on right now. Give: product, channel, score 0-100, action (SCALE/TEST/KILL), one-line reason. Be direct.'
   );
-  const scored = DEFAULT_COMBOS.slice().sort((a, b) => b.score - a.score);
   return {
     stage: 'decision', status: 'done', source: intel.source,
-    ai_recommendation: intel.text,
-    top_combos: scored.slice(0, 3),
-    scale: scored.filter(c => c.action === 'SCALE'),
-    test:  scored.filter(c => c.action === 'TEST'),
-    kill:  scored.filter(c => c.action === 'KILL'),
-    summary: { scale_count: scored.filter(c => c.action === 'SCALE').length, kill_count: 0 },
-    products: DEFAULT_PRODUCTS, channels: DEFAULT_CHANNELS,
+    top_combos: [], scale: [], test: [], kill: [],
+    summary: { scale_count: 0, kill_count: 0 },
+    products: [], channels: [],
     generated_at: new Date().toISOString(), timestamp: new Date().toISOString()
   };
 }
@@ -121,7 +116,7 @@ async function stageShop() {
   const intel = await ask(
     'For Pet Hair Remover, Posture Corrector, Facial Roller, Resistance Bands, AB Roller: give best TikTok/Pinterest hook + key customer pain point + strongest buy reason. 2 sentences each product.'
   );
-  return { stage: 'shop', status: 'done', source: intel.source, shop_intel: intel.text, products: DEFAULT_PRODUCTS, timestamp: new Date().toISOString() };
+  return { stage: 'shop', status: 'done', source: intel.source, shop_intel: intel.text, products: [], timestamp: new Date().toISOString() };
 }
 
 async function stagePrometheus() {
@@ -140,7 +135,7 @@ async function stageRevenue(req) {
   } catch (e) { /* offline */ }
   return {
     stage: 'revenue', status: 'offline',
-    channels: DEFAULT_CHANNELS, products: DEFAULT_PRODUCTS, top_combos: DEFAULT_COMBOS,
+    channels: [], products: [], top_combos: [],
     revenue: { today_usd: null, month_usd: null, total_orders: null },
     sources: { stripe: 'offline', qdrant: 'offline', decisions: 'static' },
     message: 'Add STRIPE_SECRET_KEY to Vercel env vars to see live revenue.'
