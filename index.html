@@ -1698,6 +1698,8 @@ function startActivityLog(stage) {
 }
 function stopActivityLog(stage) {
   if (_activityPollers[stage]) { clearInterval(_activityPollers[stage]); delete _activityPollers[stage]; }
+  var logEl = document.getElementById(stage + '-activity-log');
+  if (logEl) { logEl.classList.remove('visible'); logEl.innerHTML = ''; }
 }
 
 // â”€â”€ Set stage-status display â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1733,6 +1735,9 @@ function handleStageResult(stage, data) {
   var msg = '[DONE] Source: ' + src;
 
   if (stage === 'research') {
+    // Remove any legacy raw-text intel card from old code
+    var oldCard = document.getElementById('research-intel');
+    if (oldCard) oldCard.remove();
     if (data.products && data.products.length) {
       _allProducts = data.products;
       var list = document.getElementById('product-list');
