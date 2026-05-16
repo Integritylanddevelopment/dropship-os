@@ -72,16 +72,28 @@ const DEFAULT_PRODUCTS = [
   { name: 'AB Roller',         niche: 'fitness tools',   margin_pct: 55, trending: false }
 ];
 
+// ── Parse JSON from AI response, fallback to defaults ────────────────────────
+function parseAIJson(text, fallback) {
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (match) { const parsed = JSON.parse(match[0]); if (parsed && typeof parsed === 'object') return parsed; }
+  } catch (e) { /* fall through */ }
+  return fallback;
+}
+
 // ── Stage handlers ────────────────────────────────────────────────────────────
 async function stageResearch() {
   const [prodRes, chanRes] = await Promise.all([
-    ask('Top 5 dropshipping products with highest profit margin in 2025. For each: name, niche, estimated margin %, why it sells, best supplier (Zendrop/AutoDS). Be specific and direct.'),
-    ask('Cheapest organic channels for dropshipping in 2025. Rank TikTok, Pinterest, YouTube Shorts, Reddit, Instagram by CPM and viral potential. Give specific CPM numbers and best product types for each.')
+    ask('Return ONLY valid JSON, no markdown. Format: {"products":[{"name":"...","niche":"...","margin_pct":72,"trending":true,"supplier":"Zendrop"}]}. List top 5 highest-margin dropshipping products for 2026. Real products, real margins.'),
+    ask('Return ONLY valid JSON, no markdown. Format: {"channels":[{"key":"tiktok_organic","label":"TikTok Organic","cpm":0,"viral_coeff":1.6,"score":95}]}. List 7 channels ranked by CPM cost for dropshipping: TikTok Organic, Pinterest Organic, YouTube Shorts, Reddit Organic, Instagram Reels, X/Twitter, Meta Paid.')
   ]);
+  const prodData = parseAIJson(prodRes.text, {});
+  const chanData = parseAIJson(chanRes.text, {});
+  const products = (prodData.products && prodData.products.length) ? prodData.products : DEFAULT_PRODUCTS;
+  const channels = (chanData.channels && chanData.channels.length) ? chanData.channels : DEFAULT_CHANNELS;
   return {
     stage: 'research', status: 'done', source: prodRes.source,
-    product_intel: prodRes.text, channel_intel: chanRes.text,
-    products: DEFAULT_PRODUCTS, channels: DEFAULT_CHANNELS,
+    products, channels,
     top_combos: DEFAULT_COMBOS.slice(0, 3),
     timestamp: new Date().toISOString()
   };

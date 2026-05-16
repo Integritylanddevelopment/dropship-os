@@ -1755,7 +1755,6 @@ function handleStageResult(stage, data) {
       if (cnt) cnt.textContent = data.products.length;
     }
     if (data.channels && data.channels.length) populateChannels({ channels: data.channels });
-    if (data.product_intel) injectIntelCard('research-status', 'research-intel', data.product_intel, data.channel_intel);
     msg = '[DONE] ' + (data.products || []).length + ' products | ' + (data.channels || []).length + ' channels | source: ' + src;
   }
   else if (stage === 'decision') {
@@ -1763,7 +1762,6 @@ function handleStageResult(stage, data) {
     if (fakeM.top_combos.length || fakeM.scale.length) populateDecision(fakeM);
     if (data.channels) populateChannels({ channels: data.channels });
     if (data.products) { _allProducts = data.products; _allCombos = (fakeM.scale || []).concat(fakeM.test || []); }
-    if (data.ai_recommendation) injectIntelCard('decision-status', 'decision-intel', data.ai_recommendation);
     msg = '[DONE] ' + (data.top_combos || []).length + ' combos scored | source: ' + src;
   }
   else if (stage === 'shop') {
