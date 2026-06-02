@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quinn Launcher OS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+      background-attachment: fixed;
+      color: #e0e6ff;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .topbar {
+      background: rgba(10, 20, 40, 0.95);
+      border-bottom: 1px solid rgba(0, 255, 200, 0.2);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-left {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .topbar-clock {
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #00ffff;
+    }
+
+    .topbar-date {
+      color: #9099ff;
+    }
+
+    .topbar-right {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.online {
+      background: #00ff88;
+      box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+    }
+
+    .status-dot.offline {
+      background: #ff3366;
+      box-shadow: 0 0 8px rgba(255, 51, 102, 0.6);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .service-status {
+      background: rgba(15, 25, 50, 0.9);
+      border-bottom: 1px solid rgba(0, 200, 255, 0.15);
+      padding: 12px 24px;
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      z-index: 99;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 255, 200, 0.3) transparent;
+    }
+
+    .service-tile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(20, 40, 80, 0.7);
+      border: 1px solid rgba(0, 255, 200, 0.2);
+      border-radius: 4px;
+      white-space: nowrap;
+      font-size: 12px;
+      min-width: fit-content;
+      transition: all 0.3s ease;
+    }
+
+    .service-tile:hover {
+      background: rgba(30, 60, 100, 0.9);
+      border-color: rgba(0, 255, 200, 0.5);
+      box-shadow: 0 0 12px rgba(0, 255, 200, 0.3);
+    }
+
+    .service-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .service-dot.online {
+      background: #00ff88;
+      box-shadow: 0 0 6px rgba(0, 255, 136, 0.8);
+    }
+
+    .service-dot.offline {
+      background: #ff3366;
+      box-shadow: 0 0 6px rgba(255, 51, 102, 0.8);
+    }
+
+    .service-label {
+      color: #a0a8ff;
+    }
+
+    .service-port {
+      color: #6080ff;
+      font-size: 11px;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      overflow: hidden;
+      z-index: 50;
+    }
+
+    .launcher-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .launcher-title {
+      font-size: 14px;
+      color: #00ffff;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-bottom: 1px solid rgba(0, 255, 200, 0.2);
+      padding-bottom: 8px;
+    }
+
+    .launcher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      overflow-y: auto;
+      padding-right: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 255, 200, 0.3) transparent;
+    }
+
+    .launcher-tile {
+      background: linear-gradient(135deg, rgba(30, 50, 100, 0.8), rgba(20, 40, 80, 0.8));
+      border: 1px solid rgba(0, 255, 200, 0.25);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 12px;
+      text-align: center;
+      text-decoration: none;
+      color: #e0e6ff;
+      min-height: 100px;
+    }
+
+    .launcher-tile:hover {
+      background: linear-gradient(135deg, rgba(50, 80, 150, 0.9), rgba(40, 60, 120, 0.9));
+      border-color: rgba(0, 255, 200, 0.6);
+      box-shadow: 0 0 20px rgba(0, 255, 200, 0.4), inset 0 0 20px rgba(0, 255, 200, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .launcher-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 255, 200, 0.1);
+      border-radius: 4px;
+    }
+
+    .launcher-label {
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .activity-section {
+      flex: 0 0 300px;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid rgba(0, 255, 200, 0.2);
+      padding-left: 20px;
+    }
+
+    .activity-feed {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 255, 200, 0.3) transparent;
+    }
+
+    .activity-card {
+      background: rgba(20, 40, 80, 0.6);
+      border: 1px solid rgba(0, 255, 200, 0.15);
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 11px;
+      color: #a0a8ff;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .activity-card:hover {
+      background: rgba(30, 60, 100, 0.8);
+      border-color: rgba(0, 255, 200, 0.4);
+    }
+
+    .activity-time {
+      color: #6080ff;
+      font-size: 10px;
+    }
+
+    .activity-action {
+      color: #e0e6ff;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    .activity-empty {
+      color: #606080;
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+    }
+
+    .quickchat-bar {
+      background: rgba(10, 20, 40, 0.95);
+      border-top: 1px solid rgba(0, 255, 200, 0.2);
+      padding: 12px 24px;
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .quickchat-input {
+      flex: 1;
+      background: rgba(20, 40, 80, 0.8);
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      border-radius: 4px;
+      padding: 8px 12px;
+      color: #e0e6ff;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .quickchat-input:focus {
+      outline: none;
+      border-color: rgba(0, 255, 200, 0.8);
+      background: rgba(30, 60, 100, 0.9);
+      box-shadow: 0 0 12px rgba(0, 255, 200, 0.3);
+    }
+
+    .quickchat-btn {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.8), rgba(0, 200, 100, 0.8));
+      border: 1px solid rgba(0, 255, 200, 0.5);
+      border-radius: 4px;
+      padding: 8px 20px;
+      color: #0a0e27;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .quickchat-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 200, 0.9), rgba(0, 220, 150, 0.9));
+      box-shadow: 0 0 12px rgba(0, 255, 200, 0.6);
+    }
+
+    .quickchat-btn:active {
+      transform: scale(0.98);
+    }
+
+    .quickchat-response {
+      position: fixed;
+      bottom: 60px;
+      right: 24px;
+      max-width: 300px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 200, 0.5);
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 11px;
+      color: #a0a8ff;
+      z-index: 101;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 200, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 255, 200, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-clock" id="clock">00:00:00</div>
+      <div class="topbar-date" id="date">Loading...</div>
+    </div>
+    <div class="topbar-right">
+      <span>Stack Status:</span>
+      <div class="status-dot offline" id="systemStatus"></div>
+    </div>
+  </div>
+
+  <div class="service-status" id="serviceStatus">
+    <div class="service-tile">
+      <div class="service-dot offline" id="qdrant-dot"></div>
+      <span class="service-label">Qdrant</span>
+      <span class="service-port">:6333</span>
+    </div>
+    <div class="service-tile">
+      <div class="service-dot offline" id="ollama-dot"></div>
+      <span class="service-label">Ollama</span>
+      <span class="service-port">:11434</span>
+    </div>
+    <div class="service-tile">
+      <div class="service-dot offline" id="quinn-bridge-dot"></div>
+      <span class="service-label">Quinn Bridge</span>
+      <span class="service-port">:8765</span>
+    </div>
+    <div class="service-tile">
+      <div class="service-dot offline" id="quinn-dashboard-dot"></div>
+      <span class="service-label">Quinn Dashboard</span>
+      <span class="service-port">:8888</span>
+    </div>
+    <div class="service-tile">
+      <div class="service-dot offline" id="shipstack-dot"></div>
+      <span class="service-label">ShipStack</span>
+      <span class="service-port">:3000</span>
+    </div>
+    <div class="service-tile">
+      <div class="service-dot offline" id="prometheus-dot"></div>
+      <span class="service-label">Prometheus</span>
+      <span class="service-port">:8766</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="launcher-section">
+      <div class="launcher-title">Applications & Actions</div>
+      <div class="launcher-grid">
+        <a class="launcher-tile" href="http://localhost:8888" target="_blank">
+          <div class="launcher-icon">🎯</div>
+          <div class="launcher-label">Quinn Command Center</div>
+        </a>
+        <a class="launcher-tile" href="http://localhost:3000" target="_blank">
+          <div class="launcher-icon">📦</div>
+          <div class="launcher-label">ShipStack</div>
+        </a>
+        <a class="launcher-tile" href="http://localhost:8888" target="_blank">
+          <div class="launcher-icon">💬</div>
+          <div class="launcher-label">Quinn Chat</div>
+        </a>
+        <button class="launcher-tile" id="backupBtn">
+          <div class="launcher-icon">💾</div>
+          <div class="launcher-label">GitHub Backup</div>
+        </button>
+        <button class="launcher-tile" id="reindexBtn">
+          <div class="launcher-icon">🔍</div>
+          <div class="launcher-label">Reindex Quinn</div>
+        </button>
+        <button class="launcher-tile" id="restartBtn">
+          <div class="launcher-icon">🔄</div>
+          <div class="launcher-label">Restart Stack</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="activity-section">
+      <div class="launcher-title">Recent Activity</div>
+      <div class="activity-feed" id="activityFeed">
+        <div class="activity-empty">Waiting for activity...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quickchat-bar">
+    <input 
+      class="quickchat-input" 
+      id="chatInput" 
+      type="text" 
+      placeholder="Ask Quinn anything... (press Enter to send)"
+      autocomplete="off"
+    >
+    <button class="quickchat-btn" id="chatBtn">Send</button>
+  </div>
+
+  <script>
+    const CONFIG = {
+      QUINN_BRIDGE: 'http://localhost:8765',
+      QUINN_DASHBOARD: 'http://localhost:8888',
+      STATUS_POLL_INTERVAL: 15000,
+      ACTIVITY_POLL_INTERVAL: 30000,
+      LOCAL_ONLY: true,
+      ALLOW_CLOUD_FALLBACK: false
+    };
+
+    const SERVICES = [
+      { id: 'qdrant-dot', name: 'Qdrant', port: 6333 },
+      { id: 'ollama-dot', name: 'Ollama', port: 11434 },
+      { id: 'quinn-bridge-dot', name: 'Quinn Bridge', port: 8765 },
+      { id: 'quinn-dashboard-dot', name: 'Quinn Dashboard', port: 8888 },
+      { id: 'shipstack-dot', name: 'ShipStack', port: 3000 },
+      { id: 'prometheus-dot', name: 'Prometheus', port: 8766 }
+    ];
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = 
+        now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      document.getElementById('date').textContent = dateStr;
+    }
+
+    async function checkServiceStatus() {
+      try {
+        const response = await fetch(`${CONFIG.QUINN_DASHBOARD}/api/status`, { 
+          method: 'GET',
+          timeout: 5000 
+        });
+        
+        if (!response.ok) throw new Error('Status check failed');
+        const data = await response.json();
+        
+        SERVICES.forEach(service => {
+          const dot = document.getElementById(service.id);
+          const isOnline = data.services && data.services[service.name.toLowerCase()] === 'online';
+          if (dot) {
+            dot.className = `service-dot ${isOnline ? 'online' : 'offline'}`;
+          }
+        });
+        
+        const systemDot = document.getElementById('systemStatus');
+        const allOnline = SERVICES.every(s => {
+          const dot = document.getElementById(s.id);
+          return dot.className.includes('online');
+        });
+        
+        if (systemDot) {
+          systemDot.className = `status-dot ${allOnline ? 'online' : 'offline'}`;
+        }
+      } catch (error) {
+        console.error('Service status check failed:', error);
+        SERVICES.forEach(service => {
+          const dot = document.getElementById(service.id);
+          if (dot) dot.className = 'service-dot offline';
+        });
+        document.getElementById('systemStatus').className = 'status-dot offline';
+      }
+    }
+
+    async function updateActivityFeed() {
+      try {
+        const response = await fetch(`${CONFIG.QUINN_DASHBOARD}/api/recent_actions`, { 
+          method: 'GET',
+          timeout: 5000 
+        });
+        
+        if (!response.ok) throw new Error('Activity fetch failed');
+        const actions = await response.json();
+        const feed = document.getElementById('activityFeed');
+        
+        if (!actions || actions.length === 0) {
+          feed.innerHTML = '<div class="activity-empty">No recent activity</div>';
+          return;
+        }
+        
+        feed.innerHTML = actions.slice(0, 10).map(action => `
+          <div class="activity-card">
+            <div class="activity-time">${new Date(action.timestamp).toLocaleTimeString()}</div>
+            <div class="activity-action">${action.action}</div>
+            ${action.details ? `<div style="color: #606080; margin-top: 2px; font-size: 10px;">${action.details}</div>` : ''}
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Activity feed update failed:', error);
+      }
+    }
+
+    async function sendChatMessage(message) {
+      if (!message.trim()) return;
+      
+      try {
+        const response = await fetch(`${CONFIG.QUINN_BRIDGE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 30000,
+          body: JSON.stringify({ message: message.trim() })
+        });
+        
+        if (!response.ok) throw new Error('Chat failed');
+        const data = await response.json();
+        
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'quickchat-response';
+        responseDiv.textContent = data.response || 'Quinn is thinking...';
+        document.body.appendChild(responseDiv);
+        
+        setTimeout(() => responseDiv.remove(), 5000);
+        document.getElementById('chatInput').value = '';
+      } catch (error) {
+        console.error('Chat error:', error);
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'quickchat-response';
+        responseDiv.style.borderColor = 'rgba(255, 51, 102, 0.5)';
+        responseDiv.style.background = 'rgba(255, 51, 102, 0.1)';
+        responseDiv.textContent = 'Quinn bridge unavailable';
+        document.body.appendChild(responseDiv);
+        setTimeout(() => responseDiv.remove(), 3000);
+      }
+    }
+
+    document.getElementById('backupBtn').addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${CONFIG.QUINN_BRIDGE}/backup`, { method: 'POST', timeout: 60000 });
+        if (response.ok) {
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'quickchat-response';
+          responseDiv.textContent = 'Backup complete';
+          document.body.appendChild(responseDiv);
+          setTimeout(() => responseDiv.remove(), 3000);
+        }
+      } catch (error) {
+        console.error('Backup error:', error);
+      }
+    });
+
+    document.getElementById('reindexBtn').addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${CONFIG.QUINN_BRIDGE}/reindex`, { method: 'POST', timeout: 60000 });
+        if (response.ok) {
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'quickchat-response';
+          responseDiv.textContent = 'Reindexing Quinn...';
+          document.body.appendChild(responseDiv);
+          setTimeout(() => responseDiv.remove(), 3000);
+        }
+      } catch (error) {
+        console.error('Reindex error:', error);
+      }
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${CONFIG.QUINN_DASHBOARD}/api/restart`, { method: 'POST', timeout: 60000 });
+        if (response.ok) {
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'quickchat-response';
+          responseDiv.textContent = 'Restarting stack...';
+          document.body.appendChild(responseDiv);
+          setTimeout(() => responseDiv.remove(), 3000);
+        }
+      } catch (error) {
+        console.error('Restart error:', error);
+      }
+    });
+
+    document.getElementById('chatBtn').addEventListener('click', () => {
+      const message = document.getElementById('chatInput').value;
+      if (message.trim()) {
+        sendChatMessage(message);
+      }
+    });
+
+    document.getElementById('chatInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendChatMessage(document.getElementById('chatInput').value);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateClock();
+      checkServiceStatus();
+      updateActivityFeed();
+      setInterval(updateClock, 1000);
+      setInterval(checkServiceStatus, CONFIG.STATUS_POLL_INTERVAL);
+      setInterval(updateActivityFeed, CONFIG.ACTIVITY_POLL_INTERVAL);
+    });
+  </script>
+</body>
+</html>

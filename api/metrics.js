@@ -1,15 +1,20 @@
 // ═══════════════════════════════════════════════════════════════
-// Dropship OS — Live Metrics API (Vercel Edge Function)
+// ShipStack — Live Metrics API (Local Express.js handler)
 //
 // Returns a single JSON object with ALL live dashboard data:
 //   - Stripe: today's revenue, orders, avg order value
-//   - Qdrant: collection counts via Quinn bridge /stats
+//   - Qdrant: dropship_intel collection stats via Quinn bridge /stats
 //   - Decision engine: scores, channel rankings, product combos
 //     (from static metrics.json written by decision_engine.py)
 //
-// Vercel env vars:
+// NOTE: ShipStack ONLY references dropship_intel collection.
+// Quinn-owned collections (strategy_books, general_knowledge,
+// commandcore_memory, worker_log, global_directives) are NOT
+// referenced here. ShipStack uses Quinn bridge as a TOOL only.
+//
+// Env vars (from .env.local):
 //   STRIPE_SECRET_KEY      — Stripe secret key (sk_live_... or sk_test_...)
-//   QUINN_ENDPOINT         — ngrok URL for Quinn bridge
+//   QUINN_ENDPOINT         — Quinn bridge URL (http://localhost:8765)
 //   QUINN_BRIDGE_SECRET    — bridge auth token
 // ═══════════════════════════════════════════════════════════════
 
@@ -36,11 +41,17 @@ export default async function handler(req) {
   const qdrantData = qdrant.status === 'fulfilled' ? qdrant.value   : null;
   const engine   = decisions.status === 'fulfilled' ? decisions.value : null;
 
+  // Extract only dropship_intel from Quinn's /stats response
+  const dropshipIntel = qdrantData?.dropship_intel ?? null;
+
   const payload = {
     generated_at: new Date().toISOString(),
     stale: !engine,
     revenue: revenue ?? { today_usd: null, total_orders: null, avg_order_value: null, currency: 'usd' },
-    qdrant: qdrantData ?? { dropship_intel: null, strategy_books: null, general_knowledge: null, commandcore_memory: null, total_vectors: null },
+    qdrant: {
+      dropship_intel: dropshipIntel,
+      total_vectors: dropshipIntel?.vector_count ?? null,
+    },
     channels:   engine?.channels   ?? [],
     top_combos: engine?.top_combos ?? [],
     scale:      engine?.scale      ?? [],
@@ -64,7 +75,7 @@ export default async function handler(req) {
 // ── Stripe: today's revenue + order count ───────────────────────────────────
 async function fetchStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) return null;
+  if (!key || key.includes('PLACEHOLDER')) return null;
 
   const now   = Math.floor(Date.now() / 1000);
   const start = now - (now % 86400); // midnight UTC
