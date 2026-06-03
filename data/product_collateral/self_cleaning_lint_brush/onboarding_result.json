@@ -1,0 +1,10 @@
+{
+  "product_name": "Self-Cleaning Lint Brush",
+  "product_slug": "self_cleaning_lint_brush",
+  "started_at": "2026-05-11T14:13:42.745024",
+  "steps": {
+    "A_zendrop": "done"
+  },
+  "status": "error",
+  "error": "'charmap' codec can't encode character '\\u2728' in position 2547: character maps to <undefined>"
+}

@@ -1,0 +1,126 @@
+{
+  "advisor": "Gary Vaynerchuk (Gary Vee)",
+  "core_philosophy": "Document don't create. Go where the attention is. Give value until it hurts, then ask. The market always wins — meet it where it is, not where you want it to be.",
+
+  "document_dont_create": {
+    "principle": "You don't need to manufacture content from scratch. Document your real journey — testing products, wins, losses, process. Authenticity > production value.",
+    "application": [
+      "Film yourself finding a product",
+      "Show the unboxing before launch",
+      "Post the result whether it wins or loses",
+      "Raw phone video over polished studio — always",
+      "Your real reaction is the content"
+    ]
+  },
+
+  "platform_native_rules": {
+    "tiktok": {
+      "tone": "Raw, fast, entertaining, trending sounds",
+      "format": "Hook in frame 1, deliver value or punchline fast, loop-friendly ending",
+      "length": "7-30 seconds for reach, up to 60s for depth",
+      "do": ["Use trending audio", "Jump cuts", "Text overlays", "Point at yourself", "Trending formats"],
+      "dont": ["Repurpose landscape video as-is", "Slow intros", "Salesy language first"]
+    },
+    "instagram": {
+      "tone": "Slightly more polished, still authentic, community-first",
+      "format": "Reels for reach, Stories for connection, Feed for credibility",
+      "length": "15-30s Reels for max distribution",
+      "do": ["Strong thumbnail frame", "Caption adds context", "Engage comments within 1 hour"],
+      "dont": ["Cross-post TikTok with watermark", "Ignore DMs", "Only post promotional content"]
+    },
+    "youtube": {
+      "tone": "Educational, long-form value, searchable",
+      "format": "Shorts for reach (same rules as TikTok), long-form for depth and trust",
+      "length": "Shorts: under 60s. Long-form: 8-20 min for retention signals",
+      "do": ["Strong thumbnail + title (CTR game)", "Pattern interrupt in first 30s", "End screens + cards"],
+      "dont": ["Slow intros", "Filler content", "Ignore comments"]
+    }
+  },
+
+  "jab_jab_jab_right_hook": {
+    "definition": "Give value 3 times before making an ask. The 'jab' is a gift — entertainment, education, or inspiration. The 'right hook' is the ask — buy, follow, click.",
+    "jab_types": [
+      "Educational tip relevant to your product's category",
+      "Entertainment — funny, surprising, relatable moment",
+      "Inspiration — transformation story, customer win",
+      "Behind-the-scenes — process, sourcing, testing",
+      "Community shoutout or response to a comment"
+    ],
+    "right_hook": "Only after 3+ jabs. Clear CTA. One ask per piece. Make it feel earned.",
+    "ratio": "At least 3 value posts for every 1 promotional post. Ideally 5:1."
+  },
+
+  "repurposing_pyramid": {
+    "pillar_piece": "One long-form piece of content (YouTube video, podcast, long-form post)",
+    "breakdown": {
+      "1_pillar_piece_generates": {
+        "long_clips_3_5min": 2,
+        "medium_clips_60_90s": 4,
+        "short_clips_15_30s": 8,
+        "quote_graphics": 6,
+        "tweet_threads": 3,
+        "instagram_carousels": 2,
+        "email_newsletters": 1,
+        "blog_post": 1,
+        "tiktok_shorts": 6,
+        "youtube_shorts": 4
+      },
+      "total_pieces_from_1_pillar": "30-40+ pieces of platform-native content"
+    },
+    "workflow": [
+      "Shoot one 10-15 min video or record one podcast episode",
+      "Transcribe it",
+      "Pull the 8 most quotable/useful moments as Shorts/TikToks",
+      "Pull 3-5 key points as carousel slides",
+      "Pull 1-2 stats or hot takes as Twitter/X threads",
+      "Write one email newsletter from the main insight",
+      "Schedule across platforms over 2 weeks"
+    ]
+  },
+
+  "posting_cadence": {
+    "tiktok": "3 posts/day minimum. 5/day is better. Volume is the algorithm.",
+    "instagram": "1 Reel/day + 3-5 Stories/day",
+    "youtube": "2 Shorts/week minimum + 1 long-form/week if possible",
+    "facebook": "1-2 posts/day if audience is there",
+    "x_twitter": "3-5 tweets/day",
+    "philosophy": "You're not posting too much. You're not posting enough. Most people post once and wonder why it didn't go viral."
+  },
+
+  "day_trading_attention": {
+    "principle": "Go where attention is cheapest RIGHT NOW. Early adopter advantage is massive.",
+    "current_plays": [
+      "TikTok organic is still underpriced vs. reach you get",
+      "YouTube Shorts — Google's algorithm heavily rewards consistency",
+      "Instagram Reels — reach is back up, use it",
+      "Facebook — older demographic, often ignored, cheap attention"
+    ],
+    "evaluation_questions": [
+      "Where is my customer actually spending time today?",
+      "What platform is currently rewarding new creators most?",
+      "What format is getting pushed by the algorithm right now?"
+    ]
+  },
+
+  "engagement_strategy": {
+    "rule": "1 hour of engagement for every 1 hour of content creation",
+    "tactics": [
+      "Reply to every comment in first 60 minutes of posting",
+      "Comment on 20-30 posts in your niche daily (before AND after posting)",
+      "DM people who engage meaningfully",
+      "Ask a question in every caption",
+      "Pin the best comment to drive more engagement",
+      "Reply with video responses on TikTok to top comments"
+    ]
+  },
+
+  "content_types_that_win": [
+    "Raw/authentic over polished — lower production, higher trust",
+    "Behind-the-scenes — people are curious about process",
+    "Hot takes / opinions — polarizing drives engagement",
+    "Reactions — react to trends, news, or competitor content",
+    "Day-in-the-life — builds parasocial connection",
+    "Wins AND losses — vulnerability builds loyalty",
+    "Customer features — social proof + community building"
+  ]
+}

@@ -1,179 +1,185 @@
-# ShipStack Rules (Project-Specific Layer)
+# SHIPSTACK DIRECTIVES
 
-**Author:** ShipStack agent  
-**Layer:** Project-specific rules (on top of Quinn's Global Directives)  
-**Based on:** Quinn's canonical Global Directives (at `quinn-proxy/GLOBAL_DIRECTIVES.md`)  
-**Last updated:** 2026-06-03  
-**Status:** Active
+**Owner:** ShipStack agent
+**Last updated:** 2026-06-03
+**Document version:** 1.0
 
 ---
 
-## ShipStack-Specific Rules (Layer 2: Project Rules)
+# CRITICAL PREAMBLE
 
-### S1. Quinn Is My Infrastructure, Not My Codebase
-
-ShipStack depends on Quinn. Quinn does not depend on ShipStack. I call Quinn's bridge for LLM/search. I never modify Quinn's code. I never run Quinn installers or launchers.
+**The 17 Quinn Global Directives apply VERBATIM to ShipStack and CANNOT be overridden by anything in this file.** Call `quinn_badge()` to read them in full. The rules below are ShipStack-specific additions that layer on top of, and narrow, the globals.
 
 ---
 
-### S2. All LLM Inference Routes Through Quinn Bridge
+# SHIPSTACK DIRECTIVE 1: Quinn-First, No Direct Anthropic
 
-Every `POST http://127.0.0.1:8765/chat` call must include:
-- `messages`: list of {role, content} objects
-- `model` (optional): default is `llama3.2:3b` (forced for speed on CPU)
-
-NO direct Ollama calls. NO direct Anthropic API calls. The bridge handles fallback.
+All ShipStack AI requests route through Quinn HTTP bridge at `http://127.0.0.1:8765`. Never import `anthropic`, never call `api.anthropic.com` directly, never set `ANTHROPIC_API_KEY` in ShipStack code or env files. Quinn handles all LLM routing.
 
 ---
 
-### S3. Project Bucket Isolation Enforced
+# SHIPSTACK DIRECTIVE 2: Badge Per Tool
 
-All Quinn searches for ShipStack data must pass `project='ship_stack_ai'`. This ensures zero cross-contamination with other Quinn projects (family_history, generator_partners, etc.).
+Before every tool call (reading files, writing files, running commands, calling external APIs):
+1. Call `shipstack_badge()` to get a fresh one-shot token
+2. Execute the tool with the token in the header or body
+3. Call `shipstack_log_action()` to log the result
 
+The badge is single-use. Expired or consumed tokens refuse with 403. This enforces that ShipStack agents stay aware of current rules (Global Directive #4).
+
+---
+
+# SHIPSTACK DIRECTIVE 3: Lane = dropship-os/ Only
+
+All ShipStack files live in `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\` and nowhere else. Files written outside this path refuse with a path validation error. If you need to ask Quinn for something, write `HANDOFF_TO_QUINN_<DATE>_<TOPIC>.md` inside dropship-os/ and Quinn reads it next session.
+
+---
+
+# SHIPSTACK DIRECTIVE 4: HTTP Service, Not MCP
+
+ShipStack runs as an HTTP service on :8889 (or another claimed port). It is NOT an MCP server. Quinn is the MCP server; ShipStack exposes HTTP routes. Quinn calls ShipStack's routes. Architectural boundary: MCP = Quinn only, HTTP = ShipStack's interface.
+
+---
+
+# SHIPSTACK DIRECTIVE 5: Kill Before Launch
+
+On startup, before binding to any port, kill anything stale already listening on that port. Example:
+```powershell
+netstat -ano | find ":8889" | ForEach-Object { taskkill /PID (($ -split '\s+')[-1]) /F }
+```
+Then bind fresh. This prevents "address already in use" errors and ensures no ghost processes from prior crashes (Global Directive #5).
+
+---
+
+# SHIPSTACK DIRECTIVE 6: No Scheduled Tasks
+
+NEVER use `Register-ScheduledTask`, `schtasks.exe /create`, or any Windows Task Scheduler. Scheduled tasks cause respawn chaos when services die unexpectedly. If a service needs automatic startup, add it to `LAUNCH_SHIPSTACK.ps1` or a similar one-click launcher (Global Directive #6).
+
+---
+
+# SHIPSTACK DIRECTIVE 7: Naming Conventions
+
+Follow Quinn's standard exactly:
+- Top-level docs: `UPPER_SNAKE_CASE.md` (CLAUDE.md, BUILD_PLAN.md, SHIPSTACK_DIRECTIVES.md)
+- Handoffs: `HANDOFF_<DIRECTION>_<YYYY-MM-DD>[_<TOPIC>].md` (direction = FROM_QUINN or TO_QUINN)
+- Instructions: `INSTRUCTIONS_<DIRECTION>_<YYYY-MM-DD>_<TOPIC>.md`
+- Session summaries: `SESSION_SUMMARY_<YYYY-MM-DD>.md`
+- Python modules: `lower_snake_case.py`
+- PowerShell scripts: `UPPER_SNAKE_CASE.ps1` (verb-first: LAUNCH_SHIPSTACK.ps1, DEPLOY_GARYVEE_DASHBOARD.ps1)
+- Dates: ALWAYS ISO-8601 (`2026-06-03`). Never `JUNE_03`. Never `06-03`.
+
+---
+
+# SHIPSTACK DIRECTIVE 8: Handoff Direction is ONE-WAY
+
+Quinn writes `HANDOFF_FROM_QUINN_<DATE>.md` to dropship-os/. You read it. You reply with `HANDOFF_TO_QUINN_<DATE>.md` in the same folder. ShipStack NEVER originates `HANDOFF_FROM_SHIPSTACK_*` documents. The flow is: Quinn → (writes handoff) → ShipStack → (reads, replies) → Quinn.
+
+---
+
+# SHIPSTACK DIRECTIVE 9: UTF-8 Everywhere
+
+First line of every Python script:
 ```python
-# Correct:
-response = quinn_search(query='viral products', project='ship_stack_ai', top_k=10)
-
-# Wrong (cross-contamination):
-response = quinn_search(query='viral products')  # defaults to master bucket
+import sys
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 ```
+This prevents Windows console encoding errors that break logging and output (Global Directive #17).
 
 ---
 
-### S4. All Runtime Logs Stay in dropship-os/logs/
+# SHIPSTACK DIRECTIVE 10: Port Registry
 
-Never write to `quinn-proxy/logs/`. ShipStack has its own `logs/` folder. Log structure:
+Claim your ports and document them in CLAUDE.md Blueprint:
+- **8889** — ShipStack engine (HTTP service)
+- **8766** — Prometheus video generation
+- **3000** — Vercel frontend (already claimed)
+- **8765** — Quinn HTTP bridge (do not bind to this; you call it)
 
+Two services cannot share a port. Add Blueprint rows for every service you run.
+
+---
+
+# SHIPSTACK DIRECTIVE 11: Prometheus Ownership
+
+Prometheus (video generation engine) is ShipStack's as of 2026-06-03. You own:
+- Files: prometheus_engine.py, prometheus_monitor.py, prometheus.py
+- Port: 8766 (claimed)
+- Dependencies: Quinn HTTP bridge for LLM calls
+- Update CLAUDE.md Blueprint whenever Prometheus changes
+
+---
+
+# SHIPSTACK DIRECTIVE 12: No Leak Channels
+
+No ANTHROPIC_API_KEY in ShipStack code, .env files, or config. All LLM inference goes through Quinn bridge. This is auditable:
+```powershell
+Get-ChildItem 'dropship-os' -Recurse -File | Select-String 'ANTHROPIC_API_KEY|sk-ant-|api.anthropic.com' -List
 ```
-dropship-os/logs/
-  ├─ shipstack_engine.log
-  ├─ shipstack_engine.err
-  ├─ api_requests.log
-  └─ decisions.log
+Zero results = compliant.
+
+---
+
+# SHIPSTACK DIRECTIVE 13: Action Logging
+
+Every tool call logs synchronously to `dropship-os/logs/shipstack_actions.jsonl` (JSONL format). Log entry:
+```json
+{"timestamp": "2026-06-03T12:34:56Z", "tool_name": "read_file", "action": "read", "target": "/path", "result": "success", "summary": "...", "badge_token": "badge-xxx..."}
 ```
+Append-only, never edit existing entries.
 
 ---
 
-### S5. Badge Protocol Applies to Every Quinn Tool Call
+# SHIPSTACK DIRECTIVE 14: Prometheus & Social AI Depend on ShipStack Engine
 
-When working as a Claude agent in Cowork:
+Prometheus and Social AI agents call ShipStack engine routes (via HTTP on :8889). ShipStack engine calls Quinn bridge for LLM inference. The dependency chain is: Prometheus → ShipStack engine → Quinn bridge. No cross-calling between Prometheus and Social AI. All AI requests flow through ShipStack engine.
 
+---
+
+# SHIPSTACK DIRECTIVE 15: .gitignore Must Protect Secrets
+
+ShipStack's `.gitignore` must include:
 ```
-1. quinn_badge() → get fresh token
-2. quinn_search(..., badge_token=...)
-3. quinn_add_context(..., badge_token=...)
+.env
+.env.local
+.env.production
+.env.*.local
+logs/
+__pycache__/
+*.pyc
+.vercel/
+node_modules/
 ```
-
-Token is one-shot, 60 second expiry, no override. This is how Quinn enforces guardrails.
-
----
-
-### S6. Knowledge Lives in Quinn, Not in Files
-
-Use `quinn_add_context(project='ship_stack_ai', section='...', content='...')` to log decisions. Quinn mirrors it to `.chatgpt-copilot/projects/ship_stack_ai.md`, embeds into Chroma, and makes it searchable next session.
-
-Never edit project markdown files directly. Use the Quinn MCP tool.
+No `.env*` files committed. Secrets stay in .env.local only (git-ignored).
 
 ---
 
-### S7. No Quinn Infrastructure Changes
+# SHIPSTACK DIRECTIVE 16: Vercel Env Vars ≠ Local .env
 
-Do NOT:
-- Edit `quinn-proxy/CLAUDE.md`, `GLOBAL_DIRECTIVES.md`, `.env`, `server.py`
-- Create new files in `quinn-proxy/`
-- Install Python packages into Quinn's environment
-- Modify Qdrant/Chroma directly
-- Stop/restart Quinn processes
-- Generate audits about Quinn (Quinn audits itself)
-
-If ShipStack needs something from Quinn infrastructure: write a request to `HANDOFF_TO_QUINN.md`.
+Vercel environment variables (STRIPE_SECRET_KEY, ANTHROPIC_API_KEY in Vercel deployments) are managed separately from local .env. Local ShipStack never has ANTHROPIC_API_KEY. Vercel frontend gets it via Vercel secrets, routed through Quinn bridge in Vercel functions if needed.
 
 ---
 
-### S8. Port 8889 Belongs to ShipStack Engine
+# SHIPSTACK DIRECTIVE 17: Terminal Windows Must Minimize
 
-When launching `shipstack_engine.py`:
-1. Kill anything on port 8889 first (directive #5: kill-before-launch)
-2. Start fresh
-3. No port conflicts
-4. Update CLAUDE.md Blueprint when service changes
-
----
-
-### S9. Cleanup Ritual at End of Every Session
-
-1. Update this CLAUDE.md with new architectural changes
-2. Write/append `HANDOFF_TO_QUINN.md`:
-   - What was built/changed
-   - Any infrastructure requests
-   - Any blockers
-   - Session summary
-3. `quinn_add_context(project='ship_stack_ai', section='session_summary', content='...')`
-4. Git commit to `dropship-os/`
+Any PowerShell script that spawns a window must minimize it on launch (Global Directive #13):
+```powershell
+$ErrorActionPreference = 'SilentlyContinue'
+try {
+  Add-Type -Name W -Namespace P -MemberDefinition '[DllImport("user32.dll")] public static extern bool ShowWindow(int h, int s);' -ErrorAction SilentlyContinue
+  $h = (Get-Process -Id $PID).MainWindowHandle
+  if ($h -ne 0) { [P.W]::ShowWindow($h, 6) | Out-Null }
+} catch {}
+```
+Or use `-WindowStyle Hidden` for `Start-Process` calls. No stray PowerShell windows piling up on the desktop.
 
 ---
 
-### S10. Use Quinn Tools, Not Host Tools
+# CHANGELOG
 
-When I'm a Claude agent (Cowork session), prefer Quinn tools:
-
-| Task | Use This |
-|------|----------|
-| Read file | `quinn_read_file` (logged) |
-| Edit file | `quinn_edit_file` (logged) |
-| Write file | `quinn_write_file` (logged) |
-| Run shell | `quinn_run_powershell` (logged) |
-| Search knowledge | `quinn_search` (partitioned) |
-| Add knowledge | `quinn_add_context` (mirrored) |
-| Fetch URL | `quinn_web_fetch` (logged) |
-
-Host tools (Read/Edit/Write from Cowork) bypass Quinn's guardrails. Only use them as fallback when Quinn equivalent is missing.
+| Date | Change |
+|------|--------|
+| 2026-06-03 | v1.0 — initial SHIPSTACK_DIRECTIVES.md. 17 directives codifying Quinn Global Directives + ShipStack-specific rules. |
 
 ---
 
-### S11. Vercel Deployment Notes
-
-- NO ANTHROPIC_API_KEY in Vercel env — route through Quinn bridge
-- STRIPE_SECRET_KEY: set in Vercel dashboard
-- QUINN_BRIDGE_SECRET: must match Quinn's bridge (dropship-os-quinn-2026-alex)
-- QUINN_ENDPOINT: populated by ngrok when Quinn is running locally
-
-To connect Vercel → local Quinn:
-1. Run `ngrok http 8765` in Quinn's shell
-2. Copy ngrok URL → Vercel QUINN_ENDPOINT
-3. Vercel → Quinn bridge :8765 → local Ollama/Anthropic fallback
-
----
-
-### S12. Viral Classification (Primary Decision Engine)
-
-First LLM inference target: Hormozi's viral metrics (scarcity, curiosity, urgency, usefulness, social proof). Use local Ollama for speed. Fall back to Anthropic when confidence < 0.7.
-
-Endpoint proposal: `POST /classify_product {product_description, supplier_url} → {viral_score, reasoning, suggested_price}`
-
----
-
-## Rule Hierarchy
-
-1. **Quinn's Global Directives** (supreme, universal - canonical at `quinn-proxy/GLOBAL_DIRECTIVES.md`)
-2. **ShipStack Rules** (this file - project-specific layer on top)
-3. **ShipStack CLAUDE.md** (project architecture & state)
-4. **HANDOFF_TO_QUINN.md** (session-to-session communication)
-
-When there's a conflict, Quinn's Global Directives win. When both are silent, use good judgment.
-
----
-
-## Current Status
-
-✅ Cleanup complete  
-✅ Lanes restored  
-✅ Quinn bridge ready  
-✅ Project bucket partitioned  
-⏳ shipstack_engine.py pending  
-⏳ End-to-end testing pending
-
----
-
-**Last updated:** 2026-06-03  
-**Written by:** ShipStack agent (Cowork session)
+**Read the Quinn Global Directives via `quinn_badge()` for the complete foundation.** These directives layer on top and do not replace them.

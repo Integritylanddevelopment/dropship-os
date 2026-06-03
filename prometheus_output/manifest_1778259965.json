@@ -1,0 +1,68 @@
+{
+  "status": "complete",
+  "product": "Pet Lint Roller Pro",
+  "niche": "pet accessories",
+  "generated_at": "2026-05-08T17:06:05.042983",
+  "script": "HOOK: Are you tired of lint all over your clothes after pet grooming sessions?\nPROBLEM: Pet hair sticks everywhere\u2014sheets, furniture, you!\nSOLUTION: Introducing the Pet Lint Roller Pro\u2014saves time, reduces hassle.\nPROOF: Check our Instagram for customer before-and-afters!\nCTA: Try it now and join the lint-free club! Link in bio.",
+  "source_video": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\runway_3fb52bd2-c0e_1778259938.mp4",
+  "outputs": {
+    "tiktok": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_tiktok.mp4",
+    "instagram": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_instagram.mp4",
+    "youtube": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_youtube.mp4",
+    "pinterest": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_pinterest.mp4",
+    "facebook": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_facebook.mp4",
+    "twitter": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_twitter.mp4"
+  },
+  "tools_used": {
+    "ffmpeg": true,
+    "whisper": true,
+    "ollama": true,
+    "runway": true,
+    "elevenlabs": true,
+    "heygen": true
+  },
+  "clips": [
+    {
+      "platform": "TikTok",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_tiktok.mp4",
+      "aspect": "9:16",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "Instagram Reels",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_instagram.mp4",
+      "aspect": "9:16",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "YouTube Shorts",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_youtube.mp4",
+      "aspect": "9:16",
+      "duration": 60,
+      "ready": true
+    },
+    {
+      "platform": "Pinterest",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_pinterest.mp4",
+      "aspect": "2:3",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "Facebook",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_facebook.mp4",
+      "aspect": "9:16",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "X / Twitter",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260508_1205\\Pet_Lint_Roller_Pro_twitter.mp4",
+      "aspect": "16:9",
+      "duration": 45,
+      "ready": true
+    }
+  ]
+}

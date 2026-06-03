@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ab Roller &mdash; 30 Days. No Gym. This Happened.</title>
+<meta name="description" content="The ab roller that engages 6 muscle groups, folds flat, and turns 5 minutes a day into visible results.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #1a1a1a;
+    --bg3: #242424;
+    --accent: #00d4aa;
+    --accent-dark: #00a882;
+    --white: #ffffff;
+    --gray: #aaaaaa;
+    --warn: #ff6b35;
+  }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+
+  .announce-bar {
+    background: var(--accent);
+    color: var(--bg);
+    text-align: center;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+  }
+
+  .hero {
+    background: linear-gradient(160deg, #0f0f0f 0%, #1a2e28 100%);
+    padding: 60px 20px 50px;
+    text-align: center;
+  }
+  .hero .hook {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 7vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero .tagline {
+    font-size: clamp(1rem, 3.5vw, 1.2rem);
+    color: var(--gray);
+    margin-bottom: 32px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .benefits { list-style: none; display: inline-block; text-align: left; margin-bottom: 36px; }
+  .benefits li { font-size: 1rem; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
+  .benefits li .check { color: var(--accent); font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+  .cta-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 1.15rem;
+    font-weight: 800;
+    padding: 18px 44px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+  }
+  .cta-btn:hover { background: var(--accent-dark); transform: translateY(-2px); }
+  .urgency { margin-top: 16px; font-size: 0.85rem; color: var(--warn); font-weight: 600; }
+  .urgency span { color: var(--gray); font-weight: 400; }
+
+  .product-img-wrap {
+    background: var(--bg3);
+    border: 2px solid #2a2a2a;
+    border-radius: 8px;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto 0;
+    max-width: 420px;
+    color: var(--gray);
+    font-size: 0.85rem;
+  }
+
+  .section { padding: 56px 20px; }
+  .section-alt { background: var(--bg2); }
+  .section h2 { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 800; margin-bottom: 32px; text-align: center; letter-spacing: -0.02em; }
+  .section h2 span { color: var(--accent); }
+
+  .muscle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .muscle {
+    background: var(--bg3);
+    border-radius: 6px;
+    padding: 16px 10px;
+    text-align: center;
+    border-top: 2px solid var(--accent);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .steps { display: flex; flex-direction: column; gap: 20px; }
+  .step { display: flex; gap: 20px; align-items: flex-start; background: var(--bg3); border-radius: 8px; padding: 24px; border-left: 3px solid var(--accent); }
+  .step-num { font-size: 1.8rem; font-weight: 900; color: var(--accent); flex-shrink: 0; line-height: 1; min-width: 36px; }
+  .step-text h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+  .step-text p { font-size: 0.92rem; color: var(--gray); }
+
+  .reviews { display: flex; flex-direction: column; gap: 20px; }
+  .review { background: var(--bg3); border-radius: 8px; padding: 24px; }
+  .review .stars { color: var(--accent); font-size: 1rem; margin-bottom: 10px; letter-spacing: 2px; }
+  .review p { font-size: 0.95rem; color: #dddddd; margin-bottom: 12px; line-height: 1.7; }
+  .review .reviewer { font-size: 0.82rem; color: var(--gray); font-weight: 600; }
+  .review .verified { color: var(--accent); font-size: 0.78rem; margin-left: 8px; }
+
+  .cta-section { background: linear-gradient(160deg, #0d2620 0%, #0f0f0f 100%); padding: 60px 20px; text-align: center; }
+  .cta-section h2 { font-size: clamp(1.4rem, 5vw, 2rem); font-weight: 800; margin-bottom: 12px; }
+  .cta-section p { color: var(--gray); margin-bottom: 28px; font-size: 0.95rem; }
+
+  footer { background: #080808; border-top: 1px solid #1e1e1e; padding: 28px 20px; text-align: center; }
+  footer p { color: var(--gray); font-size: 0.82rem; }
+  footer a { color: var(--accent); }
+
+  @media (min-width: 600px) {
+    .steps { flex-direction: row; }
+    .reviews { flex-direction: row; }
+    .review { flex: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="announce-bar">FREE SHIPPING TODAY ONLY &mdash; Limited stock remaining</div>
+
+<section class="hero">
+  <div class="container">
+    <span class="hook">FitTok Viral &mdash; 30-Day Challenge</span>
+    <h1>30 days.<br><span>No gym.</span><br>This happened.</h1>
+    <p class="tagline">The ab roller that engages 6 muscle groups at once, locks with non-slip wheels, and folds flat under your bed. Five minutes a day is all it takes.</p>
+    <ul class="benefits">
+      <li><span class="check">&#10003;</span> Engages 6 muscle groups &mdash; abs, obliques, back, arms, shoulders, chest</li>
+      <li><span class="check">&#10003;</span> Non-slip wheels &mdash; silent on hardwood and carpet</li>
+      <li><span class="check">&#10003;</span> Folds flat &mdash; stores under any bed or couch</li>
+    </ul>
+    <br>
+    <a class="cta-btn" href="https://dropship-os-gamma.vercel.app" target="_blank" rel="noopener">Get Yours Now &#8594;</a>
+    <p class="urgency">&#9888; Only 47 left in stock &mdash; <span>order ships today</span></p>
+    <div class="product-img-wrap">[Product image &mdash; Zendrop ID 1913578]</div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2>6 Muscles. <span>Every Rep.</span></h2>
+    <div class="muscle-grid">
+      <div class="muscle">Rectus Abdominis</div>
+      <div class="muscle">Obliques</div>
+      <div class="muscle">Lower Back</div>
+      <div class="muscle">Biceps</div>
+      <div class="muscle">Shoulders</div>
+      <div class="muscle">Chest</div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <h3>Start on Your Knees</h3>
+          <p>Beginners start from knees. Roll forward slowly until your core is fully extended. Go only as far as you can control. Quality over quantity every time.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <h3>Brace and Return</h3>
+          <p>Brace your core hard and pull yourself back. Feel every muscle fire. Three sets of 10 reps is a complete workout. Most people can barely do 5 on day one.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <h3>Progress Weekly</h3>
+          <p>By week 2 you will do full rollouts from standing. By week 4 you will look in the mirror and not recognize your core. The 30-day challenge works.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>What Fitness Beginners Are <span>Saying</span></h2>
+    <div class="reviews">
+      <div class="review">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"I have never had visible abs in my life. Did the 30-day challenge as a joke. By week 3 I had definition I have never seen before. I am not a gym person. This changed my mind."</p>
+        <span class="reviewer">Josh M. &mdash; Atlanta, GA</span>
+        <span class="verified">&#10003; Verified Buyer</span>
+      </div>
+      <div class="review">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"My lower back has always been weak. After two weeks of daily rolling my back pain is gone and my core feels completely different. The knee pad included is great quality too."</p>
+        <span class="reviewer">Amanda P. &mdash; Charlotte, NC</span>
+        <span class="verified">&#10003; Verified Buyer</span>
+      </div>
+      <div class="review">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"I travel constantly and have no time for a gym. This lives in my suitcase. 10 minutes in my hotel room every morning. I have not missed a day in 6 weeks. Totally worth it."</p>
+        <span class="reviewer">Chris D. &mdash; San Francisco, CA</span>
+        <span class="verified">&#10003; Verified Buyer</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <h2>The 30-day challenge <span style="color:var(--accent)">starts today.</span></h2>
+    <p>Thousands of beginners have already started. The only question is whether you are next. Free shipping ends tonight.</p>
+    <a class="cta-btn" href="https://dropship-os-gamma.vercel.app" target="_blank" rel="noopener">Get Yours Now &#8594;</a>
+    <p class="urgency" style="margin-top:14px;">&#9888; Only 47 left in stock &mdash; <span style="color:var(--gray)">ships within 24 hours</span></p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Powered by <strong>ShipStack AI</strong> &mdash; <a href="https://dropship-os-gamma.vercel.app/privacy">Privacy Policy</a></p>
+    <p style="margin-top:6px;">&copy; 2026 ShipStack AI. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

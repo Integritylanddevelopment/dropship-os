@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AliExpress Auth — ShipStack AI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background: #0a0a0f; color: #e0e0e0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+    .card { background: #12121f; border: 1px solid #2a2a5a; border-radius: 16px; padding: 48px 40px; max-width: 680px; width: 100%; text-align: center; }
+    .logo { font-size: 3rem; margin-bottom: 12px; }
+    h1 { font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .sub { color: #8888aa; font-size: 0.95rem; margin-bottom: 36px; }
+    .status { font-size: 1.1rem; font-weight: 600; padding: 16px 24px; border-radius: 10px; margin-bottom: 24px; }
+    .status.success { background: #0d2a1a; border: 1px solid #1a6a3a; color: #4dff88; }
+    .status.error   { background: #2a0d0d; border: 1px solid #6a1a1a; color: #ff6666; }
+    .status.pending { background: #1a1a2a; border: 1px solid #3a3a6a; color: #8888cc; }
+    .code-box { background: #0a0a15; border: 1px solid #3a3a6a; border-radius: 8px; padding: 20px 24px; margin: 20px 0; text-align: left; }
+    .code-box label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #6666aa; display: block; margin-bottom: 8px; }
+    .code-box .value { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #aaffcc; word-break: break-all; }
+    .copy-btn { background: #2a2a5a; border: 1px solid #4a4a8a; color: #aaaaee; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; margin-top: 16px; transition: background 0.2s; }
+    .copy-btn:hover { background: #3a3a7a; }
+    .copy-btn.copied { background: #1a4a2a; border-color: #2a8a4a; color: #4dff88; }
+    .instructions { background: #0d0d1a; border: 1px solid #2a2a4a; border-radius: 10px; padding: 24px; margin-top: 28px; text-align: left; }
+    .instructions h3 { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: #6666aa; margin-bottom: 16px; }
+    .step { display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+    .step-num { background: #2a2a5a; color: #8888cc; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+    .step-text { font-size: 0.9rem; color: #bbb; line-height: 1.5; }
+    code { background: #1a1a2a; padding: 2px 7px; border-radius: 4px; font-family: monospace; font-size: 0.85em; color: #aaaaff; }
+    .footer { margin-top: 32px; color: #444; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">⚡</div>
+    <h1>ShipStack AI</h1>
+    <div class="sub">AliExpress Authorization</div>
+
+    <div id="status-box" class="status pending">Reading authorization response...</div>
+
+    <div id="code-section" style="display:none">
+      <div class="code-box">
+        <label>Authorization Code</label>
+        <div class="value" id="auth-code">—</div>
+      </div>
+      <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy Code</button>
+      <div class="instructions">
+        <h3>Next Step — Complete the OAuth Flow</h3>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">Open a terminal in your ShipStack project folder</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">Run: <code>python integrations/aliexpress_connector.py oauth</code></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">Paste the code above when prompted — the access token saves to <code>.env</code> automatically</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="error-section" style="display:none">
+      <div class="code-box">
+        <label>Error Details</label>
+        <div class="value" id="error-detail">—</div>
+      </div>
+    </div>
+
+    <div id="no-params" style="display:none">
+      <div class="instructions">
+        <h3>How to Start the Auth Flow</h3>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">Run: <code>python integrations/aliexpress_connector.py oauth</code></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">Visit the URL it prints — AliExpress will ask you to authorize</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">After approving, you land here with your authorization code automatically</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">⚡ ShipStack AI — Integrity Land Development LLC</div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code  = params.get('code');
+    const error = params.get('error');
+
+    const statusBox    = document.getElementById('status-box');
+    const codeSection  = document.getElementById('code-section');
+    const errorSection = document.getElementById('error-section');
+    const noParams     = document.getElementById('no-params');
+
+    if (code) {
+      statusBox.className = 'status success';
+      statusBox.textContent = '✅ Authorization successful — copy your code below';
+      document.getElementById('auth-code').textContent = code;
+      codeSection.style.display = 'block';
+      navigator.clipboard.writeText(code).catch(() => {});
+    } else if (error) {
+      statusBox.className = 'status error';
+      statusBox.textContent = '❌ Authorization failed';
+      document.getElementById('error-detail').textContent =
+        'error=' + error + '  description=' + (params.get('error_description') || 'none');
+      errorSection.style.display = 'block';
+    } else {
+      statusBox.className = 'status pending';
+      statusBox.textContent = 'Waiting for authorization redirect...';
+      noParams.style.display = 'block';
+    }
+
+    function copyCode() {
+      const code = document.getElementById('auth-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = '✅ Copied!';
+        btn.className = 'copy-btn copied';
+        setTimeout(() => { btn.textContent = 'Copy Code'; btn.className = 'copy-btn'; }, 2500);
+      });
+    }
+  </script>
+</body>
+</html>

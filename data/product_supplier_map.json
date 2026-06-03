@@ -1,0 +1,38 @@
+{
+  "_instructions": "Keys must match Stripe charge.description exactly. IDs sourced from Zendrop dashboard URLs 2026-05-10.",
+
+  "Facial Roller (Rose Quartz)": {
+    "supplier": "zendrop",
+    "product_id": "1857795",
+    "variant_id": "1857795",
+    "_name": "Rose Quartz Face Roller by BeNat"
+  },
+
+  "Posture Corrector Brace": {
+    "supplier": "zendrop",
+    "product_id": "2990129",
+    "variant_id": "2990129",
+    "_name": "Posture Corrector Brace"
+  },
+
+  "Resistance Band Set (11pc)": {
+    "supplier": "zendrop",
+    "product_id": "2019581",
+    "variant_id": "2019581",
+    "_name": "11-Piece Resistance Band Set"
+  },
+
+  "Ab Roller Wheel": {
+    "supplier": "zendrop",
+    "product_id": "1913578",
+    "variant_id": "1913578",
+    "_name": "Ab Roller Wheel"
+  },
+
+  "Pet Hair Remover Brush": {
+    "supplier": "zendrop",
+    "product_id": "2005402",
+    "variant_id": "2005402",
+    "_name": "Pet Hair Remover Brush"
+  }
+}

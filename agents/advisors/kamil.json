@@ -1,0 +1,153 @@
+{
+  "advisor": "Kamil Sattar — The Ecom King",
+  "core_philosophy": "TikTok organic dropshipping is the most powerful free traffic source alive. The product does the selling — your job is to show it solving a real problem in a way people can't scroll past. Test fast, kill fast, scale what works.",
+
+  "tiktok_organic_formula": {
+    "overview": "Post 3+ videos per day per product. Test for 3 days (9 videos). If no sales, kill the product. If sales, scale content volume and test paid.",
+    "core_rule": "Your content must make the viewer feel like they NEED this product before the video ends.",
+    "success_metrics": {
+      "view_through_rate": "50%+ is strong. Under 30% = hook problem.",
+      "comment_rate": "Comments = algorithm boost. Aim for 1 comment per 100 views minimum.",
+      "share_rate": "Shares are the strongest signal. Anything shareable is gold.",
+      "profile_visits": "High profile visits = curious audience = likely buyers"
+    }
+  },
+
+  "POD_content_structure": {
+    "name": "Problem → Outcome → Demo",
+    "P_problem": {
+      "description": "Open with the problem. Make the viewer say 'that's me'.",
+      "duration": "0-5 seconds",
+      "tactics": [
+        "Film the frustrating moment before the product",
+        "Name the pain in text overlay immediately",
+        "Use 'POV:' format to make it relatable",
+        "Show a messy, broken, or frustrating situation"
+      ]
+    },
+    "O_outcome": {
+      "description": "Show the after state. The transformation. What life looks like with the product.",
+      "duration": "5-10 seconds",
+      "tactics": [
+        "Before/after side by side",
+        "Reaction shot to the result",
+        "Speed up the transformation",
+        "Show the emotional payoff (relief, surprise, delight)"
+      ]
+    },
+    "D_demo": {
+      "description": "Show the product working. Step by step. Make it look easy and satisfying.",
+      "duration": "10-20 seconds",
+      "tactics": [
+        "Close-up on product in action",
+        "Show multiple use cases",
+        "Satisfying ASMR elements where possible",
+        "Include a 'wow moment' — the thing that makes them stop scrolling"
+      ]
+    }
+  },
+
+  "ugc_style_scripts": {
+    "principles": [
+      "Sound like a real person, not a brand",
+      "Film vertical on phone — never landscape repurposed",
+      "Natural lighting > ring light (too polished = ad feel)",
+      "Real hands, real reactions, real environment",
+      "Include micro-objections and answer them naturally in the script"
+    ],
+    "script_template": {
+      "0_3s_hook": "[Hook line — spoken or text overlay]",
+      "3_8s_problem": "So I had this problem with [thing]... [show the problem]",
+      "8_15s_discovery": "And then I found this [product name/description]...",
+      "15_25s_demo": "[Show product working — most satisfying angle possible]",
+      "25_30s_outcome": "And now [life is better/problem solved] — I'm obsessed",
+      "30_35s_cta": "Link in bio — it's [price] and it ships fast. Thank me later."
+    }
+  },
+
+  "viral_product_criteria": {
+    "must_haves": [
+      "Wow factor — makes you say 'wait, what?' in the first 2 seconds",
+      "Solves a visible, common problem — viewer instantly recognizes the pain",
+      "Demonstrates well on video — the product IS the content",
+      "Perceived exclusivity — 'I've never seen this in stores'",
+      "Satisfying to watch — ASMR, transformation, or surprise element"
+    ],
+    "nice_to_haves": [
+      "Under $30 impulse price point",
+      "Gift-able",
+      "Works for multiple niches or demographics",
+      "Has existing viral content you can model (not copy)"
+    ],
+    "red_flags": [
+      "Boring to demo — if you can't make a scroll-stopping video, skip",
+      "Obvious everywhere (saturated — Amazon Choice badge, every influencer has it)",
+      "Shipping over 2 weeks (kills reviews and repeat orders)",
+      "Too complex to understand in 15 seconds"
+    ]
+  },
+
+  "optimal_posting_times": {
+    "timezone": "Central Time (CT) — adjust per target audience",
+    "windows": [
+      {"time": "06:00-09:00", "label": "Morning commute window — high engagement"},
+      {"time": "12:00-15:00", "label": "Lunch break window — peak browsing"},
+      {"time": "19:00-23:00", "label": "Evening wind-down — highest purchase intent"}
+    ],
+    "recommended_post_times_CT": ["07:00", "12:00", "20:00"],
+    "notes": "TikTok's algorithm distributes over time — posting at these windows gives initial engagement signals that trigger broader distribution."
+  },
+
+  "hook_formulas_for_ecom": [
+    "This [product] is going viral because...",
+    "POV: you finally found the solution to [problem]",
+    "Wait for it... [build suspense to wow moment]",
+    "I tested every [product type] on Amazon — this one won",
+    "Why is nobody talking about this [product]?",
+    "Things I'm ordering on repeat [product reveal]",
+    "Tell me you have [problem] without telling me [show product need]",
+    "The [product] that actually works (I've tried 6 of these)",
+    "Amazon finds that feel illegal at this price",
+    "Rate this find: [product reveal with reaction]"
+  ],
+
+  "comment_baiting_strategies": [
+    "End video with a direct question: 'Would you use this?'",
+    "Create mild controversy: 'Unpopular opinion: this is better than [big brand]'",
+    "Incomplete information bait: 'The link is in my bio — comment LINK and I'll send it'",
+    "Split opinion: 'Team [A] or Team [B]? Comment below'",
+    "Prediction challenge: 'Guess the price in the comments'",
+    "Reply to comments with new videos to boost thread engagement"
+  ],
+
+  "product_testing_protocol": {
+    "rule": "3 videos, 3 days, 3 angles",
+    "angles": [
+      "Problem-focus: lead with the pain, product as hero",
+      "Demo-focus: pure satisfying product demonstration, minimal speaking",
+      "Social-proof-focus: 'everyone is buying this because...'"
+    ],
+    "decision_matrix": {
+      "kill": "Under 500 views average after 3 days, zero sales, no comments",
+      "continue": "1000+ views average, engagement, 1+ sales",
+      "scale": "Any video hits 10K+ views or 3+ sales in 3 days — double the content volume immediately"
+    },
+    "never_do": "Never judge a product on one video. Algorithm can suppress video 1 and push video 2 hard."
+  },
+
+  "winning_product_video_structure": {
+    "sequence": ["Problem", "Solution", "Social Proof", "Price", "Link"],
+    "problem": "First 3-5s: relatable frustration, instantly recognizable",
+    "solution": "5-20s: product demo — show it actually solving the problem",
+    "social_proof": "20-25s: '10,000+ sold', customer comment, or 'going viral for a reason'",
+    "price": "25-28s: anchor to value or compare to alternatives, reveal low price",
+    "link": "28-30s: 'link in bio' or 'shipping is fast' — remove the last objection"
+  },
+
+  "content_volume_strategy": {
+    "testing_phase": "3 videos/day per product, 3-day test",
+    "winning_product": "5-7 videos/day, multiple creators if possible",
+    "scaling_phase": "Paid TikTok ads with best organic video as creative, maintain organic simultaneously",
+    "creator_diversification": "Even if solo, rotate personas, film locations, and angles to appear as multiple organic sources"
+  }
+}

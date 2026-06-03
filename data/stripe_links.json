@@ -1,0 +1,47 @@
+[
+  {
+    "product": "Facial Roller (Rose Quartz)",
+    "price": 34.99,
+    "url": "https://buy.stripe.com/7sY5kEesH6ZJ0fKaXL3F60c",
+    "id": "plink_1TTpLYLvDFE2wEbdKZCsmjkP",
+    "niche": "beauty skincare",
+    "supplier": "zendrop",
+    "score": 71.8
+  },
+  {
+    "product": "Posture Corrector Brace",
+    "price": 29.99,
+    "url": "https://buy.stripe.com/dRm5kEacrck3aUo2rf3F60a",
+    "id": "plink_1TTpLYLvDFE2wEbdYqcYQTKK",
+    "niche": "fitness tools",
+    "supplier": "zendrop",
+    "score": 69.5
+  },
+  {
+    "product": "Resistance Band Set (11pc)",
+    "price": 39.99,
+    "url": "https://buy.stripe.com/3cIeVeacr1FpgeIaXL3F60d",
+    "id": "plink_1TTpLYLvDFE2wEbdgRI2v2W5",
+    "niche": "fitness tools",
+    "supplier": "zendrop",
+    "score": 68.6
+  },
+  {
+    "product": "Ab Roller Wheel",
+    "price": 24.99,
+    "url": "https://buy.stripe.com/8x214o84j1Fp5A48PD3F60e",
+    "id": "plink_1TTpLYLvDFE2wEbdraZIRqKY",
+    "niche": "fitness tools",
+    "supplier": "aliexpress",
+    "score": 71.3
+  },
+  {
+    "product": "Pet Hair Remover Brush",
+    "price": 19.99,
+    "url": "https://buy.stripe.com/4gM6oI84jdo73rW8PD3F60b",
+    "id": "plink_1TTpLYLvDFE2wEbdsLSCatDH",
+    "niche": "pet accessories",
+    "supplier": "zendrop",
+    "score": 63.1
+  }
+]

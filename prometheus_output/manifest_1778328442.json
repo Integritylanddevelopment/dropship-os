@@ -1,0 +1,68 @@
+{
+  "status": "complete",
+  "product": "Pet Lint Roller Pro",
+  "niche": "pet accessories",
+  "generated_at": "2026-05-09T12:07:22.002694",
+  "script": "HOOK: Are you tired of finding fur all over your clothes after petting your kitty?\n\nPROBLEM: Sure, I am! Pets are great but why do they leave us covered in lint?\n\nSOLUTION: Introducing the Pet Lint Roller Pro\u2014squeezes out 95% of pet hair on contact!\n\nPROOF: Check out @PawsAndRoll, their review went viral!\n\nCTA: Get yours now and stop the fur frenzy! Link in bio.",
+  "source_video": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\runway_726a0431-76b_1778328403.mp4",
+  "outputs": {
+    "tiktok": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_tiktok_captioned.mp4",
+    "instagram": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_instagram_captioned.mp4",
+    "youtube": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_youtube_captioned.mp4",
+    "pinterest": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_pinterest_captioned.mp4",
+    "facebook": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_facebook_captioned.mp4",
+    "twitter": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_twitter_captioned.mp4"
+  },
+  "tools_used": {
+    "ffmpeg": true,
+    "whisper": true,
+    "ollama": true,
+    "runway": true,
+    "elevenlabs": true,
+    "heygen": true
+  },
+  "clips": [
+    {
+      "platform": "TikTok",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_tiktok_captioned.mp4",
+      "aspect": "9:16",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "Instagram Reels",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_instagram_captioned.mp4",
+      "aspect": "9:16",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "YouTube Shorts",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_youtube_captioned.mp4",
+      "aspect": "9:16",
+      "duration": 60,
+      "ready": true
+    },
+    {
+      "platform": "Pinterest",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_pinterest_captioned.mp4",
+      "aspect": "2:3",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "Facebook",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_facebook_captioned.mp4",
+      "aspect": "9:16",
+      "duration": 30,
+      "ready": true
+    },
+    {
+      "platform": "X / Twitter",
+      "path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\Drop shipping\\prometheus_output\\Pet_Lint_Roller_Pro_20260509_0706\\Pet_Lint_Roller_Pro_twitter_captioned.mp4",
+      "aspect": "16:9",
+      "duration": 45,
+      "ready": true
+    }
+  ]
+}

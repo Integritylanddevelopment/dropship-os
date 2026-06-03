@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pinterest AI Agent — Control Center</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #E60023;
+    --primary-dark: #ad081b;
+    --bg: #0f0f12;
+    --bg-card: #1a1a20;
+    --bg-card2: #24242c;
+    --border: #2e2e3a;
+    --text: #e8e8f0;
+    --text-muted: #888899;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --orange: #f97316;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1a0008 0%, #1a1a20 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { font-size: 28px; }
+  .logo-text { font-size: 20px; font-weight: 700; }
+  .logo-sub { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .header-status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--green); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .last-update { font-size: 12px; color: var(--text-muted); }
+
+  /* NAV */
+  nav {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .nav-tab {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  /* MAIN */
+  main { padding: 32px; max-width: 1600px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* STATS ROW */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent, var(--primary));
+  }
+  .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .stat-value { font-size: 32px; font-weight: 700; line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .stat-trend { font-size: 12px; margin-top: 4px; }
+  .trend-up { color: var(--green); }
+  .trend-down { color: #ef4444; }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .grid-full { margin-bottom: 24px; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title span { font-size: 16px; }
+
+  /* TABLES */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th { text-align: left; padding: 10px 12px; color: var(--text-muted); font-weight: 500; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .data-table td { padding: 12px 12px; border-bottom: 1px solid var(--border); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--bg-card2); }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-red { background: rgba(230,0,35,0.15); color: var(--primary); }
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .badge-yellow { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .badge-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .badge-orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+
+  /* SCORE BARS */
+  .score-bar-wrap { display: flex; align-items: center; gap: 12px; }
+  .score-bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--primary), var(--orange)); }
+  .score-num { font-size: 13px; font-weight: 600; width: 30px; text-align: right; }
+
+  /* ACTION BUTTONS */
+  .actions-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary { background: var(--bg-card2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); }
+
+  /* PIPELINE */
+  .pipeline { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; }
+  .pipeline-col { min-width: 240px; flex: 1; }
+  .pipeline-header { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; background: var(--bg-card2); border-radius: 8px 8px 0 0; border: 1px solid var(--border); border-bottom: none; display: flex; align-items: center; justify-content: space-between; }
+  .pipeline-body { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 0 0 8px 8px; padding: 12px; min-height: 200px; display: flex; flex-direction: column; gap: 8px; }
+  .pin-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 12px; }
+  .pin-card-title { font-weight: 600; margin-bottom: 6px; line-height: 1.3; }
+  .pin-card-meta { color: var(--text-muted); display: flex; gap: 8px; flex-wrap: wrap; }
+  .pin-count-badge { background: var(--primary); color: white; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700; }
+
+  /* SEASONAL CALENDAR */
+  .calendar-item { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .calendar-item:last-child { border-bottom: none; }
+  .cal-date { min-width: 80px; text-align: center; background: var(--bg-card2); border-radius: 8px; padding: 8px; }
+  .cal-month { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+  .cal-day { font-size: 22px; font-weight: 700; color: var(--primary); }
+  .cal-info { flex: 1; }
+  .cal-event { font-weight: 600; margin-bottom: 4px; }
+  .cal-themes { font-size: 12px; color: var(--text-muted); }
+  .cal-urgency { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+  .urgency-now { background: rgba(230,0,35,0.15); color: var(--primary); }
+  .urgency-soon { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .urgency-upcoming { background: rgba(59,130,246,0.15); color: var(--blue); }
+
+  /* OPPORTUNITY MATRIX */
+  .opp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .opp-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .opp-title { font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .opp-score-big { font-size: 28px; font-weight: 800; color: var(--primary); }
+  .opp-dimensions { display: flex; flex-direction: column; gap: 8px; }
+  .opp-dim { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .opp-dim-label { min-width: 130px; color: var(--text-muted); }
+  .opp-action { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
+
+  /* KEYWORD TABLE */
+  .kw-intent { font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+  .kw-buyer { background: rgba(34,197,94,0.15); color: var(--green); }
+  .kw-problem { background: rgba(249,115,22,0.15); color: var(--orange); }
+  .kw-info { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .kw-seasonal { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+  /* COMMAND CENTER */
+  .command-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .command-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .command-card:hover { border-color: var(--primary); background: var(--bg-card2); transform: translateY(-2px); }
+  .command-icon { font-size: 36px; margin-bottom: 12px; }
+  .command-name { font-weight: 700; margin-bottom: 6px; }
+  .command-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+  .command-cmd { font-size: 11px; color: var(--primary); margin-top: 10px; font-family: monospace; background: rgba(230,0,35,0.1); padding: 4px 8px; border-radius: 4px; }
+
+  /* CHARTS */
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* ALERT BANNER */
+  .alert { padding: 14px 20px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .alert-warning { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); color: var(--yellow); }
+  .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
+  .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: var(--blue); }
+
+  /* SECTION HEADERS */
+  .section-header { margin-bottom: 24px; }
+  .section-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .section-sub { font-size: 13px; color: var(--text-muted); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📌</div>
+    <div>
+      <div class="logo-text">Pinterest AI Agent</div>
+      <div class="logo-sub">Enterprise Drop Shipping Control Center</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-status">
+      <div class="dot"></div>
+      <span>Agent Active</span>
+    </div>
+    <div class="last-update" id="lastUpdate">Loading...</div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-tab active" onclick="showSection('overview')">📊 Overview</div>
+  <div class="nav-tab" onclick="showSection('pipeline')">📌 Content Pipeline</div>
+  <div class="nav-tab" onclick="showSection('boards')">🗂️ Boards</div>
+  <div class="nav-tab" onclick="showSection('keywords')">🔑 Keywords</div>
+  <div class="nav-tab" onclick="showSection('opportunities')">🎯 Opportunities</div>
+  <div class="nav-tab" onclick="showSection('seasonal')">📅 Seasonal</div>
+  <div class="nav-tab" onclick="showSection('analytics')">📈 Analytics</div>
+  <div class="nav-tab" onclick="showSection('commands')">⚡ Commands</div>
+</nav>
+
+<main>
+
+<!-- OVERVIEW -->
+<div id="section-overview" class="section active">
+  <div class="section-header">
+    <div class="section-title">Pinterest Growth Overview</div>
+    <div class="section-sub">Real-time performance dashboard for your drop shipping Pinterest strategy</div>
+  </div>
+
+  <div id="alerts-container"></div>
+
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card" style="--accent: var(--primary);">
+      <div class="stat-label">Published Pins</div>
+      <div class="stat-value" id="stat-pins">—</div>
+      <div class="stat-sub">Total live pins</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--green);">
+      <div class="stat-label">Total Saves</div>
+      <div class="stat-value" id="stat-saves">—</div>
+      <div class="stat-sub">Free redistribution signals</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--blue);">
+      <div class="stat-label">Outbound Clicks</div>
+      <div class="stat-value" id="stat-clicks">—</div>
+      <div class="stat-sub">Traffic to your store</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--yellow);">
+      <div class="stat-label">Impressions</div>
+      <div class="stat-value" id="stat-impressions">—</div>
+      <div class="stat-sub">Pinterest reach</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--purple);">
+      <div class="stat-label">Active Boards</div>
+      <div class="stat-value" id="stat-boards">—</div>
+      <div class="stat-sub">Topical authority signals</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--orange);">
+      <div class="stat-label">Queued Content</div>
+      <div class="stat-value" id="stat-queue">—</div>
+      <div class="stat-sub">Ready to publish</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span>🏆</span> Top Performing Pins (by Saves)</div>
+      <table class="data-table" id="top-pins-table">
+        <thead><tr><th>Pin Title</th><th>Saves</th><th>Clicks</th><th>Score</th></tr></thead>
+        <tbody id="top-pins-body"><tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:20px;">Loading data...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>📌</span> Performance by Pin Type</div>
+      <div class="chart-wrap"><canvas id="pinTypeChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span>🗂️</span> Board Performance</div>
+      <table class="data-table" id="board-table">
+        <thead><tr><th>Board</th><th>Avg Saves</th><th>Total Clicks</th></tr></thead>
+        <tbody id="board-body"><tr><td colspan="3" style="color:var(--text-muted);text-align:center;padding:20px;">Loading...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>📈</span> Saves Over Time</div>
+      <div class="chart-wrap"><canvas id="savesChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT PIPELINE -->
+<div id="section-pipeline" class="section">
+  <div class="section-header">
+    <div class="section-title">Content Pipeline</div>
+    <div class="section-sub">Track pins from generation → published → compounding</div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn btn-primary" onclick="runCommand('content')">✍️ Generate Content</button>
+    <button class="btn btn-secondary" onclick="runCommand('publish --dry-run')">👁️ Preview Publish</button>
+    <button class="btn btn-secondary" onclick="runCommand('publish --count 10')">🚀 Publish 10 Pins</button>
+  </div>
+  <div class="pipeline" id="pipeline-container">
+    <div class="pipeline-col">
+      <div class="pipeline-header">✍️ In Queue <span class="pin-count-badge" id="queue-count">0</span></div>
+      <div class="pipeline-body" id="pipeline-queued">
+        <div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px;">Run content generation to fill queue</div>
+      </div>
+    </div>
+    <div class="pipeline-col">
+      <div class="pipeline-header">🔗 Needs Links <span class="pin-count-badge" id="needs-links-count">0</span></div>
+      <div class="pipeline-body" id="pipeline-needs-links">
+        <div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px;">Pins waiting for product URLs</div>
+      </div>
+    </div>
+    <div class="pipeline-col">
+      <div class="pipeline-header">🚀 Ready to Publish <span class="pin-count-badge" id="ready-count">0</span></div>
+      <div class="pipeline-body" id="pipeline-ready">
+        <div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px;">Pins ready with all required fields</div>
+      </div>
+    </div>
+    <div class="pipeline-col">
+      <div class="pipeline-header">✅ Published <span class="pin-count-badge" id="published-count">0</span></div>
+      <div class="pipeline-body" id="pipeline-published">
+        <div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px;">Live pins gaining traffic</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOARDS -->
+<div id="section-boards" class="section">
+  <div class="section-header">
+    <div class="section-title">Board Architecture</div>
+    <div class="section-sub">Pinterest SEO topical authority map — your account's search signal structure</div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn btn-primary" onclick="runCommand('boards')">🗂️ Create Planned Boards</button>
+    <button class="btn btn-secondary" onclick="runCommand('boards --dry-run')">👁️ Preview Board Changes</button>
+  </div>
+  <div id="boards-container">
+    <div class="card">
+      <div class="card-title"><span>🗂️</span> Recommended Board Structure</div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Board Name</th><th>Keyword Cluster</th><th>Traffic Type</th><th>Status</th><th>Priority</th></tr></thead>
+        <tbody id="boards-body">
+          <!-- Populated by JS -->
+          <tr><td>1</td><td>Home Organization Ideas</td><td>Primary</td><td><span class="badge badge-green">Buyer Intent</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td></tr>
+          <tr><td>2</td><td>Kitchen Gadgets & Tools</td><td>Primary</td><td><span class="badge badge-green">Buyer Intent</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td></tr>
+          <tr><td>3</td><td>Gift Ideas for Everyone</td><td>Seasonal</td><td><span class="badge badge-green">Buyer Intent</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td></tr>
+          <tr><td>4</td><td>Bedroom Decor & Aesthetic</td><td>Lifestyle</td><td><span class="badge badge-purple">Inspiration</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td></tr>
+          <tr><td>5</td><td>Useful Products Worth Buying</td><td>Discovery</td><td><span class="badge badge-orange">Research</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td></tr>
+          <tr><td>6</td><td>Under $50 Finds That Are Worth It</td><td>Price Intent</td><td><span class="badge badge-green">Buyer Intent</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td></tr>
+          <tr><td>7</td><td>Home Gym & Fitness Equipment</td><td>Primary</td><td><span class="badge badge-green">Buyer Intent</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:70%"></div></div><span class="score-num">7</span></div></td></tr>
+          <tr><td>8</td><td>Cozy Home Decor</td><td>Lifestyle</td><td><span class="badge badge-purple">Inspiration</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:70%"></div></div><span class="score-num">7</span></div></td></tr>
+          <tr><td>9</td><td>Bathroom Organization & Decor</td><td>Primary</td><td><span class="badge badge-orange">Research</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:70%"></div></div><span class="score-num">7</span></div></td></tr>
+          <tr><td>10</td><td>Morning & Evening Routine</td><td>Lifestyle</td><td><span class="badge badge-blue">Problem Solving</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:60%"></div></div><span class="score-num">6</span></div></td></tr>
+          <tr><td>11</td><td>Outdoor & Patio Ideas</td><td>Seasonal</td><td><span class="badge badge-purple">Inspiration</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:60%"></div></div><span class="score-num">6</span></div></td></tr>
+          <tr><td>12</td><td>Holiday Decor & Seasonal Finds</td><td>Seasonal</td><td><span class="badge badge-green">Buyer Intent</span></td><td><span class="badge badge-yellow">Planned</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- KEYWORDS -->
+<div id="section-keywords" class="section">
+  <div class="section-header">
+    <div class="section-title">Keyword Intelligence</div>
+    <div class="section-sub">Pinterest search phrases ranked by opportunity score — your organic traffic map</div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn btn-primary" onclick="runCommand('research')">🔍 Run Research</button>
+    <button class="btn btn-secondary" onclick="runCommand('research --keywords home+organization,kitchen+gadgets')">+ Expand Keywords</button>
+  </div>
+  <div class="card">
+    <div class="card-title"><span>🔑</span> Keyword Opportunity Database</div>
+    <table class="data-table">
+      <thead><tr><th>Keyword</th><th>Intent</th><th>Competition</th><th>Buyer Intent</th><th>Save Potential</th><th>Click Potential</th><th>Overall Score</th></tr></thead>
+      <tbody id="keywords-body">
+        <!-- Seeded with strategy keywords -->
+        <tr><td>home organization ideas</td><td><span class="kw-intent kw-info">Informational</span></td><td><span class="badge badge-yellow">High</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><span style="font-weight:700;color:var(--green)">8.3</span></td></tr>
+        <tr><td>small apartment organization products</td><td><span class="kw-intent kw-buyer">Buyer Intent</span></td><td><span class="badge badge-green">Low</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><span style="font-weight:700;color:var(--green)">8.7</span></td></tr>
+        <tr><td>kitchen gadgets that save time</td><td><span class="kw-intent kw-problem">Problem Aware</span></td><td><span class="badge badge-green">Low</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><span style="font-weight:700;color:var(--green)">8.7</span></td></tr>
+        <tr><td>unique gifts for women who have everything</td><td><span class="kw-intent kw-buyer">Buyer Intent</span></td><td><span class="badge badge-blue">Medium</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><span style="font-weight:700;color:var(--green)">9.3</span></td></tr>
+        <tr><td>home gym setup under $200</td><td><span class="kw-intent kw-buyer">Buyer Intent</span></td><td><span class="badge badge-green">Low</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:70%"></div></div><span class="score-num">7</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><span style="font-weight:700;color:var(--green)">9.0</span></td></tr>
+        <tr><td>useful products you didn't know you needed</td><td><span class="kw-intent kw-info">Informational</span></td><td><span class="badge badge-green">Low</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><span style="font-weight:700;color:var(--green)">8.7</span></td></tr>
+        <tr><td>cozy bedroom products under $50</td><td><span class="kw-intent kw-buyer">Buyer Intent</span></td><td><span class="badge badge-green">Low</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><span style="font-weight:700;color:var(--green)">9.0</span></td></tr>
+        <tr><td>bathroom organization under sink</td><td><span class="kw-intent kw-problem">Problem Aware</span></td><td><span class="badge badge-green">Low</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><span style="font-weight:700;color:var(--green)">8.3</span></td></tr>
+        <tr><td>christmas gifts for him unique</td><td><span class="kw-intent kw-seasonal">Seasonal</span></td><td><span class="badge badge-blue">Medium</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><span style="font-weight:700;color:var(--yellow)">9.3</span></td></tr>
+        <tr><td>best amazon finds home organization</td><td><span class="kw-intent kw-buyer">Buyer Intent</span></td><td><span class="badge badge-blue">Medium</span></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-num">9</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:80%"></div></div><span class="score-num">8</span></div></td><td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill" style="width:100%"></div></div><span class="score-num">10</span></div></td><td><span style="font-weight:700;color:var(--green)">9.0</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- OPPORTUNITIES -->
+<div id="section-opportunities" class="section">
+  <div class="section-header">
+    <div class="section-title">Opportunity Scoring Matrix</div>
+    <div class="section-sub">Cheapest attention × highest margin products — ranked by 10-dimension score</div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn btn-primary" onclick="runCommand('score')">📊 Rescore All</button>
+  </div>
+  <div class="opp-grid" id="opportunities-grid">
+    <!-- Populated by JS with strategy data -->
+  </div>
+</div>
+
+<!-- SEASONAL -->
+<div id="section-seasonal" class="section">
+  <div class="section-header">
+    <div class="section-title">Seasonal Content Calendar</div>
+    <div class="section-sub">Publish 6-10 weeks ahead of every event — early content wins on Pinterest</div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn btn-primary" onclick="runCommand('seasonal')">📅 Refresh Calendar</button>
+  </div>
+  <div class="card">
+    <div class="card-title"><span>📅</span> Upcoming Seasonal Events — Content Deadlines</div>
+    <div id="seasonal-calendar">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div id="section-analytics" class="section">
+  <div class="section-header">
+    <div class="section-title">Performance Analytics</div>
+    <div class="section-sub">Pin performance, board metrics, and compounding traffic analysis</div>
+  </div>
+  <div class="actions-bar">
+    <button class="btn btn-primary" onclick="runCommand('analytics')">📡 Refresh Analytics</button>
+    <button class="btn btn-secondary" onclick="runCommand('analytics --output json')">📄 Export JSON</button>
+  </div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><span>💾</span> Save Rate</div>
+      <div style="font-size:48px;font-weight:800;color:var(--green)" id="avg-save-rate">—</div>
+      <div style="font-size:12px;color:var(--text-muted)">Average saves per 1000 impressions</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>🖱️</span> Click Rate</div>
+      <div style="font-size:48px;font-weight:800;color:var(--blue)" id="avg-click-rate">—</div>
+      <div style="font-size:12px;color:var(--text-muted)">Outbound clicks per 1000 impressions</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>♻️</span> Compounding Pins</div>
+      <div style="font-size:48px;font-weight:800;color:var(--purple)" id="compounding-count">—</div>
+      <div style="font-size:12px;color:var(--text-muted)">Pins 60+ days old still generating traffic</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span>📈</span> Traffic Growth Timeline</div>
+    <div class="chart-wrap" style="height:280px;"><canvas id="trafficChart"></canvas></div>
+  </div>
+</div>
+
+<!-- COMMANDS -->
+<div id="section-commands" class="section">
+  <div class="section-header">
+    <div class="section-title">Agent Command Center</div>
+    <div class="section-sub">Run any agent function from your terminal — copy the exact command</div>
+  </div>
+  <div class="command-grid">
+    <div class="command-card" onclick="copyCmd('python main.py setup')">
+      <div class="command-icon">🔧</div>
+      <div class="command-name">Initial Setup</div>
+      <div class="command-desc">Connect APIs, build board structure, seed keywords, build seasonal calendar</div>
+      <div class="command-cmd">python main.py setup</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py research')">
+      <div class="command-icon">🔍</div>
+      <div class="command-name">Research Cycle</div>
+      <div class="command-desc">Discover keywords, score opportunities, identify seasonal priorities</div>
+      <div class="command-cmd">python main.py research</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py content --count 20')">
+      <div class="command-icon">✍️</div>
+      <div class="command-name">Generate Content</div>
+      <div class="command-desc">AI-generate pin titles, descriptions, lead magnets, weekly plans</div>
+      <div class="command-cmd">python main.py content --count 20</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py boards')">
+      <div class="command-icon">🗂️</div>
+      <div class="command-name">Create Boards</div>
+      <div class="command-desc">Deploy board structure to Pinterest with SEO-optimized descriptions</div>
+      <div class="command-cmd">python main.py boards</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py publish --count 15')">
+      <div class="command-icon">🚀</div>
+      <div class="command-name">Publish Pins</div>
+      <div class="command-desc">Deploy queued pins to Pinterest via API. Respects rate limits.</div>
+      <div class="command-cmd">python main.py publish --count 15</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py analytics')">
+      <div class="command-icon">📊</div>
+      <div class="command-name">Analytics Report</div>
+      <div class="command-desc">Pull fresh pin/account analytics, identify top performers</div>
+      <div class="command-cmd">python main.py analytics</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py seasonal')">
+      <div class="command-icon">📅</div>
+      <div class="command-name">Seasonal Planning</div>
+      <div class="command-desc">Build seasonal calendar, generate time-sensitive content</div>
+      <div class="command-cmd">python main.py seasonal</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py score')">
+      <div class="command-icon">🎯</div>
+      <div class="command-name">Score Opportunities</div>
+      <div class="command-desc">Run 10-dimension opportunity scoring to find best content areas</div>
+      <div class="command-cmd">python main.py score</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py full-cycle')">
+      <div class="command-icon">🔄</div>
+      <div class="command-name">Full Growth Cycle</div>
+      <div class="command-desc">Run everything: research → boards → content → publish → analytics</div>
+      <div class="command-cmd">python main.py full-cycle</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py publish --dry-run')">
+      <div class="command-icon">👁️</div>
+      <div class="command-name">Dry Run Preview</div>
+      <div class="command-desc">Preview all actions without making changes to Pinterest</div>
+      <div class="command-cmd">python main.py publish --dry-run</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py research --niche \"kitchen gadgets\" --keywords \"kitchen organizer,drawer organizer\"')">
+      <div class="command-icon">🔑</div>
+      <div class="command-name">Niche Research</div>
+      <div class="command-desc">Research a specific niche or product category with custom seed keywords</div>
+      <div class="command-cmd">python main.py research --niche "kitchen gadgets"</div>
+    </div>
+    <div class="command-card" onclick="copyCmd('python main.py analytics --output json')">
+      <div class="command-icon">📄</div>
+      <div class="command-name">Export Analytics</div>
+      <div class="command-desc">Export full analytics data as JSON for spreadsheet analysis</div>
+      <div class="command-cmd">python main.py analytics --output json</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:24px;">
+    <div class="card-title"><span>⚡</span> Quick Copy — Most Used Commands</div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-family:monospace;font-size:13px;">
+      <div onclick="copyCmd(this.textContent.trim())" style="padding:10px 14px;background:var(--bg-card2);border-radius:6px;cursor:pointer;border:1px solid var(--border);">python main.py full-cycle</div>
+      <div onclick="copyCmd(this.textContent.trim())" style="padding:10px 14px;background:var(--bg-card2);border-radius:6px;cursor:pointer;border:1px solid var(--border);">python main.py content --count 20 && python main.py publish --count 15</div>
+      <div onclick="copyCmd(this.textContent.trim())" style="padding:10px 14px;background:var(--bg-card2);border-radius:6px;cursor:pointer;border:1px solid var(--border);">python main.py research && python main.py score</div>
+      <div onclick="copyCmd(this.textContent.trim())" style="padding:10px 14px;background:var(--bg-card2);border-radius:6px;cursor:pointer;border:1px solid var(--border);">python main.py analytics && python main.py seasonal</div>
+    </div>
+    <div id="copy-confirm" style="color:var(--green);font-size:13px;margin-top:10px;display:none;">✅ Copied to clipboard!</div>
+  </div>
+</div>
+
+</main>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:13px;display:none;z-index:1000;max-width:300px;"></div>
+
+<script>
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ============================================================
+// DATA
+// ============================================================
+const STRATEGY_DATA = {
+  summary: {
+    total_published_pins: 0,
+    total_saves: 0,
+    total_clicks: 0,
+    total_impressions: 0,
+    active_boards: 12,
+    queued_content: 0,
+    tracked_keywords: 10,
+  },
+  opportunities: [
+    { topic: "Home Organization Products", overall_score: 8.3, buyer_intent: 8, save_potential: 9, click_potential: 8, traffic_potential: 9, evergreen_value: 9, competition_level: 7, recommended_action: "Create 3 roundup pins linking to curated org product blog posts immediately" },
+    { topic: "Problem-Solution Products", overall_score: 8.0, buyer_intent: 9, save_potential: 7, click_potential: 9, traffic_potential: 7, evergreen_value: 8, competition_level: 8, recommended_action: "Build problem-aware pin series targeting long-tail pain keywords" },
+    { topic: "Gift Guides (Seasonal)", overall_score: 7.9, buyer_intent: 9, save_potential: 8, click_potential: 9, traffic_potential: 8, evergreen_value: 7, competition_level: 6, recommended_action: "Launch seasonal gift guide blog post + 5 pin variations NOW" },
+    { topic: "Kitchen Gadgets & Tools", overall_score: 7.9, buyer_intent: 8, save_potential: 8, click_potential: 8, traffic_potential: 8, evergreen_value: 8, competition_level: 7, recommended_action: "Create 'time-saving kitchen gadgets' roundup with 10 products" },
+    { topic: "Under $50 Product Finds", overall_score: 8.0, buyer_intent: 9, save_potential: 8, click_potential: 9, traffic_potential: 8, evergreen_value: 7, competition_level: 8, recommended_action: "Run weekly 'under $50 finds' pin — one of the highest buyer-intent formats" },
+    { topic: "Bedroom Aesthetic Products", overall_score: 8.1, buyer_intent: 7, save_potential: 10, click_potential: 7, traffic_potential: 9, evergreen_value: 9, competition_level: 7, recommended_action: "Create aesthetic mood board pins — extremely high save volume for list building" },
+    { topic: "Fitness & Home Gym", overall_score: 7.6, buyer_intent: 8, save_potential: 7, click_potential: 8, traffic_potential: 8, evergreen_value: 8, competition_level: 7, recommended_action: "Target January/New Year peak + summer body prep with home gym product pins" },
+    { topic: "Cozy Lifestyle Products", overall_score: 7.9, buyer_intent: 7, save_potential: 10, click_potential: 7, traffic_potential: 8, evergreen_value: 9, competition_level: 7, recommended_action: "Build cozy room aesthetic pins — highest save rate format for email capture" },
+    { topic: "Lead Magnet — Buyer's Guide", overall_score: 7.0, buyer_intent: 6, save_potential: 6, click_potential: 8, traffic_potential: 5, evergreen_value: 9, competition_level: 9, recommended_action: "Create free 'home essentials buyer's guide' — best email capture mechanism" },
+    { topic: "Outdoor & Patio Products", overall_score: 7.3, buyer_intent: 8, save_potential: 8, click_potential: 8, traffic_potential: 7, evergreen_value: 6, competition_level: 8, recommended_action: "Publish March–July outdoor content now — seasonal window is opening" },
+  ],
+  seasonal: [
+    { event: "Mother's Day", target_date: "2026-05-10", publish_by: "2026-03-25", themes: ["gift guides", "self-care products", "home upgrades"], urgency: "now" },
+    { event: "Memorial Day / Summer Kickoff", target_date: "2026-05-25", publish_by: "2026-04-01", themes: ["outdoor entertaining", "patio products", "summer home"], urgency: "now" },
+    { event: "Father's Day", target_date: "2026-06-21", publish_by: "2026-05-01", themes: ["unique gifts for men", "home improvement", "gadgets"], urgency: "soon" },
+    { event: "Summer Back to School", target_date: "2026-08-15", publish_by: "2026-06-15", themes: ["dorm organization", "school supplies", "desk setup"], urgency: "soon" },
+    { event: "Labor Day", target_date: "2026-09-07", publish_by: "2026-07-20", themes: ["fall prep", "home refresh", "cozy home"], urgency: "upcoming" },
+    { event: "Halloween", target_date: "2026-10-31", publish_by: "2026-09-01", themes: ["fall decor", "home decoration", "seasonal gifts"], urgency: "upcoming" },
+    { event: "Black Friday / Cyber Monday", target_date: "2026-11-27", publish_by: "2026-10-01", themes: ["deal guides", "gift ideas", "wish lists"], urgency: "upcoming" },
+    { event: "Christmas", target_date: "2026-12-25", publish_by: "2026-10-15", themes: ["gift guides", "home decor", "holiday entertaining"], urgency: "upcoming" },
+  ]
+};
+
+// ============================================================
+// RENDER FUNCTIONS
+// ============================================================
+function loadDashboard() {
+  // Try to load from data.json first, fall back to strategy data
+  fetch('data.json')
+    .then(r => r.json())
+    .then(data => renderAll(data))
+    .catch(() => renderAll({ summary: STRATEGY_DATA.summary }));
+
+  renderOpportunities();
+  renderSeasonalCalendar();
+  document.getElementById('lastUpdate').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+}
+
+function renderAll(data) {
+  const s = data.summary || STRATEGY_DATA.summary;
+
+  // Stats
+  document.getElementById('stat-pins').textContent = s.total_published_pins?.toLocaleString() || '0';
+  document.getElementById('stat-saves').textContent = s.total_saves?.toLocaleString() || '0';
+  document.getElementById('stat-clicks').textContent = s.total_clicks?.toLocaleString() || '0';
+  document.getElementById('stat-impressions').textContent = s.total_impressions?.toLocaleString() || '0';
+  document.getElementById('stat-boards').textContent = s.active_boards?.toLocaleString() || '0';
+  document.getElementById('stat-queue').textContent = s.queued_content?.toLocaleString() || '0';
+
+  // Analytics metrics
+  document.getElementById('avg-save-rate').textContent = (s.avg_save_rate || 0).toFixed(1) + '%';
+  document.getElementById('avg-click-rate').textContent = (s.avg_click_rate || 0).toFixed(1) + '%';
+  document.getElementById('compounding-count').textContent = data.compounding_pins || '0';
+
+  // Top pins table
+  if (data.top_pins?.length) {
+    const tbody = document.getElementById('top-pins-body');
+    tbody.innerHTML = data.top_pins.slice(0, 8).map(p => `
+      <tr>
+        <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.title || 'N/A'}</td>
+        <td><strong style="color:var(--green)">${(p.saves||0).toLocaleString()}</strong></td>
+        <td>${(p.outbound_clicks||0).toLocaleString()}</td>
+        <td><span style="color:${(p.performance_score||0) > 7 ? 'var(--green)' : (p.performance_score||0) > 4 ? 'var(--yellow)' : 'var(--text-muted)'}">${(p.performance_score||0).toFixed(1)}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // Board performance
+  if (data.board_performance?.length) {
+    const tbody = document.getElementById('board-body');
+    tbody.innerHTML = data.board_performance.slice(0, 8).map(b => `
+      <tr>
+        <td>${b.name || 'N/A'}</td>
+        <td><strong style="color:var(--green)">${(b.avg_saves||0).toFixed(1)}</strong></td>
+        <td>${(b.total_clicks||0).toLocaleString()}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Charts
+  renderPinTypeChart(data.content_type_performance || {});
+  renderSavesChart(data.history || []);
+  renderTrafficChart(data.history || []);
+
+  // Alerts
+  renderAlerts(s);
+}
+
+function renderAlerts(s) {
+  const container = document.getElementById('alerts-container');
+  const alerts = [];
+  if (!s.total_published_pins || s.total_published_pins < 10) {
+    alerts.push({ type: 'warning', msg: '⚠️  No published pins yet — run setup then generate content and publish to start building your Pinterest presence' });
+  }
+  if (s.active_boards < 5) {
+    alerts.push({ type: 'warning', msg: '⚠️  Low board count — run board creation to establish topical authority' });
+  }
+  if (s.total_published_pins > 0 && s.total_saves === 0) {
+    alerts.push({ type: 'info', msg: 'ℹ️  Analytics data will appear after refreshing from Pinterest API (run: python main.py analytics)' });
+  }
+  if (alerts.length === 0) {
+    alerts.push({ type: 'success', msg: '✅ Agent is active and pipeline is healthy — keep the publishing cadence going' });
+  }
+  container.innerHTML = alerts.map(a => `
+    <div class="alert alert-${a.type}">${a.msg}</div>
+  `).join('');
+}
+
+function renderPinTypeChart(typeData) {
+  const ctx = document.getElementById('pinTypeChart');
+  if (!ctx) return;
+  const labels = Object.keys(typeData).length ? Object.keys(typeData) : ['product_feature', 'problem_solution', 'roundup', 'educational', 'lead_magnet'];
+  const values = labels.map(l => typeData[l]?.avg_saves || Math.random() * 10);
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels.map(l => l.replace('_', ' ')),
+      datasets: [{ data: values, backgroundColor: '#E60023aa', borderColor: '#E60023', borderWidth: 1, borderRadius: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#2e2e3a' }, ticks: { color: '#888899', font: { size: 10 } } },
+        y: { grid: { color: '#2e2e3a' }, ticks: { color: '#888899' } }
+      }
+    }
+  });
+}
+
+function renderSavesChart(history) {
+  const ctx = document.getElementById('savesChart');
+  if (!ctx) return;
+  // Generate placeholder data if no history
+  const labels = history.length ? history.map(h => h.snapshot_date?.slice(5, 10)) : Array.from({length: 8}, (_, i) => `Day ${i+1}`);
+  const values = history.length ? history.map(h => h.total_saves) : [0,0,0,0,0,0,0,0];
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values, borderColor: '#22c55e', backgroundColor: '#22c55e22',
+        fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#22c55e'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#2e2e3a' }, ticks: { color: '#888899', font: { size: 10 } } },
+        y: { grid: { color: '#2e2e3a' }, ticks: { color: '#888899' } }
+      }
+    }
+  });
+}
+
+function renderTrafficChart(history) {
+  const ctx = document.getElementById('trafficChart');
+  if (!ctx) return;
+  const labels = history.length ? history.map(h => h.snapshot_date?.slice(5, 10)) : Array.from({length: 12}, (_, i) => `Wk ${i+1}`);
+  const saves = history.length ? history.map(h => h.total_saves) : [0,0,0,0,0,0,0,0,0,0,0,0];
+  const clicks = history.length ? history.map(h => h.total_clicks) : [0,0,0,0,0,0,0,0,0,0,0,0];
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Saves', data: saves, borderColor: '#22c55e', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3 },
+        { label: 'Clicks', data: clicks, borderColor: '#3b82f6', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#888899', font: { size: 11 } } }
+      },
+      scales: {
+        x: { grid: { color: '#2e2e3a' }, ticks: { color: '#888899', font: { size: 10 } } },
+        y: { grid: { color: '#2e2e3a' }, ticks: { color: '#888899' } }
+      }
+    }
+  });
+}
+
+function renderOpportunities() {
+  const container = document.getElementById('opportunities-grid');
+  container.innerHTML = STRATEGY_DATA.opportunities.map(opp => {
+    const scoreColor = opp.overall_score >= 8.5 ? 'var(--green)' : opp.overall_score >= 7.5 ? 'var(--yellow)' : 'var(--orange)';
+    const dims = [
+      { label: 'Traffic Potential', val: opp.traffic_potential },
+      { label: 'Buyer Intent', val: opp.buyer_intent },
+      { label: 'Save Potential', val: opp.save_potential },
+      { label: 'Click Potential', val: opp.click_potential },
+      { label: 'Evergreen Value', val: opp.evergreen_value },
+      { label: 'Competition (inv)', val: opp.competition_level },
+    ];
+    return `
+      <div class="opp-card">
+        <div class="opp-title">
+          <span>${opp.topic}</span>
+          <span class="opp-score-big" style="color:${scoreColor}">${opp.overall_score}</span>
+        </div>
+        <div class="opp-dimensions">
+          ${dims.map(d => `
+            <div class="opp-dim">
+              <span class="opp-dim-label">${d.label}</span>
+              <div class="score-bar" style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+                <div style="width:${d.val * 10}%;height:100%;background:${scoreColor};border-radius:2px;"></div>
+              </div>
+              <span style="font-size:11px;font-weight:600;min-width:20px;text-align:right;">${d.val}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="opp-action">→ ${opp.recommended_action}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderSeasonalCalendar() {
+  const container = document.getElementById('seasonal-calendar');
+  container.innerHTML = STRATEGY_DATA.seasonal.map(ev => {
+    const date = new Date(ev.target_date);
+    const month = date.toLocaleString('default', { month: 'short' }).toUpperCase();
+    const day = date.getDate();
+    const urgencyClass = { now: 'urgency-now', soon: 'urgency-soon', upcoming: 'urgency-upcoming' }[ev.urgency];
+    const urgencyLabel = { now: '🔴 PUBLISH NOW', soon: '🟡 SOON', upcoming: '🔵 UPCOMING' }[ev.urgency];
+    return `
+      <div class="calendar-item">
+        <div class="cal-date">
+          <div class="cal-month">${month}</div>
+          <div class="cal-day">${day}</div>
+        </div>
+        <div class="cal-info">
+          <div class="cal-event">${ev.event}</div>
+          <div class="cal-themes">Content: ${ev.themes.join(' · ')}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Publish by: <strong>${ev.publish_by}</strong></div>
+        </div>
+        <div class="cal-urgency ${urgencyClass}">${urgencyLabel}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function runCommand(cmd) {
+  showToast(`Run in terminal: python main.py ${cmd}`);
+  copyCmd(`python main.py ${cmd}`);
+}
+
+function copyCmd(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const confirm = document.getElementById('copy-confirm');
+    if (confirm) { confirm.style.display = 'block'; setTimeout(() => confirm.style.display = 'none', 2000); }
+    showToast('✅ Command copied to clipboard');
+  }).catch(() => showToast('📋 ' + text));
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadDashboard();
+setInterval(loadDashboard, 30000); // Refresh every 30 seconds
+</script>
+</body>
+</html>

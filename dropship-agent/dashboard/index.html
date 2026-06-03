@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dropship Intelligence Agent</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
+
+  /* Layout */
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
+  .logo span { color: var(--accent2); }
+  .status-bar { display: flex; gap: 16px; align-items: center; font-size: 12px; color: var(--muted); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 4px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  main { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 56px); }
+  nav { background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; }
+  nav a { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: var(--muted); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.15s; cursor: pointer; }
+  nav a:hover { background: var(--surface2); color: var(--text); }
+  nav a.active { background: var(--surface2); color: var(--accent); border-left-color: var(--accent); }
+  nav .section-label { padding: 16px 20px 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+
+  .content { padding: 24px; overflow-y: auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Cards */
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .card-header { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+  .card-value { font-size: 28px; font-weight: 700; }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* Score bars */
+  .score-bar { background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 4px; transition: width 0.6s; }
+
+  /* Product cards */
+  .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; position: relative; overflow: hidden; transition: border-color 0.2s; }
+  .product-card:hover { border-color: var(--accent); }
+  .product-card .rank { position: absolute; top: 14px; right: 14px; font-size: 22px; font-weight: 800; color: var(--border); }
+  .product-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .product-meta { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .winner-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px 4px 2px 0; }
+  .badge-overall    { background: rgba(124,58,237,0.2); color: #a78bfa; }
+  .badge-margin     { background: rgba(16,185,129,0.2); color: #34d399; }
+  .badge-comp       { background: rgba(59,130,246,0.2); color: #60a5fa; }
+  .badge-launch     { background: rgba(245,158,11,0.2); color: #fbbf24; }
+  .badge-attention  { background: rgba(6,182,212,0.2); color: #22d3ee; }
+
+  .scores-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 12px 0; }
+  .score-item { text-align: center; }
+  .score-item .label { font-size: 10px; color: var(--muted); }
+  .score-item .value { font-size: 14px; font-weight: 700; }
+
+  .economics-row { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; }
+  .econ-tag { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; }
+  .econ-tag strong { color: var(--green); }
+
+  /* Channel cards */
+  .channel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; align-items: center; gap: 16px; }
+  .channel-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .channel-info { flex: 1; }
+  .channel-name { font-weight: 600; font-size: 14px; }
+  .channel-stats { display: flex; gap: 12px; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .channel-score { text-align: right; }
+  .channel-score .big { font-size: 22px; font-weight: 800; }
+
+  /* Match table */
+  table { width: 100%; border-collapse: collapse; }
+  th { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* Score colors */
+  .s9, .s10 { color: #10b981; }
+  .s8 { color: #34d399; }
+  .s7 { color: #f59e0b; }
+  .s6 { color: #fb923c; }
+  .s5, .s4, .s3 { color: #ef4444; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #6d28d9; }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); }
+
+  /* Page titles */
+  .page-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .page-sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+  /* Content strategy */
+  .hook-card { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 10px; }
+  .hook-format { font-size: 10px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
+  .hook-text { font-size: 15px; font-weight: 500; margin-top: 4px; }
+  .hook-platform { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .script-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; font-family: inherit; }
+
+  /* Loading state */
+  .loading { text-align: center; padding: 60px; color: var(--muted); }
+  .spinner { border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; width: 32px; height: 32px; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 60px; }
+  .empty .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty h3 { color: var(--text); margin-bottom: 8px; }
+  .empty p { color: var(--muted); font-size: 13px; }
+  code { background: var(--surface2); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 13px; }
+
+  /* Scrollable containers */
+  .scroll-x { overflow-x: auto; }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+  #toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Dropship<span>Intelligence</span></div>
+  <div class="status-bar">
+    <span><span class="dot"></span>Agent Active</span>
+    <span id="last-updated">No scan yet</span>
+    <button class="btn btn-primary" onclick="triggerScan()">▶ Run Scan</button>
+  </div>
+</header>
+
+<main>
+  <nav>
+    <div class="section-label">Overview</div>
+    <a class="active" onclick="showPage('dashboard')">📊 Dashboard</a>
+    <a onclick="showPage('products')">🛍 Products</a>
+    <a onclick="showPage('channels')">📡 Channels</a>
+    <a onclick="showPage('matches')">🎯 Best Matches</a>
+
+    <div class="section-label">Strategy</div>
+    <a onclick="showPage('content')">✍️ Content Strategy</a>
+    <a onclick="showPage('arbitrage')">⚡ Traffic Arbitrage</a>
+
+    <div class="section-label">Intelligence</div>
+    <a onclick="showPage('winners')">🏆 Winner Labels</a>
+    <a onclick="showPage('history')">📜 Scan History</a>
+  </nav>
+
+  <div class="content" id="main-content">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Real-time product & channel intelligence</div>
+
+      <div class="grid grid-4" id="kpi-cards">
+        <div class="card"><div class="card-header">Products Analyzed</div><div class="card-value" id="kpi-products">—</div></div>
+        <div class="card"><div class="card-header">Channels Analyzed</div><div class="card-value" id="kpi-channels">—</div></div>
+        <div class="card"><div class="card-header">Top Score</div><div class="card-value s9" id="kpi-top-score">—</div></div>
+        <div class="card"><div class="card-header">Cheapest CPM</div><div class="card-value" id="kpi-cheapest-cpm">—</div></div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <div class="page-title" style="font-size:16px;margin-bottom:16px;">🏆 Winner Labels</div>
+        <div class="grid grid-3" id="winner-cards-dash"></div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <div class="page-title" style="font-size:16px;margin-bottom:16px;">Top 5 Products</div>
+        <div id="dash-top-products"></div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS PAGE -->
+    <div class="page" id="page-products">
+      <div class="page-title">Product Opportunities</div>
+      <div class="page-sub">Ranked by overall opportunity score</div>
+      <div id="products-list"></div>
+    </div>
+
+    <!-- CHANNELS PAGE -->
+    <div class="page" id="page-channels">
+      <div class="page-title">Attention Channels</div>
+      <div class="page-sub">Ranked by cheapest qualified attention</div>
+      <div class="grid" id="channels-list"></div>
+    </div>
+
+    <!-- MATCHES PAGE -->
+    <div class="page" id="page-matches">
+      <div class="page-title">Best Product × Channel Matches</div>
+      <div class="page-sub">Optimal product-channel pairings by net margin after CAC</div>
+      <div class="scroll-x">
+        <table id="matches-table">
+          <thead><tr><th>#</th><th>Product</th><th>Channel</th><th>Match Score</th><th>Est. CAC</th><th>Net Margin</th><th>Why It Works</th></tr></thead>
+          <tbody id="matches-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTENT PAGE -->
+    <div class="page" id="page-content">
+      <div class="page-title">Content Strategy</div>
+      <div class="page-sub">Hooks, scripts, and 30-day content playbooks for top products</div>
+      <div id="content-strategies"></div>
+    </div>
+
+    <!-- ARBITRAGE PAGE -->
+    <div class="page" id="page-arbitrage">
+      <div class="page-title">Traffic Arbitrage</div>
+      <div class="page-sub">Where to spend $1 to get the most buyer attention</div>
+
+      <div class="grid grid-2" style="margin-bottom:24px;">
+        <div class="card">
+          <div class="card-header">Phase 1 — Organic First</div>
+          <p style="color:var(--muted);font-size:13px;line-height:1.6;margin-top:8px;">Post 2-3x daily on TikTok, Pinterest, Instagram — zero ad spend. Use all 5 hook formats. Find the winner organically before paying a dollar.</p>
+        </div>
+        <div class="card">
+          <div class="card-header">Phase 2 — Amplify Winners</div>
+          <p style="color:var(--muted);font-size:13px;line-height:1.6;margin-top:8px;">Identify which organic posts perform. Run TikTok Spark Ads on winners. Launch Pinterest Shopping. Test Reddit promoted posts at $5/day.</p>
+        </div>
+        <div class="card">
+          <div class="card-header">Phase 3 — Arbitrage Scale</div>
+          <p style="color:var(--muted);font-size:13px;line-height:1.6;margin-top:8px;">Kill any channel where CAC exceeds 20% of AOV. Double budget on lowest-CAC channel weekly. Add email/SMS to reduce future CAC to near $0.</p>
+        </div>
+        <div class="card">
+          <div class="card-header">Gary V Content Formula</div>
+          <p style="color:var(--muted);font-size:13px;line-height:1.6;margin-top:8px;">Document don't create. Find trending formats. Piggyback viral sounds. React to competitor content. Duet creators in your niche. Stitch viral videos.</p>
+        </div>
+      </div>
+
+      <div class="page-title" style="font-size:16px;margin-bottom:16px;">Platform CPM Comparison</div>
+      <div id="cpm-grid"></div>
+    </div>
+
+    <!-- WINNERS PAGE -->
+    <div class="page" id="page-winners">
+      <div class="page-title">🏆 Winner Labels</div>
+      <div class="page-sub">Best product and channel per category</div>
+      <div class="grid grid-2" id="winners-detail"></div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div class="page" id="page-history">
+      <div class="page-title">Scan History</div>
+      <div class="page-sub">All previous scans and tracked products</div>
+      <div id="scan-history"></div>
+    </div>
+
+  </div>
+</main>
+
+<div id="toast">✓ Scan triggered — refreshing in 30s</div>
+
+<script>
+// ── State ───────────────────────────────────────────────────
+let data = null;
+
+// ── Navigation ──────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  const navLinks = document.querySelectorAll('nav a');
+  navLinks.forEach(a => {
+    if (a.getAttribute('onclick')?.includes("'" + page + "'")) a.classList.add('active');
+  });
+}
+
+// ── Data Loading ────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('/api/latest');
+    if (!res.ok) { showEmpty(); return; }
+    data = await res.json();
+    renderAll(data);
+  } catch {
+    showEmpty();
+  }
+}
+
+function showEmpty() {
+  document.getElementById('kpi-products').textContent = '0';
+  document.getElementById('kpi-channels').textContent = '0';
+  document.getElementById('kpi-top-score').textContent = '—';
+  document.getElementById('kpi-cheapest-cpm').textContent = '—';
+  document.getElementById('dash-top-products').innerHTML = `
+    <div class="empty">
+      <div class="icon">🤖</div>
+      <h3>No scan data yet</h3>
+      <p>Run a scan to populate the dashboard:<br/><br/><code>node index.js scan</code><br/><br/>or click the <strong>▶ Run Scan</strong> button above.</p>
+    </div>`;
+}
+
+// ── Render All ──────────────────────────────────────────────
+function renderAll(d) {
+  const updated = d.lastUpdated ? new Date(d.lastUpdated).toLocaleString() : 'Unknown';
+  document.getElementById('last-updated').textContent = 'Updated: ' + updated;
+
+  const s = d.summary || {};
+  document.getElementById('kpi-products').textContent = s.productsAnalyzed || d.topProducts?.length || 0;
+  document.getElementById('kpi-channels').textContent = s.channelsAnalyzed || d.topChannels?.length || 0;
+
+  const topScore = d.topProducts?.[0]?.overallScore;
+  document.getElementById('kpi-top-score').textContent = topScore ? topScore + '/10' : '—';
+
+  const cheapestCPM = [...(d.topChannels || [])].sort((a, b) => (a.cpm ?? 99) - (b.cpm ?? 99))[0];
+  document.getElementById('kpi-cheapest-cpm').textContent = cheapestCPM ? '$' + (cheapestCPM.cpm ?? 0) : '—';
+
+  renderWinnerCards(d.winners, 'winner-cards-dash');
+  renderTopProducts(d.topProducts, 'dash-top-products', 5);
+  renderAllProducts(d.topProducts);
+  renderChannels(d.topChannels);
+  renderMatches(d.topMatches);
+  renderContent(d.topProducts);
+  renderCPMGrid(d.platformCPMs);
+  renderWinnersDetail(d.winners, d.topProducts, d.topChannels);
+}
+
+// ── Winner Cards ────────────────────────────────────────────
+function renderWinnerCards(winners, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el || !winners) return;
+  const labels = [
+    { key: 'bestOverallProduct',  icon: '🥇', label: 'Best Overall',       badge: 'badge-overall' },
+    { key: 'bestMarginProduct',   icon: '💰', label: 'Best Margin',        badge: 'badge-margin' },
+    { key: 'bestLowCompProduct',  icon: '🔵', label: 'Best Low Competition', badge: 'badge-comp' },
+    { key: 'bestFastLaunch',      icon: '🚀', label: 'Fastest Launch',      badge: 'badge-launch' },
+    { key: 'bestCheapAttention',  icon: '💚', label: 'Cheapest Attention',  badge: 'badge-attention' },
+    { key: 'bestOrganicChannel',  icon: '🆓', label: 'Best Organic Channel', badge: 'badge-comp' },
+  ];
+  el.innerHTML = labels.map(l => {
+    const item = winners[l.key];
+    if (!item) return '';
+    return `<div class="card">
+      <div style="font-size:24px;margin-bottom:8px;">${l.icon}</div>
+      <div class="card-header">${l.label}</div>
+      <div style="font-size:16px;font-weight:600;margin:4px 0;">${item.name || item.channel || '—'}</div>
+      <div class="card-sub">${item.overallScore ? item.overallScore + '/10' : (item.cpm !== undefined ? 'CPM $' + item.cpm : '')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Product Cards ────────────────────────────────────────────
+function renderTopProducts(products, containerId, limit = 10) {
+  const el = document.getElementById(containerId);
+  if (!el || !products?.length) return;
+  const items = products.slice(0, limit);
+  el.innerHTML = `<div class="grid">${items.map((p, i) => productCardHTML(p, i + 1)).join('')}</div>`;
+}
+
+function renderAllProducts(products) {
+  const el = document.getElementById('products-list');
+  if (!el) return;
+  if (!products?.length) { el.innerHTML = `<div class="empty"><div class="icon">📦</div><h3>No products yet</h3><p>Run a scan first.</p></div>`; return; }
+  el.innerHTML = `<div class="grid">${products.map((p, i) => productCardHTML(p, i + 1)).join('')}</div>`;
+}
+
+function productCardHTML(p, rank) {
+  const s = p.scores || {};
+  const scoreClass = (v) => v >= 9 ? 's9' : v >= 8 ? 's8' : v >= 7 ? 's7' : v >= 6 ? 's6' : 's5';
+  const badges = [];
+  if (p.labels) p.labels.forEach(l => {
+    if (l.includes('OVERALL')) badges.push(`<span class="winner-badge badge-overall">${l}</span>`);
+    else if (l.includes('MARGIN')) badges.push(`<span class="winner-badge badge-margin">${l}</span>`);
+    else if (l.includes('COMPETITION')) badges.push(`<span class="winner-badge badge-comp">${l}</span>`);
+    else if (l.includes('LAUNCH')) badges.push(`<span class="winner-badge badge-launch">${l}</span>`);
+    else if (l.includes('ATTENTION')) badges.push(`<span class="winner-badge badge-attention">${l}</span>`);
+  });
+
+  return `<div class="product-card">
+    <div class="rank">${rank}</div>
+    <div class="product-name">${p.name}</div>
+    <div class="product-meta">${p.targetBuyer || 'Consumer product'}</div>
+    ${badges.join('')}
+    <div class="scores-grid">
+      <div class="score-item"><div class="label">Demand</div><div class="value ${scoreClass(s.demand)}">${s.demand || '?'}</div></div>
+      <div class="score-item"><div class="label">Comp.</div><div class="value ${scoreClass(s.competition)}">${s.competition || '?'}</div></div>
+      <div class="score-item"><div class="label">Attn.</div><div class="value ${scoreClass(s.attention)}">${s.attention || '?'}</div></div>
+      <div class="score-item"><div class="label">Margin</div><div class="value ${scoreClass(s.margin)}">${s.margin || '?'}</div></div>
+      <div class="score-item"><div class="label">Launch</div><div class="value ${scoreClass(s.launch)}">${s.launch || '?'}</div></div>
+    </div>
+    <div class="economics-row">
+      ${p.sellingPrice ? `<div class="econ-tag">Sell: <strong>$${p.sellingPrice}</strong></div>` : ''}
+      ${p.landedCost ? `<div class="econ-tag">Cost: $${p.landedCost}</div>` : ''}
+      ${p.grossMarginPct ? `<div class="econ-tag">GM: <strong>${p.grossMarginPct}%</strong></div>` : ''}
+      ${p.bestPlatform ? `<div class="econ-tag">${p.bestPlatform}</div>` : ''}
+    </div>
+    ${p.gapReason ? `<div style="margin-top:10px;font-size:12px;color:var(--muted);font-style:italic;">${p.gapReason}</div>` : ''}
+    <div style="margin-top:10px;text-align:right;">
+      <span class="card-value ${scoreClass(p.overallScore)}" style="font-size:20px;">${p.overallScore}/10</span>
+      <span style="font-size:11px;color:var(--muted);margin-left:6px;">${p.scoreLabel || ''}</span>
+    </div>
+  </div>`;
+}
+
+// ── Channels ─────────────────────────────────────────────────
+const channelIcons = { tiktok: '📱', pinterest: '📌', reddit: '💬', facebook: '📘', instagram: '📸', youtube: '▶️', google: '🔍', email: '📧', sms: '💬', default: '📡' };
+function getIcon(name) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('tiktok')) return '📱';
+  if (n.includes('pinterest')) return '📌';
+  if (n.includes('reddit')) return '💬';
+  if (n.includes('instagram')) return '📸';
+  if (n.includes('youtube')) return '▶️';
+  if (n.includes('google')) return '🔍';
+  if (n.includes('facebook')) return '📘';
+  if (n.includes('email')) return '📧';
+  return '📡';
+}
+
+function renderChannels(channels) {
+  const el = document.getElementById('channels-list');
+  if (!el) return;
+  if (!channels?.length) { el.innerHTML = `<div class="empty"><div class="icon">📡</div><h3>No channels yet</h3></div>`; return; }
+  el.innerHTML = channels.map(c => `
+    <div class="channel-card">
+      <div class="channel-icon" style="background:var(--surface2);">${getIcon(c.name)}</div>
+      <div class="channel-info">
+        <div class="channel-name">${c.name}</div>
+        <div class="channel-stats">
+          <span>CPM: $${c.cpm ?? 0}</span>
+          <span>CPC: $${c.cpc ?? 0}</span>
+          <span>CAC ~$${c.avgCac ?? '?'}</span>
+          <span>${c.type || 'hybrid'}</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${c.whyUnderpriced || c.bestContentType || ''}</div>
+      </div>
+      <div class="channel-score">
+        <div class="big ${c.overallScore >= 8 ? 's9' : c.overallScore >= 7 ? 's8' : 's7'}">${c.overallScore}</div>
+        <div style="font-size:10px;color:var(--muted);">/ 10</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Matches ──────────────────────────────────────────────────
+function renderMatches(matches) {
+  const tbody = document.getElementById('matches-tbody');
+  if (!tbody) return;
+  if (!matches?.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:40px;">No matches yet</td></tr>`; return; }
+  tbody.innerHTML = matches.slice(0, 15).map((m, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong>${m.product}</strong></td>
+      <td>${m.channel}</td>
+      <td class="${m.matchScore >= 8 ? 's9' : m.matchScore >= 7 ? 's8' : 's7'}">${m.matchScore}/10</td>
+      <td>${m.estimatedCAC}</td>
+      <td style="color:var(--green);">${m.estimatedNetMargin}</td>
+      <td style="font-size:12px;color:var(--muted);max-width:200px;">${m.whyItWorks || ''}</td>
+    </tr>`).join('');
+}
+
+// ── Content Strategies ────────────────────────────────────────
+function renderContent(products) {
+  const el = document.getElementById('content-strategies');
+  if (!el || !products?.length) return;
+  const top3 = products.slice(0, 3);
+  el.innerHTML = top3.map(p => {
+    const hooks = p.bestContentHook ? [{format:'primary', hook: p.bestContentHook, platform: p.bestPlatform || 'TikTok'}] : [];
+    return `<div class="card" style="margin-bottom:16px;">
+      <div class="product-name">${p.name}</div>
+      <div style="margin:12px 0;">
+        ${hooks.map(h => `
+          <div class="hook-card">
+            <div class="hook-format">${h.format}</div>
+            <div class="hook-text">"${h.hook}"</div>
+            <div class="hook-platform">Best for: ${h.platform}</div>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:12px;color:var(--muted);">
+        ${p.gapReason ? `<strong>Market Gap:</strong> ${p.gapReason}<br/>` : ''}
+        ${p.videoFriendly ? '<span style="color:var(--green);">✓ Video-friendly product</span>&nbsp;&nbsp;' : ''}
+        ${p.impulseBuy ? '<span style="color:var(--yellow);">⚡ Impulse buy potential</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── CPM Grid ─────────────────────────────────────────────────
+function renderCPMGrid(platforms) {
+  const el = document.getElementById('cpm-grid');
+  if (!el || !platforms) return;
+  const sorted = Object.entries(platforms).sort(([,a], [,b]) => (a.cpm || 0) - (b.cpm || 0));
+  el.innerHTML = `<div class="grid grid-4">${sorted.map(([key, p]) => {
+    const pct = p.cpm === 0 ? 0 : Math.min(100, (p.cpm / 15) * 100);
+    const color = p.cpm === 0 ? 'var(--green)' : p.cpm < 5 ? '#34d399' : p.cpm < 10 ? '#f59e0b' : '#ef4444';
+    return `<div class="card">
+      <div class="card-header">${getIcon(p.label || key)} ${p.label || key}</div>
+      <div class="card-value" style="color:${color};">$${p.cpm || 0}</div>
+      <div class="card-sub">CPM | CPC: $${p.cpc || 0}</div>
+      <div style="margin-top:10px;">
+        <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${color};"></div></div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── Winners Detail ────────────────────────────────────────────
+function renderWinnersDetail(winners, products, channels) {
+  const el = document.getElementById('winners-detail');
+  if (!el || !winners) return;
+  const items = [
+    { key: 'bestOverallProduct',   icon: '🥇', title: 'Best Overall Product',     desc: 'Highest combined score across all dimensions' },
+    { key: 'bestMarginProduct',    icon: '💰', title: 'Best Margin Product',       desc: 'Highest gross margin percentage' },
+    { key: 'bestLowCompProduct',   icon: '🔵', title: 'Best Low Competition',      desc: 'Least saturated market with real buyer demand' },
+    { key: 'bestFastLaunch',       icon: '🚀', title: 'Best Fast Launch',          desc: 'Fastest to source, list, and start selling' },
+    { key: 'bestCheapAttention',   icon: '💚', title: 'Cheapest Attention Channel', desc: 'Lowest cost per thousand impressions' },
+    { key: 'bestOrganicChannel',   icon: '🆓', title: 'Best Organic Channel',      desc: 'Best free traffic potential' },
+  ];
+  el.innerHTML = items.map(item => {
+    const w = winners[item.key];
+    if (!w) return '';
+    return `<div class="card">
+      <div style="font-size:32px;margin-bottom:12px;">${item.icon}</div>
+      <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">${item.title}</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px;">${w.name || w.channel || '—'}</div>
+      <div style="font-size:12px;color:var(--muted);">${item.desc}</div>
+      <div style="margin-top:12px;font-size:13px;">
+        ${w.overallScore ? `Score: <strong>${w.overallScore}/10</strong>` : ''}
+        ${w.grossMarginPct ? ` | Margin: <strong>${w.grossMarginPct}%</strong>` : ''}
+        ${w.cpm !== undefined ? ` | CPM: <strong>$${w.cpm}</strong>` : ''}
+        ${w.scoreLabel ? ` | <span style="color:var(--accent);">${w.scoreLabel}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Scan History ──────────────────────────────────────────────
+async function loadHistory() {
+  const el = document.getElementById('scan-history');
+  if (!el) return;
+  try {
+    const res = await fetch('/api/history');
+    const db  = await res.json();
+    const h   = db.scanHistory || [];
+    if (!h.length) { el.innerHTML = `<div class="empty"><div class="icon">📜</div><h3>No history yet</h3></div>`; return; }
+    el.innerHTML = `<table><thead><tr><th>Timestamp</th><th>Products Found</th><th>Top Product</th><th>Top Score</th></tr></thead>
+      <tbody>${h.slice().reverse().slice(0, 20).map(s => `<tr>
+        <td>${s.timestamp?.slice(0,16)}</td>
+        <td>${s.productsFound}</td>
+        <td>${s.topProduct || '—'}</td>
+        <td class="${s.topScore >= 8 ? 's9' : 's7'}">${s.topScore || '—'}</td>
+      </tr>`).join('')}</tbody></table>`;
+  } catch {
+    el.innerHTML = `<div class="empty"><p>Could not load history.</p></div>`;
+  }
+}
+
+// ── Scan trigger ──────────────────────────────────────────────
+async function triggerScan() {
+  try {
+    await fetch('/api/scan', { method: 'POST' });
+    showToast('Scan started! Results will appear in ~2 minutes.');
+    setTimeout(loadData, 30000);
+  } catch {
+    showToast('Could not trigger scan. Is the agent running?');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Override showPage to lazy-load history ───────────────────
+const origShowPage = window.showPage;
+window.showPage = function(page) {
+  showPage(page);
+  if (page === 'history') loadHistory();
+};
+
+// ── Init ─────────────────────────────────────────────────────
+loadData();
+// Auto-refresh every 60 seconds
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>

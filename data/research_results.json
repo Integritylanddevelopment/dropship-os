@@ -1,0 +1,99 @@
+{
+  "products": [
+    {
+      "name": "Trending Products for Dropshipping to Sell Now - Zendr\u2026",
+      "margin_pct": 35,
+      "source_url": "https://zendrop.com/trending-products/",
+      "snippet": "Our trending list is updated based on real sales activity, supplier performance, and emerging demand \u2014 so you only pick \u2026",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    },
+    {
+      "name": "Zendrop\u2019s Product List -The Best Items to Sell in 2026!",
+      "margin_pct": 35,
+      "source_url": "https://www.dropshippinghustle.com/zendrops-product/",
+      "snippet": "Dec 15, 2025 \u00b7 I\u2019ve gone through Zendrop\u2019s catalog of products and given my opinion on the best products to sell, the products \u2026",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    },
+    {
+      "name": "Discover the Top Best-Selling Products on Zendrop for 2025",
+      "margin_pct": 35,
+      "source_url": "https://www.spocket.co/blogs/best-selling-products-zendrop",
+      "snippet": "Jan 27, 2025 \u00b7 Explore our curated list of the most popular products available on Zendrop this year. For dropshippers \u2026",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    },
+    {
+      "name": "Zendrop Trending Products 2025: Top Picks - accio.com",
+      "margin_pct": 35,
+      "source_url": "https://www.accio.com/business/zendrop-trending-products",
+      "snippet": "Discover the hottest zendrop trending products for 2025. From smartwatches to wireless earbuds, find top-selling items \u2026",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    },
+    {
+      "name": "Zendrop\u2019s Product List: What\u2019s Gonna Be Hot This Year?",
+      "margin_pct": 35,
+      "source_url": "https://ecombusinesshub.com/zendrops-product-list/",
+      "snippet": "So there you have it, the list of hot-selling products for 2023 on Zendrop. With these trending products, you have a great \u2026",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    },
+    {
+      "name": "Product Discovery - Find Dropshipping Products - Zendrop",
+      "margin_pct": 35,
+      "source_url": "https://www.zendrop.com/product-discovery/",
+      "snippet": "Our specialists use internal data to regularly identify and deliver a list of trending products for dropshipping beginners and existing sellers. Discover products based on category, price, and more fr",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    },
+    {
+      "name": "20 Best Dropshipping Products of 2026 - Zendrop",
+      "margin_pct": 35,
+      "source_url": "https://zendrop.com/blog/best-dropshipping-products/",
+      "snippet": "Nov 15, 2024 \u00b7 Looking for the best dropshipping products of 2026? Here\u2019s a deep dive into the best niches to sell so you can launch or scale your store faster.",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    },
+    {
+      "name": "10 Best Selling Products and Trends to Watch in 2026 - stagin\u2026",
+      "margin_pct": 35,
+      "source_url": "https://www.staging.zendrop.io/blog/best-selling-products/",
+      "snippet": "Nov 14, 2024 \u00b7 Looking for the best selling products to sell online? This guide covers the top trending products in 2026 that \u2026",
+      "query": "zendrop trending products",
+      "confidence": 0.4
+    }
+  ],
+  "channels": [
+    {
+      "channel": "TikTok",
+      "cpm": 1.0,
+      "audience_type": "General",
+      "notes": "No data",
+      "snippets": []
+    },
+    {
+      "channel": "Pinterest",
+      "cpm": 0.8,
+      "audience_type": "General",
+      "notes": "No data",
+      "snippets": []
+    },
+    {
+      "channel": "Instagram",
+      "cpm": 3.5,
+      "audience_type": "General",
+      "notes": "No data",
+      "snippets": []
+    },
+    {
+      "channel": "YouTube",
+      "cpm": 2.0,
+      "audience_type": "General",
+      "notes": "No data",
+      "snippets": []
+    }
+  ],
+  "run_at": "2026-05-14T11:35:48.108488"
+}

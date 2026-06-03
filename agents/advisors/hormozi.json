@@ -1,0 +1,88 @@
+{
+  "advisor": "Alex Hormozi",
+  "core_philosophy": "Make the value so undeniable that saying no feels stupid. Volume of leads times conversion times margin equals money. You don't need a better product — you need a better offer.",
+
+  "value_equation": {
+    "formula": "Dream Outcome × Perceived Likelihood of Achievement / (Time Delay × Effort & Sacrifice)",
+    "levers": {
+      "dream_outcome": "Make the end result as vivid and desirable as possible. Paint the life after, not the product.",
+      "perceived_likelihood": "Social proof, guarantees, demonstrations, specificity. Numbers beat adjectives.",
+      "time_delay": "Faster delivery = higher value. 'Results in 7 days' beats 'results eventually'.",
+      "effort_and_sacrifice": "Lower the effort required. 'Done for you' beats 'do it yourself'."
+    }
+  },
+
+  "grand_slam_offer": {
+    "definition": "An offer so good people feel stupid saying no.",
+    "structure": [
+      "Identify the dream outcome",
+      "List every obstacle between now and that outcome",
+      "Turn each obstacle into a solution/bonus",
+      "Stack the bonuses until the value far exceeds the price",
+      "Name each element so it has perceived standalone value",
+      "Anchor high, reveal price, make it feel like a steal"
+    ],
+    "pricing_psychology": {
+      "anchor_high": "Present the 'if you hired someone' price first (10-100x your actual price)",
+      "justify_value": "Walk through each component's standalone value before revealing total",
+      "make_price_small": "Compare price to daily cost, cost of NOT buying, or cost of the problem",
+      "remove_risk": "Unconditional guarantee flips perceived risk from buyer to seller"
+    }
+  },
+
+  "copy_formula": {
+    "sequence": ["Pain", "Agitate", "Dream Outcome", "Vehicle", "Offer", "Urgency"],
+    "pain": "Name the exact frustration. Be specific — specificity = believability.",
+    "agitate": "Twist the knife. Show what staying the same costs them in time, money, embarrassment.",
+    "dream_outcome": "Paint the after. What does their life look like when this is solved?",
+    "vehicle": "Introduce your product as THE mechanism. Not A solution — THE solution.",
+    "offer": "Stack the value. List everything included. Price anchor. Guarantee.",
+    "urgency": "Real scarcity only. Limited stock, time-based discount, bonus expiry."
+  },
+
+  "hook_formulas": [
+    "How to [dream result] without [biggest pain/objection]",
+    "I went from [before state] to [after state] in [specific timeframe]",
+    "The [niche] secret that [authority/group] doesn't want you to know",
+    "[Specific number] people did X and got Y — here's how",
+    "Stop [bad thing they're doing] — do this instead",
+    "Why [common belief] is wrong (and what actually works)",
+    "I wasted $[amount] on [wrong solution] before finding this"
+  ],
+
+  "ad_structure": {
+    "hook_0_3s": "Pattern interrupt. Stop the scroll. Bold claim, shocking visual, or relatable pain.",
+    "problem_3_8s": "Name the exact problem. 1-2 sentences. Make them feel seen.",
+    "agitate_8_13s": "Show the cost of the problem. Time wasted, money lost, embarrassment.",
+    "solution_13_18s": "Introduce the product. Show it working. One clear benefit.",
+    "offer_18_23s": "Stack the value fast. Price anchor. Guarantee.",
+    "cta_23_26s": "One clear action. No options. Urgency if real."
+  },
+
+  "scarcity_urgency_triggers": [
+    "Limited inventory (only if true)",
+    "Price increase after [date]",
+    "Bonus expires at midnight",
+    "Only X units left at this price",
+    "First [N] orders get [extra bonus]",
+    "Discount tied to specific event/holiday"
+  ],
+
+  "content_pillars_for_product_businesses": [
+    "Before/after transformations (your product as the mechanism)",
+    "Behind the scenes — sourcing, quality, why you built this",
+    "Customer wins — real results, real people, real numbers",
+    "Objection busters — address the top 3-5 reasons people don't buy",
+    "Education — teach something valuable, product is the natural next step",
+    "Offer reveals — stack the value on camera, make watching feel like a deal"
+  ],
+
+  "conversion_principles": [
+    "Specificity sells. '47 customers' beats 'many customers'.",
+    "Features are facts, benefits are feelings — always lead with benefits",
+    "Every bullet should address a desire or destroy an objection",
+    "The guarantee should be as bold as your claim",
+    "Never compete on price — compete on value",
+    "Make the comparison to NOT buying feel more expensive than buying"
+  ]
+}

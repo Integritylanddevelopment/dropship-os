@@ -1,0 +1,7 @@
+{
+  "name": "roi-product-finder",
+  "version": "1.0.0",
+  "description": "ROI Product Finder — Arbitrage Intelligence Engine",
+  "main": "api/scan.js",
+  "engines": { "node": "18.x" }
+}

@@ -1,0 +1,10 @@
+{
+  "product_name": "Your Product Name",
+  "product_slug": "your_product_name",
+  "started_at": "2026-05-13T12:58:40.375041",
+  "steps": {
+    "A_zendrop": "done"
+  },
+  "status": "error",
+  "error": "'charmap' codec can't encode character '\\U0001f602' in position 123: character maps to <undefined>"
+}
