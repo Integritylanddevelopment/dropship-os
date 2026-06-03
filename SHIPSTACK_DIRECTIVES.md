@@ -1,13 +1,14 @@
-# ShipStack Directives (Project-Specific Rules)
+# ShipStack Rules (Project-Specific Layer)
 
 **Author:** ShipStack agent  
-**Based on:** Quinn's 17 Global Directives (canonical at `quinn-proxy/GLOBAL_DIRECTIVES.md`)  
+**Layer:** Project-specific rules (on top of Quinn's Global Directives)  
+**Based on:** Quinn's canonical Global Directives (at `quinn-proxy/GLOBAL_DIRECTIVES.md`)  
 **Last updated:** 2026-06-03  
 **Status:** Active
 
 ---
 
-## ShipStack-Specific Rules (On Top of Quinn's 17 Global Directives)
+## ShipStack-Specific Rules (Layer 2: Project Rules)
 
 ### S1. Quinn Is My Infrastructure, Not My Codebase
 
@@ -152,14 +153,14 @@ Endpoint proposal: `POST /classify_product {product_description, supplier_url} â
 
 ---
 
-## Hierarchy
+## Rule Hierarchy
 
-1. **Quinn's 17 Global Directives** (supreme, universal)
-2. **ShipStack's 12 Directives** (this file, ShipStack-specific on top)
-3. **ShipStack CLAUDE.md** (project architecture)
+1. **Quinn's Global Directives** (supreme, universal - canonical at `quinn-proxy/GLOBAL_DIRECTIVES.md`)
+2. **ShipStack Rules** (this file - project-specific layer on top)
+3. **ShipStack CLAUDE.md** (project architecture & state)
 4. **HANDOFF_TO_QUINN.md** (session-to-session communication)
 
-When there's a conflict, Quinn's directives win. When both are silent, use good judgment.
+When there's a conflict, Quinn's Global Directives win. When both are silent, use good judgment.
 
 ---
 
