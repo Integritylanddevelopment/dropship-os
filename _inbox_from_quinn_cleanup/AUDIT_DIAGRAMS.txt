@@ -1,0 +1,343 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║               SHIPSTACK AI — DEPENDENCY & OVERLAP DIAGRAMS                      ║
+║                          Generated 2026-05-13                                   ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+DIAGRAM 1: CURRENT ARCHITECTURE (PROBLEMATIC)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│                                                              │
+│           VERCEL DEPLOYED SITE                              │
+│     (https://dropship-os-gamma.vercel.app)                  │
+│                                                              │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│   │ /        │  │/playbook │  │/hormozi  │  │/content  │   │
+│   │(index)   │  │(playbook)│  │(hormozi) │  │(videos)  │   │
+│   └─────┬────┘  └─────┬────┘  └─────┬────┘  └─────┬────┘   │
+│         │             │             │             │         │
+│         └─────────────┴─────────────┴─────────────┘         │
+│                      │                                       │
+│           API ENDPOINTS (Edge Functions)                     │
+│           ├─ /api/chat.js          ← POST /chat            │
+│           ├─ /api/metrics.js       ← GET live stats         │
+│           ├─ /api/prometheus.js    ← POST /generate video   │
+│           ├─ /api/search.js        ← POST /search           │
+│           └─ /api/webhook.js       ← Stripe webhooks        │
+│                      │                                       │
+└──────────────────────┼───────────────────────────────────────┘
+                       │
+                       │ (ngrok tunnel)
+                       │ MUST BE RUNNING
+                       │ Fragile: manual setup
+                       │
+         ┌─────────────▼────────────┐
+         │   ngrok expose           │
+         │   localhost:8765 ◄────┐  │
+         │   (if running)       │  │
+         └──────────────────────┼──┘
+                                │
+                    ┌───────────▼────────────────┐
+                    │                            │
+          ┌─────────▼──────────────────┐         │
+          │  DEPENDS ON LOCAL STACK:   │         │
+          │  (on user's machine)       │         │
+          │                            │         │
+          │  ┌──────────────────────┐  │         │
+          │  │ Quinn Web Bridge     │◄─┼─────────┘
+          │  │ port 8765            │  │ (via ngrok)
+          │  │ quinn_web_bridge.py  │  │
+          │  │                      │  │
+          │  │ Routes:              │  │
+          │  │ • POST /chat        │  │
+          │  │ • GET /health       │  │
+          │  │ • POST /prometheus  │  │
+          │  │ • GET /stats        │  │
+          │  └────────┬─────┬──────┘  │
+          │           │     │          │
+          │      ┌────▼──┐ ┌▼─────┐   │
+          │      │Qdrant │ │Ollama│   │
+          │      │6333   │ │11434 │   │
+          │      │Docker │ │Local │   │
+          │      └───────┘ └──────┘   │
+          │                            │
+          │ ┌──────────────────────┐   │
+          │ │ Prometheus Engine    │   │
+          │ │ port 8766            │   │
+          │ │ prometheus_engine.py │   │
+          │ │ (local Python)       │   │
+          │ │                      │   │
+          │ │ Generates videos:    │   │
+          │ │ • Runway ML Gen-4    │   │
+          │ │ • FFmpeg cuts        │   │
+          │ │ • Whisper captions   │   │
+          │ │ • ElevenLabs voice   │   │
+          │ └──────────────────────┘   │
+          │                            │
+          └────────────────────────────┘
+
+PROBLEM: If any part fails, Vercel pages break!
+  ✗ ngrok down → chat unreachable
+  ✗ Quinn down → chat fails (Anthropic fallback only)
+  ✗ Qdrant down → metrics stale, no context injection
+  ✗ Prometheus down → video generation broken
+  ✗ Local machine offline → entire system offline
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+DIAGRAM 2: DUPLICATE CODE LOCATION
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────┐
+│          quinn_web_bridge.py EXISTS IN TWO PLACES            │
+│                  (CONFLICT!)                                 │
+└──────────────────────────────────────────────────────────────┘
+
+Location A (ShipStack project):
+  C:\Users\integ\Documents\Claude\Projects\Drop shipping\
+    └─ dropship-os\
+        └─ quinn_web_bridge.py  ← ⚠️ DO NOT USE
+           START_QUINN_BRIDGE.bat ← Starts it on port 8765
+
+Location B (Local AI Stack):
+  C:\Users\integ\quinn-proxy\
+    └─ quinn_web_bridge.py  ← ✓ USE THIS ONE
+       start_quinn.bat        ← Starts it on port 8765
+
+ISSUE:
+  • Which is canonical (source of truth)?
+  • Do they have diverged?
+  • Which should Vercel actually call?
+  • Why is it duplicated?
+
+SOLUTION:
+  DELETE: C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\quinn_web_bridge.py
+  KEEP:   C:\Users\integ\quinn-proxy\quinn_web_bridge.py (canonical)
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+DIAGRAM 3: INTENDED ARCHITECTURE (OPTION A: STANDALONE)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│                                                              │
+│           VERCEL DEPLOYED SITE                              │
+│     (https://dropship-os-gamma.vercel.app)                  │
+│                                                              │
+│   COMPLETELY INDEPENDENT — NO LOCAL DEPENDENCIES            │
+│                                                              │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│   │ /        │  │/playbook │  │/hormozi  │  │/content  │   │
+│   └─────┬────┘  └─────┬────┘  └─────┬────┘  └─────┬────┘   │
+│         │             │             │             │         │
+│         └─────────────┴─────────────┴─────────────┘         │
+│                      │                                       │
+│           API ENDPOINTS (Vercel Edge Functions)              │
+│           ├─ /api/chat.js          ← Anthropic direct       │
+│           ├─ /api/metrics.js       ← Stripe + static JSON   │
+│           ├─ /api/prometheus.js    ← Runway API (cloud)     │
+│           └─ /api/search.js        ← Anthropic embeddings   │
+│                      │                                       │
+└──────────────────────┼───────────────────────────────────────┘
+                       │
+                  ┌────▼─────┐
+                  │ Anthropic │
+                  │ API       │
+                  │ (sk-ant-)│
+                  └──────────┘
+
+ADVANTAGES:
+  ✓ No local machine needed
+  ✓ Pure SaaS deployment
+  ✓ Easy to hand off
+  ✓ Scales independently
+  ✓ No ngrok needed
+
+TRADEOFFS:
+  ✗ No local Ollama cost savings
+  ✗ Higher Anthropic API costs
+  ✗ Video generation must be cloud-based (Runway, HeyGen, etc.)
+  ✗ Significant refactor needed
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+DIAGRAM 4: INTENDED ARCHITECTURE (OPTION B: ACCEPT DEPENDENCY + AUTOMATE)
+═══════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│                                                              │
+│           VERCEL DEPLOYED SITE                              │
+│     (https://dropship-os-gamma.vercel.app)                  │
+│                                                              │
+│   WITH CLEAR FALLBACKS & STATUS INDICATORS                  │
+│                                                              │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│   │ /        │  │/playbook │  │/hormozi  │  │/content  │   │
+│   │ [ONLINE] │  │[ONLINE]  │  │[ONLINE]  │  │[LIMITED] │   │
+│   └─────┬────┘  └─────┬────┘  └─────┬────┘  └─────┬────┘   │
+│         │             │             │             │         │
+│         └─────────────┴─────────────┴─────────────┘         │
+│                      │                                       │
+│           API ENDPOINTS (Vercel Edge Functions)              │
+│           ├─ /api/health        ← Check local stack         │
+│           ├─ /api/chat.js       ← Quinn OR Anthropic       │
+│           ├─ /api/metrics.js    ← Live OR cached            │
+│           └─ /api/prometheus.js ← Local OR unavailable      │
+│                      │                                       │
+└──────────────────────┼───────────────────────────────────────┘
+                       │
+        ┌──────────────┴──────────────┐
+        │                             │
+        │ TRY LOCAL STACK (5s timeout)│
+        │         (via auto-refresh   │
+        │          ngrok)             │
+        │                             │
+    ┌───▼──────────────┐         ┌────▼────────────┐
+    │ LOCAL AVAILABLE  │         │ LOCAL UNAVAILABLE
+    │ ✓ Quinn bridge   │         │ │
+    │ ✓ Qdrant search  │         │ │ FALLBACK:
+    │ ✓ Ollama inf.    │         │ │ ├─ Anthropic direct
+    │ ✓ Prometheus     │         │ │ ├─ Cached metrics
+    │ (fast, free)     │         │ │ └─ "Unavailable" for video
+    └──────────────────┘         └────────────────┘
+
+ADVANTAGES:
+  ✓ Keeps local cost savings (Ollama)
+  ✓ Clear fallback chain
+  ✓ Status indicators in UI
+  ✓ Easier to develop locally
+  ✗ Still requires local setup for deployment
+
+AUTOMATION NEEDED:
+  1. Auto-restart ngrok on crash
+  2. Auto-update QUINN_ENDPOINT in Vercel when URL changes
+  3. Heartbeat check: Vercel pings local stack every 30s
+  4. Graceful degradation in UI when local is down
+
+THIS IS RECOMMENDED SHORT-TERM (1 week to implement)
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+DIAGRAM 5: PORT USAGE CONFLICT
+═══════════════════════════════════════════════════════════════════════════════════
+
+LOCAL MACHINE PORT REGISTRY
+───────────────────────────
+
+Port    Service              Project(s)         Status
+────    ──────────────────   ─────────────────  ───────────────
+6333    Qdrant               Local AI Stack     [OK] Docker-managed
+11434   Ollama               Local AI Stack     [OK] Ollama-managed
+8765    Quinn Web Bridge     Local AI + Ship    [CONFLICT!] Dual ownership
+8766    Prometheus Engine    ShipStack only     [OK] No conflict
+8888    Quinn Dashboard      Local AI Stack     [OK] No conflict
+8889    ShipStack Engine     ShipStack (planned)│    [OK] Planned
+
+ISSUE: Port 8765
+  • Local AI Stack: start_quinn.bat (unclear where)
+  • ShipStack: dropship-os\START_QUINN_BRIDGE.bat
+  • Same port, two "owners"
+  • Who's responsible for it?
+  • What if both try to start?
+
+SOLUTION:
+  Create single source of truth in Local AI Stack
+  ShipStack just calls that script (don't duplicate)
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+DIAGRAM 6: QDRANT COLLECTION PARTITIONING (UNCLEAR)
+═══════════════════════════════════════════════════════════════════════════════════
+
+Qdrant Database (http://127.0.0.1:6333)
+│
+├─ dropship_intel            ← DROPSHIPPING ONLY
+│  ├─ Gary Vee tactics
+│  ├─ Hormozi frameworks
+│  └─ Product research
+│
+├─ strategy_books            ← POWER/WAR STRATEGY ONLY (HARD WALL)
+│  ├─ 48 Laws of Power
+│  ├─ Art of War
+│  └─ Game Theory
+│
+├─ general_knowledge         ← RAW SESSIONS (source of truth)
+│  └─ 74 research sessions + 598 project files
+│
+└─ commandcore_memory        ← ENTERPRISE AGENTS
+   └─ 169 agents
+
+CURRENT ISSUE:
+  quinn_web_bridge.py config (line 62):
+    QDRANT_COLLECTIONS = ["dropship_intel", "general_knowledge"]
+
+  Problem: What about strategy_books?
+    • Is it searchable from chat? (shouldn't be!)
+    • If user asks about negotiation tactics, what happens?
+    • Does the bridge filter by query intent? (no code evidence)
+    • Or does it search both collections and return everything? (risky!)
+
+WHAT SHOULD HAPPEN:
+  [Dropshipping query] → search dropship_intel ONLY
+  [Power/war query]    → search strategy_books ONLY
+  [General query]      → search general_knowledge ONLY
+
+  Current behavior is unclear. Bridge might be leaking strategy context
+  into dropshipping context, violating the "hard wall" requirement.
+
+VERIFICATION NEEDED:
+  1. Run: python verify_qdrant_partitions.py
+  2. Review: quinn_web_bridge.py search logic (lines 110-141)
+  3. Test: ask a war strategy question to ShipStack chat, verify it doesn't return
+  4. Update: quinn_web_bridge.py to enforce collection boundaries
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+DIAGRAM 7: FALLBACK CHAIN COMPLETENESS
+═══════════════════════════════════════════════════════════════════════════════════
+
+CHAT ENDPOINT (/api/chat.js)
+  Primary: Quinn bridge (Ollama local) ──┐
+           │                               │
+           ├─ [FALLBACK] Anthropic direct │ ✓ HAS FALLBACK
+           │                               │
+  Current: works if either available ────┘
+
+METRICS ENDPOINT (/api/metrics.js)
+  Primary: Live Qdrant (6333) ────────┐
+           │                           │
+           ├─ [FALLBACK] cached JSON  │ ~ PARTIAL (Qdrant only)
+           │                           │
+  Current: no fallback for Stripe API ┘
+
+PROMETHEUS ENDPOINT (/api/prometheus.js)
+  Primary: Local Prometheus engine ──┐
+           │                          │
+           ├─ [FALLBACK] Anthropic   │ ✗ NO FALLBACK
+           │  (for script only)       │
+  Current: video generation fails ───┘
+
+SEARCH ENDPOINT (/api/search.js)
+  Primary: Qdrant via Quinn bridge ──┐
+           │                          │
+           ├─ [FALLBACK] Anthropic   │ ✓ HAS FALLBACK
+           │  (no context)            │
+  Current: works if either available ┘
+
+HEALTH CHECK (/api/health.js)
+  Primary: Quinn bridge heartbeat ───┐
+           │                          │
+           └─ [NO FALLBACK] ─────────┤ ✗ NEEDED
+  Current: missing entirely          ┘
+
+FIX NEEDED:
+  1. Add health check endpoint
+  2. Add Prometheus fallback (or remove feature)
+  3. Ensure all endpoints have documented fallback chain
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+END OF DIAGRAMS
+═══════════════════════════════════════════════════════════════════════════════════
