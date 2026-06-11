@@ -1,0 +1,2 @@
+C:\Users\integ\Documents\Claude\Projects\ShipStack\dashboard\pipeline_dashboard.py:2: DeprecationWarning: 'cgi' is deprecated and slated for removal in Python 3.13
+  import json, sys, pathlib, http.server, socketserver, urllib.parse, urllib.request, cgi, io, threading, uuid, time

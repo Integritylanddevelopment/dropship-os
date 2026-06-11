@@ -1,0 +1,247 @@
+"""prometheus_engine.py - Flask HTTP service on :8766 for video production.
+
+Endpoints:
+  GET  /health           -> {ok, ffmpeg, edge_tts, pexels_key, pixabay_key, music_dir, queue}
+  POST /produce          body {product_keyword, platform, collateral_paths?} -> {job_id, status: queued}
+  GET  /job/<id>         -> {id, status, result|error, queued_at, ...}
+  GET  /list             -> list of produced videos with metadata
+  GET  /file/<slug>/<f>  -> serve produced mp4
+
+Concurrency cap: 3 jobs. Jobs run in background threads.
+State persisted to engines/prometheus_state/jobs.json.
+"""
+import os, sys, json, time, uuid, threading, pathlib
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
+
+from flask import Flask, request, jsonify, send_from_directory, abort
+
+BASE_DIR = pathlib.Path(__file__).parent.resolve()
+sys.path.insert(0, str(BASE_DIR))
+from prometheus_lib import pipeline as prod_pipeline
+from prometheus_lib.compose import _ffmpeg_bin
+from prometheus_lib import voice as voice_mod
+
+OUTPUT_ROOT = BASE_DIR / "prometheus_output"
+STATE_DIR = BASE_DIR / "prometheus_state"
+STATE_DIR.mkdir(exist_ok=True)
+JOBS_FILE = STATE_DIR / "jobs.json"
+
+OUTPUT_ROOT.mkdir(exist_ok=True)
+
+MAX_CONCURRENT = 3
+PORT = int(os.environ.get("PROMETHEUS_ENGINE_PORT", 8766))
+
+app = Flask(__name__)
+
+# Load state from disk
+_state_lock = threading.Lock()
+_jobs = {}
+if JOBS_FILE.exists():
+    try:
+        _jobs = json.loads(JOBS_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        _jobs = {}
+
+# Sanity: any job in 'running' from a prior process is stale -> mark error
+for jid, j in list(_jobs.items()):
+    if j.get("status") == "running":
+        j["status"] = "error"
+        j["error"] = "process restarted while running"
+
+_running_count_lock = threading.Lock()
+_running_count = 0
+
+
+def _save_jobs():
+    tmp = JOBS_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(_jobs, indent=2, default=str), encoding="utf-8")
+    tmp.replace(JOBS_FILE)
+
+
+def _load_media_kit(product_keyword):
+    """Load kit from dashboard state."""
+    kit_file = pathlib.Path(
+        r"C:\Users\integ\Documents\Claude\Projects\ShipStack\dashboard\state\media_kits.json"
+    )
+    if not kit_file.exists():
+        return None
+    try:
+        kits = json.loads(kit_file.read_text(encoding="utf-8"))
+        return kits.get(product_keyword)
+    except Exception:
+        return None
+
+
+def _run_job(job_id):
+    global _running_count
+    with _state_lock:
+        job = _jobs.get(job_id)
+        if not job:
+            return
+        job["status"] = "running"
+        job["started_at"] = time.time()
+        _save_jobs()
+    try:
+        kit = _load_media_kit(job["product_keyword"])
+        if kit is None:
+            # Build a minimal kit on the fly so produce never blocks on missing kit
+            kit = {"product_keyword": job["product_keyword"], "hook": "", "caption": ""}
+        collateral_paths = job.get("collateral_paths") or None
+        result = prod_pipeline.produce_video(
+            kit, job["platform"], output_root=str(OUTPUT_ROOT),
+            collateral_paths=collateral_paths,
+        )
+        with _state_lock:
+            job["status"] = "done"
+            job["finished_at"] = time.time()
+            job["result"] = result
+            _save_jobs()
+    except Exception as e:
+        import traceback
+        with _state_lock:
+            job["status"] = "error"
+            job["finished_at"] = time.time()
+            job["error"] = f"{type(e).__name__}: {e}"
+            job["traceback"] = traceback.format_exc()[-2000:]
+            _save_jobs()
+    finally:
+        with _running_count_lock:
+            _running_count -= 1
+
+
+def _start_worker(job_id):
+    global _running_count
+    with _running_count_lock:
+        _running_count += 1
+    t = threading.Thread(target=_run_job, args=(job_id,), daemon=True)
+    t.start()
+
+
+@app.route("/health")
+def health():
+    ff = _ffmpeg_bin()
+    try:
+        edge_ok = bool(voice_mod.available_voices_sample())
+    except Exception:
+        edge_ok = False
+    with _running_count_lock:
+        running = _running_count
+    queued = sum(1 for j in _jobs.values() if j.get("status") == "queued")
+    return jsonify({
+        "ok": True,
+        "service": "Prometheus Engine",
+        "port": PORT,
+        "ffmpeg": bool(ff),
+        "ffmpeg_path": ff,
+        "edge_tts": edge_ok,
+        "pexels_key": bool(os.environ.get("PEXELS_API_KEY", "").strip()),
+        "pixabay_key": bool(os.environ.get("PIXABAY_API_KEY", "").strip()),
+        "music_dir_set": bool(os.environ.get("MUSIC_LIBRARY_DIR", "").strip()),
+        "running_jobs": running,
+        "queued_jobs": queued,
+        "max_concurrent": MAX_CONCURRENT,
+        "output_root": str(OUTPUT_ROOT),
+    })
+
+
+@app.route("/produce", methods=["POST"])
+def produce():
+    body = request.get_json(force=True, silent=True) or {}
+    kw = (body.get("product_keyword") or "").strip()
+    platform = (body.get("platform") or "tiktok").strip().lower()
+    collateral_paths = body.get("collateral_paths")
+    if collateral_paths is not None:
+        if not isinstance(collateral_paths, list) or not all(isinstance(x, str) for x in collateral_paths):
+            return jsonify({"error": "collateral_paths must be list[str]"}), 400
+        # Validate at least one path exists
+        existing = [p for p in collateral_paths if os.path.exists(p)]
+        if not existing:
+            return jsonify({"error": "no valid collateral paths exist on disk"}), 400
+        collateral_paths = existing
+    if not kw:
+        return jsonify({"error": "product_keyword required"}), 400
+    if platform not in prod_pipeline.DIMENSIONS:
+        return jsonify({"error": f"unknown platform '{platform}'",
+                         "valid": list(prod_pipeline.DIMENSIONS.keys())}), 400
+    with _running_count_lock:
+        if _running_count >= MAX_CONCURRENT:
+            queue_position = sum(1 for j in _jobs.values() if j.get("status") == "queued") + 1
+        else:
+            queue_position = 0
+    job_id = uuid.uuid4().hex[:12]
+    with _state_lock:
+        _jobs[job_id] = {
+            "id": job_id,
+            "product_keyword": kw,
+            "platform": platform,
+            "status": "queued",
+            "queued_at": time.time(),
+            "collateral_paths": collateral_paths,
+        }
+        _save_jobs()
+    if queue_position == 0:
+        _start_worker(job_id)
+    else:
+        threading.Thread(target=_queue_watcher, args=(job_id,), daemon=True).start()
+    return jsonify({"job_id": job_id, "status": "queued",
+                     "queue_position": queue_position,
+                     "collateral_count": len(collateral_paths) if collateral_paths else 0}), 202
+
+
+def _queue_watcher(job_id):
+    while True:
+        with _running_count_lock:
+            if _running_count < MAX_CONCURRENT:
+                break
+        time.sleep(1.0)
+    _start_worker(job_id)
+
+
+@app.route("/job/<job_id>")
+def job_status(job_id):
+    with _state_lock:
+        j = _jobs.get(job_id)
+    if not j:
+        return jsonify({"error": "job not found"}), 404
+    return jsonify(j)
+
+
+@app.route("/list")
+def list_videos():
+    with _state_lock:
+        out = []
+        for j in _jobs.values():
+            if j.get("status") == "done":
+                r = j.get("result", {})
+                out.append({
+                    "job_id": j.get("id"),
+                    "platform": j.get("platform"),
+                    "product_keyword": j.get("product_keyword"),
+                    "video_path": r.get("video_path"),
+                    "size_bytes": r.get("size_bytes"),
+                    "duration_sec": r.get("duration_sec"),
+                    "dimensions": r.get("dimensions"),
+                    "finished_at": j.get("finished_at"),
+                })
+    return jsonify({"videos": out, "count": len(out)})
+
+
+@app.route("/file/<slug>/<fname>")
+def serve_file(slug, fname):
+    safe = pathlib.Path(slug).name  # strip path components
+    safe_f = pathlib.Path(fname).name
+    target = OUTPUT_ROOT / safe
+    if not target.exists():
+        abort(404)
+    return send_from_directory(str(target), safe_f, conditional=True)
+
+
+if __name__ == "__main__":
+    # Reduce werkzeug noise; run threaded
+    import logging
+    logging.getLogger("werkzeug").setLevel(logging.WARNING)
+    print(f"Prometheus Engine starting on http://127.0.0.1:{PORT}")
+    print(f"  ffmpeg: {_ffmpeg_bin() or 'NOT FOUND'}")
+    print(f"  output: {OUTPUT_ROOT}")
+    app.run(host="127.0.0.1", port=PORT, threaded=True, use_reloader=False)

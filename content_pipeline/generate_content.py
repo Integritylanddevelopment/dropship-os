@@ -6,7 +6,7 @@ platform-specific content for the top 3 combos.
 Gary Vee playbook: volume, hooks, repurposing.
 
 Usage:
-    cd "C:\Users\integ\Documents\Claude\Projects\Drop shipping"
+    cd "C:\Users\integ\Documents\Claude\Projects\ShipStack"
     python content_pipeline/generate_content.py
 
     # Generate for a specific product:

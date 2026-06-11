@@ -1,14 +1,35 @@
-﻿node_modules/
+﻿# Environment
 .env
 .env.local
 .env.*.local
+.env.bak.*
+
+# Logs and output
 *.log
+logs/
+
+# Dependencies
+node_modules/
+__pycache__/
+
+# Archives and cleanup
+_archive/
+
+# Files with credentials — never commit
+.env.example
+Local AI stackArchitecture partners.txt
+discovery_engine/suppliers/*.json
+social_ai_agent/token_test.ps1
+
+# IDE
 .vercel
-.DS_Store
-*.swp
-*.swo
-*~
 .idea/
 .vscode/
 dist/
 build/
+
+# OS
+.DS_Store
+*.swp
+*.swo
+*~

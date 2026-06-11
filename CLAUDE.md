@@ -1,8 +1,8 @@
 # SHIPSTACK DIRECTIVE
 
 **Owner:** Alex Alexander
-**Last updated:** 2026-06-03
-**Document version:** 1.0
+**Last updated:** 2026-06-04
+**Document version:** 1.1
 **Replaces:** all prior CLAUDE.md versions
 
 ---
@@ -19,17 +19,17 @@ This document defines ShipStack's architecture, project blueprint, and engineeri
 
 All AI inference requests route through Quinn HTTP bridge at `http://127.0.0.1:8765`. Never call Anthropic directly. ShipStack calls Quinn; Quinn handles routing to Anthropic or local Ollama.
 
-## Rule 2 — Lane: dropship-os/ is ShipStack's House
+## Rule 2 — Lane: ShipStack/ is ShipStack's House
 
-All ShipStack code and assets live in `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\` only. Do not write files to parent folder, Quinn's folder, or anywhere else. If you need Quinn to change something, write `HANDOFF_TO_QUINN_<DATE>_<TOPIC>.md` and Quinn reads it next session.
+All ShipStack code and assets live in `C:\Users\integ\Documents\Claude\Projects\ShipStack\` only. Do not write files to parent folder, Quinn's folder, or anywhere else. If you need Quinn to change something, write `HANDOFF_TO_QUINN_<DATE>_<TOPIC>.md` and Quinn reads it next session.
 
 ## Rule 3 — Badge Protocol Per Tool Call
 
-Before every tool use: call `shipstack_badge()` to get a fresh one-shot token. The badge reads `dropship-os/CLAUDE.md`, returns current rules + recent actions. After the tool executes, call `shipstack_log_action()` to log the result synchronously. This happens per tool, not per session.
+Before every tool use: call `shipstack_badge()` to get a fresh one-shot token. The badge reads `CLAUDE.md`, returns current rules + recent actions. After the tool executes, call `shipstack_log_action()` to log the result synchronously. This happens per tool, not per session.
 
 ## Rule 4 — No Direct Anthropic API Keys
 
-No ANTHROPIC_API_KEY in any ShipStack code, env file, or config. All LLM calls go through Quinn bridge. This is auditable: `grep -r "api.anthropic.com\|ANTHROPIC_API_KEY" dropship-os/` must return zero results.
+No ANTHROPIC_API_KEY in any ShipStack code, env file, or config. All LLM calls go through Quinn bridge. This is auditable: `grep -r "api.anthropic.com\|ANTHROPIC_API_KEY" .` must return zero results.
 
 ## Rule 5 — HTTP Service, Not MCP
 
@@ -38,8 +38,10 @@ ShipStack runs on :8889 as a Python HTTP service (FastAPI / Flask / Express). It
 ## Rule 6 — Port Registry
 
 - **3000** — Vercel frontend (dropship-os-gamma.vercel.app)
-- **8889** — ShipStack engine (your HTTP service)
-- **8766** — Prometheus video generation engine
+- **8889** — ShipStack Engine (engines/shipstack_engine.py)
+- **8766** — Prometheus Engine (engines/prometheus_engine.py)
+- **8867** — Social AI Agent (agents/social_ai_agent.py)
+- **8890** — ShipStack Dashboard (engines/shipstack_dashboard.py)
 - **8765** — Quinn HTTP bridge (you call it, don't bind to it)
 
 ## Rule 7 — No Scheduled Tasks
@@ -52,7 +54,7 @@ Prometheus (video generation engine) is ShipStack's. Files: `prometheus_engine.p
 
 ## Rule 9 — Handoff Direction is ONE-WAY
 
-Quinn writes `HANDOFF_FROM_QUINN_<DATE>.md` to dropship-os/. You read it and reply with `HANDOFF_TO_QUINN_<DATE>.md` in the same folder. ShipStack NEVER initiates `HANDOFF_FROM_SHIPSTACK_*` docs. The conversation flows: Quinn → ShipStack → Quinn.
+Quinn writes `HANDOFF_FROM_QUINN_<DATE>.md` to `C:\Users\integ\quinn-proxy\handoff_outbox\`. You read it and reply with `HANDOFF_TO_QUINN_<DATE>.md` in `ShipStack/handoffs/`. ShipStack NEVER initiates `HANDOFF_FROM_SHIPSTACK_*` docs. The conversation flows: Quinn → ShipStack → Quinn.
 
 ## Rule 10 — Naming Conventions (Match Quinn's Standard)
 
@@ -74,20 +76,81 @@ On startup, any service must kill anything stale listening on its port. Example:
 
 ---
 
-# BLUEPRINT — LIVE ARCHITECTURE
+# BLUEPRINT — LIVE ARCHITECTURE (Reorganized 2026-06-04)
 
-| Component | Group | Type | File | Port | Health Check | Depends On | Status | Added | Notes |
-|-----------|-------|------|------|------|--------------|-----------|--------|-------|-------|
-| ShipStack Engine | ShipStack | python | shipstack_engine.py | 8889 | http://127.0.0.1:8889/health | Quinn HTTP Bridge | active | 2026-06-03 | Hormozi/Gary Vee playbook scoring, product discovery, supplier matching |
-| Decision Engine | ShipStack | python | decision_engine.py | - | internal | ShipStack Engine | active | 2026-06-03 | Product margin/volume/saturation/viral scoring logic |
-| Prometheus Engine | ShipStack | python | prometheus_engine.py | 8766 | http://127.0.0.1:8766/health | Quinn HTTP Bridge | active | 2026-06-03 | Video generation AI (Gary Vee content, viral classification, FFmpeg) |
-| Prometheus Monitor | ShipStack | python | prometheus_monitor.py | - | internal | Prometheus Engine | active | 2026-06-03 | Health checks, queue management, retry logic |
-| Social AI Agent | ShipStack | python | social_ai_agent/ | - | internal | ShipStack Engine | active | 2026-06-03 | Pinterest/Reddit/TikTok content generation + auto-posting |
-| Pinterest Agent | ShipStack | python | pinterest_agent/ | - | internal | Social AI Agent | active | 2026-06-03 | Pinterest-specific organic growth (boards, pins, scheduling) |
-| ShipStack Badge System | ShipStack | python | shipstack_badge.py | - | internal | none | active | 2026-06-03 | One-shot token generation, rule reading, hash caching |
-| Action Logger | ShipStack | python | shipstack_log_action.py | - | internal | none | active | 2026-06-03 | JSONL logging to shipstack_actions.jsonl |
-| ShipStack Dashboard | ShipStack | html | launcher_os.html | - | manual | none | active | 2026-06-03 | Desktop launcher shortcut (manually placed on user desktop) |
-| ShipStack Vercel | ShipStack | web | dropship-os-gamma.vercel.app | - | https://dropship-os-gamma.vercel.app | - | active | 2026-04 | Live frontend deployment |
+## engines/ subfolder — Core HTTP microservices
+
+| Component | Type | File | Port | Health Check | Depends On | Status | Notes |
+|-----------|------|------|------|--------------|-----------|--------|-------|
+| ShipStack Engine | python | engines/shipstack_engine.py | 8889 | http://127.0.0.1:8889/health | Quinn HTTP Bridge | active | Decision + product research APIs. No badge requirement. Public endpoints. |
+| Prometheus Engine | python | engines/prometheus_engine.py | 8766 | http://127.0.0.1:8766/health | Quinn HTTP Bridge | active | Video generation. Routes to Runway ML, ElevenLabs, Suno. No badge requirement. |
+| Social AI Agent (root file) | python | agents/social_ai_agent.py | 8867 | http://127.0.0.1:8867/health | Quinn HTTP Bridge | active | Social media orchestration. TikTok, Instagram, Pinterest, YouTube. No badge requirement. |
+| ShipStack Dashboard | python | engines/shipstack_dashboard.py | 8890 | http://127.0.0.1:8890 (self) | - | active | Real-time monitoring UI. Shows service health, recent actions, metrics. |
+
+## agents/ subfolder — Decision & research agents
+
+| Component | Type | File | Port | Depends On | Status | Notes |
+|-----------|------|------|------|-----------|--------|-------|
+| Decision Engine | python | agents/decision_engine.py | - | internal | active | Product scoring (margin, reviews, niche, competition). Callable by shipstack_engine.py. |
+| Product Research | python | agents/product_research.py | - | internal | active | Supplier aggregation (Zendrop, AutoDS, AliExpress). SQLite cache, 24-hour TTL. |
+| Analytics Engine | python | agents/analytics_engine.py | - | internal | active | Metrics computation from shipstack_actions.jsonl. Success rates, trends. |
+
+## badge/ subfolder — Authentication & logging
+
+| Component | Type | File | Port | Status | Notes |
+|-----------|------|------|------|--------|-------|
+| Badge System | python | badge/shipstack_badge.py | - | active | One-shot token generation. 60-second TTL. Internal use only (not gating public endpoints). |
+| Action Logger | python | badge/shipstack_log_action.py | - | active | JSONL logging to logs/shipstack_actions.jsonl. Synchronous writes. |
+| Config Validator | python | badge/validate_config.py | - | active | Pre-flight checks: ports available, files exist, no Anthropic API leaks. |
+
+## frontend/ subfolder — HTML/UI
+
+| Component | Type | File | Status | Notes |
+|-----------|------|------|--------|-------|
+| Main Landing | html | frontend/index.html | active | 150K. Product showcase. |
+| Launcher OS | html | frontend/launcher_os.html | active | Desktop launcher widget. Links to all 4 services. |
+| Privacy Policy | html | frontend/privacy.html | active | Legal compliance. |
+| Thank You | html | frontend/thank-you.html | active | Post-conversion. |
+| Metrics Store | json | frontend/metrics.json | active | Analytics dashboard data. |
+
+## scripts/ subfolder — Launchers & deployment
+
+| Component | Type | File | Status | Notes |
+|-----------|------|------|--------|-------|
+| LAUNCH_SHIPSTACK.ps1 | powershell | scripts/LAUNCH_SHIPSTACK.ps1 | active | Kills old processes on 8889/8766/8867/8890. Starts all 4 services. |
+| DEPLOY.ps1 | powershell | scripts/DEPLOY.ps1 | active | Deployment orchestration. |
+| PUSH_SHIPSTACK_TO_GITHUB.ps1 | powershell | scripts/PUSH_SHIPSTACK_TO_GITHUB.ps1 | active | Git push. |
+| set_vercel_envs.py | python | scripts/set_vercel_envs.py | active | Configure Vercel environment. |
+| consolidate_shipstack_env.py | python | scripts/consolidate_shipstack_env.py | active | Merge env vars. |
+
+## docs/ subfolder — Documentation
+
+| Component | Type | File | Status |
+|-----------|------|------|--------|
+| BUILD_PLAN.md | markdown | docs/BUILD_PLAN.md | active |
+| SYSTEM_ARCHITECTURE.md | markdown | docs/SYSTEM_ARCHITECTURE.md | active |
+| QUICKSTART.md | markdown | docs/QUICKSTART.md | active |
+| BADGE_PROTOCOL_EXAMPLE.md | markdown | docs/BADGE_PROTOCOL_EXAMPLE.md | active |
+| (7 others) | markdown | docs/*.md | active |
+
+## Preserved subdirectories (not reorganized)
+
+| Folder | Purpose | Status |
+|--------|---------|--------|
+| api/ | Vercel serverless functions | active |
+| social_ai_agent/ | Full social AI implementation tree | active |
+| integrations/ | Supplier/platform connectors | active |
+| content_pipeline/ | Content generation pipeline | active |
+| pinterest_agent/ | Pinterest-specific automation | active |
+| dropship-agent/ | Dropship research agent | active |
+| roi-product-finder/ | ROI calculation | active |
+| landing-pages/ | Marketing pages | active |
+| decision-engine/ | Scoring engine (with dash) | active |
+| asset_machine/ | Asset generation | active |
+| prometheus_output/ | Video output storage | active |
+| shipstack-privacy/ | Privacy docs | active |
+| data/ | Data cache | active |
+| logs/ | Runtime logs | active |
 
 ---
 
@@ -103,12 +166,17 @@ On startup, any service must kill anything stale listening on its port. Example:
 
 | Purpose | Path |
 |---------|------|
-| Active ShipStack code | `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\` |
-| ShipStack logs | `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\logs\` |
-| ShipStack artifacts | `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\artifacts\` |
-| ShipStack documentation | `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\docs\` |
-| ShipStack scripts | `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\scripts\` |
-| ShipStack archive | `C:\Users\integ\Documents\Claude\Projects\Drop shipping\dropship-os\_archive\` |
+| Active ShipStack code | `C:\Users\integ\Documents\Claude\Projects\ShipStack\` |
+| Core engines | `C:\Users\integ\Documents\Claude\Projects\ShipStack\engines\` |
+| Decision agents | `C:\Users\integ\Documents\Claude\Projects\ShipStack\agents\` |
+| Badge/auth | `C:\Users\integ\Documents\Claude\Projects\ShipStack\badge\` |
+| Frontend HTML | `C:\Users\integ\Documents\Claude\Projects\ShipStack\frontend\` |
+| Launch scripts | `C:\Users\integ\Documents\Claude\Projects\ShipStack\scripts\` |
+| Documentation | `C:\Users\integ\Documents\Claude\Projects\ShipStack\docs\` |
+| Quinn handoffs | `C:\Users\integ\Documents\Claude\Projects\ShipStack\handoffs\` |
+| Test suites | `C:\Users\integ\Documents\Claude\Projects\ShipStack\tests\` |
+| Archive/backup | `C:\Users\integ\Documents\Claude\Projects\ShipStack\_archive\` |
+| Runtime logs | `C:\Users\integ\Documents\Claude\Projects\ShipStack\logs\` |
 
 ---
 
@@ -142,7 +210,7 @@ Currently unlimited for ShipStack tools (no gates). If abuse patterns emerge, ra
 
 ## Directories Rule (B5)
 
-All ShipStack files must live under `dropship-os/`. Writes outside this directory refuse with a path validation error. Path validation uses `startswith(dropship_os_path)`.
+All ShipStack files must live under `C:\Users\integ\Documents\Claude\Projects\ShipStack\`. Writes outside this directory refuse with a path validation error. Path validation uses `startswith(ShipStack_path)`.
 
 ---
 
@@ -150,6 +218,7 @@ All ShipStack files must live under `dropship-os/`. Writes outside this director
 
 | Date | Change |
 |------|--------|
+| 2026-06-04 | v1.1 — Blueprint updated post-reorg. New structure: engines/, agents/, badge/, frontend/, scripts/, docs/, handoffs/, tests/, _archive/. Old `dropship-os/` subdir removed. Folder renamed `Drop shipping/` → `ShipStack/`. Path updated in Rules 2-4, 9. All file references corrected. |
 | 2026-06-03 | v1.0 — initial CLAUDE.md for ShipStack. Blueprint, rules, guardrails established. Tier 0 cleanup complete. |
 
 ---

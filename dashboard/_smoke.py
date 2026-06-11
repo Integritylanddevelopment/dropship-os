@@ -1,0 +1,37 @@
+import urllib.request, json, sys
+def get(u):
+    return urllib.request.urlopen('http://127.0.0.1:8891'+u, timeout=5).read().decode('utf-8','replace')
+results = []
+html = get('/')
+results.append(('html_len', len(html)))
+results.append(('has_tabbar', 'class="tabbar"' in html))
+results.append(('has_tab_discovery', 'data-tab="discovery"' in html))
+results.append(('has_tab_decide', 'data-tab="decide"' in html))
+results.append(('has_tab_distribution', 'data-tab="distribution"' in html))
+results.append(('has_modal', 'id="detailModal"' in html))
+results.append(('has_link_css', '/_pipe_dash.css' in html))
+results.append(('has_script_js', '/_pipe_dash.js' in html))
+css = get('/_pipe_dash.css')
+results.append(('css_len', len(css)))
+results.append(('css_has_modal_class', '.modal-inner' in css))
+results.append(('css_has_subscores', '.subscores' in css))
+results.append(('css_has_tabbar', '.tabbar' in css))
+js = get('/_pipe_dash.js')
+results.append(('js_len', len(js)))
+results.append(('js_has_switchTab', 'function switchTab' in js))
+results.append(('js_has_showDetail', 'function showDetail' in js))
+results.append(('js_has_renderDecide', 'function renderDecide' in js))
+results.append(('js_has_renderDiscovery', 'function renderDiscovery' in js))
+results.append(('js_has_renderDistribution', 'function renderDistribution' in js))
+results.append(('js_has_regenCal', 'async function regenCal' in js))
+results.append(('js_has_produceVideo', 'async function produceVideo' in js))
+results.append(('js_has_queuePost', 'async function queuePost' in js))
+results.append(('js_has_logEng', 'async function logEng' in js))
+run = json.loads(get('/api/latest-run'))
+results.append(('run_reports', len(run.get('reports') or [])))
+results.append(('run_signals', run.get('total_signals')))
+with open(r'C:\Users\integ\Documents\Claude\Projects\ShipStack\dashboard\_smoke_out.txt','w',encoding='utf-8') as f:
+    for k,v in results:
+        line = f'{k}={v}\n'
+        f.write(line)
+        sys.stdout.write(line)

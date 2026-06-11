@@ -1,0 +1,77 @@
+# Social AI Agent - Full Stack Requirements
+# Install: pip install -r requirements.txt --break-system-packages
+
+# Browser automation
+playwright==1.44.0
+
+# AI content generation
+openai==1.30.1
+anthropic==0.28.0
+
+# Database
+sqlalchemy==2.0.30
+alembic==1.13.1
+
+# Data validation
+pydantic==2.7.1
+pydantic-settings==2.3.0
+
+# CLI interface
+rich==13.7.1
+click==8.1.7
+typer==0.12.3
+
+# Task scheduling
+apscheduler==3.10.4
+
+# HTTP requests
+httpx==0.27.0
+aiohttp==3.9.5
+
+# Data processing
+pandas==2.2.2
+numpy==1.26.4
+
+# NLP / text analysis
+nltk==3.8.1
+textblob==0.18.0
+
+# Reddit API (ready when you get credentials)
+praw==7.7.1
+
+# Pinterest API (ready when you get credentials)
+requests==2.32.2
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Image generation / manipulation (for Pinterest pins)
+Pillow==10.3.0
+cairosvg==2.7.1
+
+# Async support
+asyncio-throttle==1.0.2
+aiofiles==23.2.1
+
+# Logging
+loguru==0.7.2
+
+# Web scraping (research layer fallback)
+beautifulsoup4==4.12.3
+lxml==5.2.2
+
+# Utilities
+python-dateutil==2.9.0
+pytz==2024.1
+tqdm==4.66.4
+tenacity==8.3.0
+
+# ── NEWLY ADDED — Trend Research + Memory Stack ──────────────────────
+# Google Trends (no API key needed)
+pytrends==4.9.2
+
+# Qdrant vector database client
+qdrant-client==1.9.1
+
+# Sentence embeddings (all-MiniLM-L6-v2, matches Qdrant server 384-dim)
+sentence-transformers==3.0.1

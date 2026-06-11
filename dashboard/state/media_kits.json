@@ -1,0 +1,14 @@
+{
+  "kitchen": {
+    "product_keyword": "kitchen",
+    "hook": "",
+    "caption": "",
+    "hashtags": [],
+    "image_url": "https://image.pollinations.ai/prompt/kitchen%20product%20hero%20shot%20vertical%2C%20studio%20lighting%2C%20ecommerce%2C%20high%20detail?width=720&height=1280&nologo=true",
+    "supplier_price": 1.93,
+    "generated_at": "2026-06-07T19:34:46",
+    "supplier_title": "Kitchen Degreaser",
+    "supplier_url": "https://www.cjdropshipping.com/product/2606060138501609000.html",
+    "error": "URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>"
+  }
+}

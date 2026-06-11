@@ -100,7 +100,7 @@ export default async function handler(req) {
 
   return json(503, {
     error: 'Prometheus Engine offline',
-    message: 'Run: python prometheus_engine.py --api-mode  (in your Drop shipping folder)',
+    message: 'Run: python engines/prometheus_engine.py --api-mode  (in your ShipStack folder)',
     product,
   });
 }

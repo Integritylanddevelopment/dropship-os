@@ -1,0 +1,589 @@
+"""ShipStack Pipeline Dashboard. 6-stage HTTP server on :8891."""
+import json, sys, pathlib, http.server, socketserver, urllib.parse, urllib.request, cgi, io, threading, uuid, time
+from datetime import datetime
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
+
+ROOT = pathlib.Path(r"C:/Users/integ/Documents/Claude/Projects/ShipStack")
+RUNS = ROOT / "discovery_engine" / "runs"
+STATE = ROOT / "dashboard" / "state"
+STATE.mkdir(parents=True, exist_ok=True)
+DECISIONS = STATE / "decisions.json"
+MEDIA_KITS = STATE / "media_kits.json"
+COLLATERAL_JOBS_FILE = STATE / "collateral_jobs.json"
+PORT = 8891
+PROMETHEUS_URL = "http://127.0.0.1:8766"
+HTML_PATH = pathlib.Path(__file__).parent / "_pipe_dash.html"
+
+# media_gen + social_push + content_calendar + collateral_scraper live next to this file
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+try:
+    import media_gen
+except Exception as _e:
+    media_gen = None
+    _media_gen_err = repr(_e)
+else:
+    _media_gen_err = None
+
+try:
+    import social_push
+except Exception as _e2:
+    social_push = None
+    _social_push_err = repr(_e2)
+else:
+    _social_push_err = None
+
+try:
+    import content_calendar
+except Exception as _e3:
+    content_calendar = None
+    _content_calendar_err = repr(_e3)
+else:
+    _content_calendar_err = None
+
+try:
+    import collateral_scraper
+except Exception as _e4:
+    collateral_scraper = None
+    _collateral_scraper_err = repr(_e4)
+else:
+    _collateral_scraper_err = None
+
+try:
+    import produced
+except Exception as _e5:
+    produced = None
+    _produced_err = repr(_e5)
+else:
+    _produced_err = None
+
+try:
+    import social_ready
+except Exception as _e6:
+    social_ready = None
+    _social_ready_err = repr(_e6)
+else:
+    _social_ready_err = None
+
+
+# ---------- collateral job tracking ----------
+_collateral_jobs_lock = threading.Lock()
+_collateral_jobs = {}
+if COLLATERAL_JOBS_FILE.exists():
+    try:
+        _collateral_jobs = json.loads(COLLATERAL_JOBS_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        _collateral_jobs = {}
+# Mark any prior running jobs as error (process restart)
+for _jid, _j in list(_collateral_jobs.items()):
+    if _j.get("status") == "running":
+        _j["status"] = "error"
+        _j["error"] = "process restarted while running"
+
+
+def _save_collateral_jobs():
+    tmp = COLLATERAL_JOBS_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(_collateral_jobs, indent=2, default=str), encoding="utf-8")
+    tmp.replace(COLLATERAL_JOBS_FILE)
+
+
+def _run_collateral_job(job_id):
+    with _collateral_jobs_lock:
+        job = _collateral_jobs.get(job_id)
+        if not job: return
+        job["status"] = "running"
+        job["started_at"] = time.time()
+        _save_collateral_jobs()
+    try:
+        kw = job["product_keyword"]
+        run = latest_run() or {}
+        rep = find_report(run, kw) or {}
+        result = collateral_scraper.scrape_product(kw, rep)
+        with _collateral_jobs_lock:
+            job["status"] = "done"
+            job["finished_at"] = time.time()
+            job["result"] = result
+            _save_collateral_jobs()
+    except Exception as e:
+        import traceback
+        with _collateral_jobs_lock:
+            job["status"] = "error"
+            job["finished_at"] = time.time()
+            job["error"] = f"{type(e).__name__}: {e}"
+            job["traceback"] = traceback.format_exc()[-1500:]
+            _save_collateral_jobs()
+
+
+def latest_run():
+    runs = sorted(RUNS.glob("run_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    if not runs: return None
+    try: return json.loads(runs[0].read_text(encoding="utf-8", errors="replace"))
+    except Exception: return None
+
+
+def load_decisions():
+    if DECISIONS.exists():
+        try: return json.loads(DECISIONS.read_text(encoding="utf-8"))
+        except Exception: return {}
+    return {}
+
+
+def save_decision(k, c):
+    d = load_decisions()
+    d[k] = {"choice": c, "ts": datetime.now().isoformat(timespec="seconds")}
+    DECISIONS.write_text(json.dumps(d, indent=2), encoding="utf-8")
+    return d
+
+
+def load_media_kits():
+    if MEDIA_KITS.exists():
+        try: return json.loads(MEDIA_KITS.read_text(encoding="utf-8"))
+        except Exception: return {}
+    return {}
+
+
+def save_media_kit(kw, kit):
+    kits = load_media_kits()
+    kits[kw] = kit
+    MEDIA_KITS.write_text(json.dumps(kits, indent=2), encoding="utf-8")
+    return kits
+
+
+def find_report(run, kw):
+    if not run or not kw: return None
+    for rep in run.get("reports", []) or []:
+        if (rep.get("product_keyword") or "") == kw:
+            return rep
+    return None
+
+
+def _proxy(path, timeout=4):
+    try:
+        with urllib.request.urlopen(PROMETHEUS_URL + path, timeout=timeout) as r:
+            return 200, json.loads(r.read().decode("utf-8", "replace"))
+    except Exception as e:
+        return 503, {"error": f"prometheus unreachable: {type(e).__name__}: {e}"}
+
+
+_CONTENT_TYPE_BY_EXT = {
+    ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
+    ".webp": "image/webp", ".gif": "image/gif",
+    ".mp4": "video/mp4", ".webm": "video/webm", ".mov": "video/quicktime",
+    ".txt": "text/plain; charset=utf-8",
+}
+
+
+class H(http.server.BaseHTTPRequestHandler):
+    def log_message(self, *a, **k): pass
+
+    def _send(self, code, payload, ctype="application/json"):
+        if isinstance(payload, (dict, list)):
+            body = json.dumps(payload, default=str).encode("utf-8")
+        else:
+            body = payload.encode("utf-8") if isinstance(payload, str) else payload
+        self.send_response(code)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _send_file(self, path):
+        path = pathlib.Path(path)
+        if not path.exists():
+            return self._send(404, {"error": "file not found"})
+        ctype = _CONTENT_TYPE_BY_EXT.get(path.suffix.lower(), "application/octet-stream")
+        data = path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
+
+    def do_GET(self):
+        p = urllib.parse.urlparse(self.path).path
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        if p in ("/", "/index.html"):
+            if HTML_PATH.exists():
+                return self._send(200, HTML_PATH.read_text(encoding="utf-8"), "text/html; charset=utf-8")
+            return self._send(404, {"error": "no html"})
+        if p in ("/_pipe_dash.css", "/_pipe_dash.js"):
+            sib = HTML_PATH.parent / p.lstrip("/")
+            if sib.exists():
+                ctype = "text/css; charset=utf-8" if p.endswith(".css") else "application/javascript; charset=utf-8"
+                return self._send(200, sib.read_text(encoding="utf-8"), ctype)
+            return self._send(404, {"error": "asset missing"})
+        if p == "/api/latest-run": return self._send(200, latest_run() or {"error": "no run files"})
+        if p == "/api/decisions": return self._send(200, load_decisions())
+        if p == "/api/media-kits": return self._send(200, load_media_kits())
+        if p == "/api/social-status":
+            if social_push is None:
+                return self._send(500, {"error": f"social_push not loaded: {_social_push_err}"})
+            return self._send(200, social_push.platforms_status())
+        if p == "/api/social-queue":
+            if social_push is None:
+                return self._send(500, {"error": f"social_push not loaded: {_social_push_err}"})
+            return self._send(200, social_push.list_queue())
+        if p == "/api/account-status":
+            if social_push is None:
+                return self._send(500, {"error": f"social_push not loaded: {_social_push_err}"})
+            return self._send(200, social_push.all_account_status())
+        if p == "/api/calendar":
+            if content_calendar is None:
+                return self._send(500, {"error": f"content_calendar not loaded: {_content_calendar_err}"})
+            return self._send(200, content_calendar.load_schedule())
+        if p == "/api/prometheus-health":
+            code, body = _proxy("/health")
+            return self._send(code, body)
+        if p == "/api/produced-videos":
+            code, body = _proxy("/list")
+            return self._send(code, body)
+        if p.startswith("/api/job/"):
+            jid = p.rsplit("/", 1)[-1]
+            code, body = _proxy("/job/" + jid)
+            return self._send(code, body)
+        # ---------- collateral GET endpoints ----------
+        if p == "/api/collateral/list":
+            if collateral_scraper is None:
+                return self._send(500, {"error": f"collateral_scraper not loaded: {_collateral_scraper_err}"})
+            kw = (q.get("product_keyword", [""]) or [""])[0].strip()
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            return self._send(200, collateral_scraper.list_collateral(kw))
+        if p == "/api/collateral/index":
+            # returns map of slug -> {count, total_size, thumb_url}
+            if collateral_scraper is None:
+                return self._send(500, {"error": f"collateral_scraper not loaded: {_collateral_scraper_err}"})
+            base = collateral_scraper.STATE_DIR
+            out = {}
+            if base.exists():
+                for d in base.iterdir():
+                    if not d.is_dir(): continue
+                    idx_file = d / "index.json"
+                    if not idx_file.exists(): continue
+                    try:
+                        idx = json.loads(idx_file.read_text(encoding="utf-8"))
+                    except Exception:
+                        continue
+                    items = idx.get("items") or []
+                    total_size = 0; thumb = None
+                    for it in items:
+                        if it.get("size"): total_size += int(it["size"])
+                        if not thumb and it.get("type") == "image" and it.get("filename"):
+                            thumb = f"/api/collateral/file/{d.name}/{it['filename']}"
+                    out[d.name] = {
+                        "slug": d.name,
+                        "product_keyword": idx.get("product_keyword"),
+                        "count": len(items),
+                        "total_size": total_size,
+                        "thumb_url": thumb,
+                        "updated_at": idx.get("updated_at"),
+                        "scraped_at": idx.get("scraped_at"),
+                    }
+            return self._send(200, out)
+        if p.startswith("/api/collateral/job/"):
+            jid = p.rsplit("/", 1)[-1]
+            with _collateral_jobs_lock:
+                j = _collateral_jobs.get(jid)
+            if not j: return self._send(404, {"error": "job not found"})
+            return self._send(200, j)
+        if p.startswith("/api/collateral/file/"):
+            parts = p.split("/", 5)
+            if len(parts) < 6:
+                return self._send(400, {"error": "bad path"})
+            slug = pathlib.Path(parts[4]).name
+            fname = pathlib.Path(parts[5]).name
+            if collateral_scraper is None:
+                return self._send(500, {"error": "collateral_scraper not loaded"})
+            target = collateral_scraper.STATE_DIR / slug / fname
+            return self._send_file(target)
+        # ---------- produced (Prometheus output) endpoints ----------
+        if p == "/api/produced/list":
+            if produced is None:
+                return self._send(500, {"error": f"produced not loaded: {_produced_err}"})
+            return self._send(200, produced.scan_produced())
+        if p == "/api/produced/selections":
+            if produced is None:
+                return self._send(500, {"error": f"produced not loaded: {_produced_err}"})
+            return self._send(200, produced.get_selections())
+        if p.startswith("/api/produced/file/"):
+            parts = p.split("/", 5)
+            if len(parts) < 6:
+                return self._send(400, {"error": "bad path"})
+            slug = pathlib.Path(parts[4]).name
+            fname = pathlib.Path(parts[5]).name
+            if produced is None:
+                return self._send(500, {"error": "produced not loaded"})
+            target = produced.PROD_DIR / slug / fname
+            return self._send_file(target)
+        # ---------- social-ready endpoints ----------
+        if p == "/api/social-ready/list":
+            if social_ready is None:
+                return self._send(500, {"error": f"social_ready not loaded: {_social_ready_err}"})
+            return self._send(200, social_ready.list_ready())
+        return self._send(404, {"error": "not found"})
+
+    def do_DELETE(self):
+        p = urllib.parse.urlparse(self.path).path
+        if p.startswith("/api/collateral/"):
+            # /api/collateral/<slug>/<item_id>
+            parts = [x for x in p.split("/") if x]
+            # parts: ['api','collateral','<slug>','<item_id>']
+            if len(parts) >= 4 and parts[0] == "api" and parts[1] == "collateral":
+                slug = parts[2]; item_id = parts[3]
+                if collateral_scraper is None:
+                    return self._send(500, {"error": "collateral_scraper not loaded"})
+                base = collateral_scraper.STATE_DIR / slug
+                idx_path = base / "index.json"
+                if not idx_path.exists():
+                    return self._send(404, {"error": "slug not found"})
+                try:
+                    idx = json.loads(idx_path.read_text(encoding="utf-8"))
+                except Exception:
+                    return self._send(500, {"error": "bad index"})
+                kw = idx.get("product_keyword") or slug
+                res = collateral_scraper.delete_collateral(kw, item_id)
+                return self._send(200, res)
+        return self._send(404, {"error": "not found"})
+
+    def do_POST(self):
+        p = urllib.parse.urlparse(self.path).path
+        ctype = self.headers.get("Content-Type", "")
+        # Multipart upload handler (for /api/collateral/add)
+        if p == "/api/collateral/add" and ctype.startswith("multipart/"):
+            if collateral_scraper is None:
+                return self._send(500, {"error": "collateral_scraper not loaded"})
+            try:
+                fs = cgi.FieldStorage(
+                    fp=self.rfile, headers=self.headers,
+                    environ={"REQUEST_METHOD": "POST", "CONTENT_TYPE": ctype},
+                    keep_blank_values=True,
+                )
+            except Exception as e:
+                return self._send(400, {"error": f"multipart parse failed: {e}"})
+            kw = (fs.getfirst("product_keyword") or "").strip()
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            f = fs["file"] if "file" in fs else None
+            if not f or not getattr(f, "filename", None):
+                return self._send(400, {"error": "file required"})
+            data = f.file.read()
+            item = collateral_scraper.add_collateral(kw, uploaded_bytes=data, filename=f.filename)
+            return self._send(200, item)
+
+        n = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(n).decode("utf-8")) if n else {}
+        if p == "/api/decide":
+            kw = body.get("kw"); choice = body.get("choice")
+            if not kw or choice not in ("pursue", "test", "watch", "skip"):
+                return self._send(400, {"error": "bad input"})
+            return self._send(200, {"ok": True, "decisions": save_decision(kw, choice)})
+        if p == "/api/generate-media":
+            kw = (body.get("product_keyword") or "").strip()
+            auto_produce = bool(body.get("auto_produce"))
+            platforms = body.get("platforms") or ["tiktok"]
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            if media_gen is None:
+                return self._send(500, {"error": f"media_gen module not loaded: {_media_gen_err}"})
+            run = latest_run() or {}
+            rep = find_report(run, kw) or {}
+            supplier = ((rep.get("top_suppliers") or []) or [None])[0]
+            try:
+                kit = media_gen.generate_kit(kw, supplier if isinstance(supplier, dict) else None,
+                                              auto_produce=auto_produce, platforms=platforms)
+            except Exception as e:
+                kit = {"product_keyword": kw, "error": f"{type(e).__name__}: {e}",
+                       "generated_at": datetime.now().isoformat(timespec="seconds")}
+            save_media_kit(kw, kit)
+            return self._send(200, kit)
+        if p == "/api/queue-post":
+            kw = (body.get("product_keyword") or "").strip()
+            platform = (body.get("platform") or "").strip()
+            if not kw or not platform:
+                return self._send(400, {"error": "product_keyword and platform required"})
+            if social_push is None:
+                return self._send(500, {"error": f"social_push not loaded: {_social_push_err}"})
+            if platform not in social_push.DRIVERS:
+                return self._send(400, {"error": "unknown platform"})
+            kits = load_media_kits()
+            kit = kits.get(kw)
+            if not kit:
+                return self._send(400, {"error": "no media kit"})
+            try:
+                entry = social_push.queue_post(platform, kit)
+            except Exception as e:
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            return self._send(200, entry)
+        if p == "/api/log-engagement":
+            if social_push is None:
+                return self._send(500, {"error": f"social_push not loaded: {_social_push_err}"})
+            try:
+                entry = social_push.log_engagement(body or {})
+            except Exception as e:
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            return self._send(200, entry)
+        if p == "/api/produce-video":
+            kw = (body.get("product_keyword") or "").strip()
+            platform = (body.get("platform") or "tiktok").strip().lower()
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            try:
+                req = urllib.request.Request(
+                    PROMETHEUS_URL + "/produce",
+                    data=json.dumps({"product_keyword": kw, "platform": platform}).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    out = json.loads(r.read().decode("utf-8", "replace"))
+                return self._send(200, out)
+            except Exception as e:
+                return self._send(503, {"error": f"prometheus unreachable: {type(e).__name__}: {e}"})
+        if p == "/api/calendar/regenerate":
+            if content_calendar is None:
+                return self._send(500, {"error": f"content_calendar not loaded: {_content_calendar_err}"})
+            platform = (body.get("platform") or "").strip()
+            try:
+                schedule = content_calendar.regenerate(platform=platform if platform else None)
+            except Exception as e:
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            return self._send(200, schedule)
+        if p == "/api/calendar/execute":
+            if content_calendar is None or social_push is None:
+                return self._send(500, {"error": f"calendar/social not loaded"})
+            platform = (body.get("platform") or "").strip()
+            if not platform:
+                return self._send(400, {"error": "platform required"})
+            cal = content_calendar.load_schedule()
+            slots = cal.get(platform) or []
+            executed = []
+            for slot in slots:
+                kw = slot.get("product_keyword")
+                if not kw: continue
+                kits = load_media_kits()
+                kit = kits.get(kw)
+                if not kit: continue
+                try:
+                    entry = social_push.queue_post(platform, kit)
+                    executed.append({"slot_id": slot.get("slot_id"), "queue_entry": entry, "pillar": slot.get("pillar")})
+                except Exception as e:
+                    executed.append({"slot_id": slot.get("slot_id"), "error": f"{type(e).__name__}: {e}"})
+            return self._send(200, {"platform": platform, "executed": executed, "count": len(executed)})
+        if p == "/api/calendar/mirror-gcal":
+            if content_calendar is None:
+                return self._send(500, {"error": f"content_calendar not loaded: {_content_calendar_err}"})
+            platform = (body.get("platform") or "").strip()
+            confirm = bool(body.get("confirm"))
+            if not platform:
+                return self._send(400, {"error": "platform required"})
+            cal = content_calendar.load_schedule()
+            slots = cal.get(platform) or []
+            if not slots:
+                return self._send(400, {"error": "no calendar for platform; regenerate first"})
+            specs = content_calendar.mirror_to_gcal(slots, dry_run=not confirm)
+            return self._send(200, {"platform": platform, "count": len(specs), "events": specs, "dry_run": not confirm})
+        # ---------- collateral POST endpoints ----------
+        if p == "/api/collateral/scrape":
+            if collateral_scraper is None:
+                return self._send(500, {"error": f"collateral_scraper not loaded: {_collateral_scraper_err}"})
+            kw = (body.get("product_keyword") or "").strip()
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            jid = uuid.uuid4().hex[:12]
+            with _collateral_jobs_lock:
+                _collateral_jobs[jid] = {
+                    "id": jid, "product_keyword": kw, "status": "queued",
+                    "queued_at": time.time(),
+                }
+                _save_collateral_jobs()
+            t = threading.Thread(target=_run_collateral_job, args=(jid,), daemon=True)
+            t.start()
+            return self._send(200, {"job_id": jid, "status": "queued",
+                                     "product_keyword": kw})
+        if p == "/api/collateral/add":
+            # JSON-body version (source_url path); multipart handled above
+            if collateral_scraper is None:
+                return self._send(500, {"error": "collateral_scraper not loaded"})
+            kw = (body.get("product_keyword") or "").strip()
+            src = (body.get("source_url") or "").strip()
+            if not kw or not src:
+                return self._send(400, {"error": "product_keyword and source_url required"})
+            item = collateral_scraper.add_collateral(kw, source_url=src)
+            return self._send(200, item)
+        if p == "/api/collateral/compile":
+            if collateral_scraper is None:
+                return self._send(500, {"error": "collateral_scraper not loaded"})
+            kw = (body.get("product_keyword") or "").strip()
+            platform = (body.get("platform") or "tiktok").strip().lower()
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            paths = collateral_scraper.collateral_paths_for_compose(kw)
+            if not paths:
+                return self._send(400, {"error": "no collateral available - scrape first"})
+            try:
+                req_body = {
+                    "product_keyword": kw, "platform": platform,
+                    "collateral_paths": paths,
+                }
+                req = urllib.request.Request(
+                    PROMETHEUS_URL + "/produce",
+                    data=json.dumps(req_body).encode("utf-8"),
+                    headers={"Content-Type": "application/json"}, method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    out = json.loads(r.read().decode("utf-8", "replace"))
+                out["collateral_count"] = len(paths)
+                return self._send(200, out)
+            except Exception as e:
+                return self._send(503, {"error": f"prometheus unreachable: {type(e).__name__}: {e}"})
+        # ---------- produced/social-ready POST endpoints ----------
+        if p == "/api/produced/select":
+            if produced is None:
+                return self._send(500, {"error": f"produced not loaded: {_produced_err}"})
+            kw = (body.get("product_keyword") or "").strip()
+            platform = (body.get("platform") or "").strip()
+            selected = bool(body.get("selected"))
+            if not kw or not platform:
+                return self._send(400, {"error": "product_keyword and platform required"})
+            try:
+                out = produced.select_for_social(kw, platform, selected)
+            except Exception as e:
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            return self._send(200, out)
+        if p == "/api/produced/push-to-social":
+            if produced is None:
+                return self._send(500, {"error": f"produced not loaded: {_produced_err}"})
+            kw = (body.get("product_keyword") or "").strip()
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            try:
+                out = produced.push_to_social_ready(kw)
+            except Exception as e:
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            return self._send(200, out)
+        if p == "/api/social-ready/select":
+            if social_ready is None:
+                return self._send(500, {"error": f"social_ready not loaded: {_social_ready_err}"})
+            kw = (body.get("product_keyword") or "").strip()
+            platform = (body.get("platform") or "").strip()
+            item_id = (body.get("item_id") or "").strip()
+            selected = bool(body.get("selected"))
+            if not kw or not platform or not item_id:
+                return self._send(400, {"error": "product_keyword, platform, item_id required"})
+            try:
+                out = social_ready.select_for_live(kw, platform, item_id, selected)
+            except Exception as e:
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            return self._send(200, out)
+        if p == "/api/social-ready/publish":
+            if social_ready is None:
+                return self._send(500, {"error": f"social_ready not loaded: {_social_ready_err}"})
+            kw = (body.get("product_keyword") or "").strip()
+            if not kw: return self._send(400, {"error": "product_keyword required"})
+            try:
+                out = social_ready.publish_live(kw)
+            except Exception as e:
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            return self._send(200, out)
+        return self._send(404, {"error": "not found"})
+
+
+if __name__ == "__main__":
+    with socketserver.TCPServer(("127.0.0.1", PORT), H) as httpd:
+        print(f"ShipStack Pipeline Dashboard on http://127.0.0.1:{PORT}", flush=True)
+        httpd.serve_forever()

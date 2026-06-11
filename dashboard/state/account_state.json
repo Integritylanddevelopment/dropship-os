@@ -1,0 +1,29 @@
+{
+  "tiktok": {
+    "account_created_at": "2026-06-08T02:00:23+00:00",
+    "engagements_since_last_post": 5,
+    "last_5_pillars": []
+  },
+  "instagram_reels": {
+    "account_created_at": "2026-06-08T02:00:23+00:00",
+    "engagements_since_last_post": 3,
+    "last_5_pillars": [
+      "promotion"
+    ]
+  },
+  "youtube_shorts": {
+    "account_created_at": "2026-05-14T02:05:48+00:00",
+    "engagements_since_last_post": 0,
+    "last_5_pillars": [
+      "education",
+      "promotion"
+    ]
+  },
+  "pinterest": {
+    "account_created_at": "2026-06-08T02:00:23+00:00",
+    "engagements_since_last_post": 0,
+    "last_5_pillars": [
+      "promotion"
+    ]
+  }
+}

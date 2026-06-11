@@ -1,0 +1,31 @@
+{
+  "kitchen gadget": {
+    "slug": "kitchen_gadget",
+    "items": []
+  },
+  "kitchen": {
+    "slug": "kitchen",
+    "items": [
+      {
+        "item_id": "kitchen__tiktok",
+        "platform": "tiktok",
+        "product_keyword": "kitchen",
+        "slug": "kitchen",
+        "mp4_path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\tiktok.mp4",
+        "mp4_url": "/api/produced/file/kitchen/tiktok.mp4",
+        "thumb_url": "/api/produced/file/kitchen/tiktok_thumb.jpg",
+        "duration_sec": 4.152,
+        "dimensions": "1080x1920",
+        "size_bytes": 844047,
+        "hook": "",
+        "caption": "",
+        "hashtags": [],
+        "image_url": "https://image.pollinations.ai/prompt/kitchen%20product%20hero%20shot%20vertical%2C%20studio%20lighting%2C%20ecommerce%2C%20high%20detail?width=720&height=1280&nologo=true",
+        "status": "queued",
+        "selected_for_live": false,
+        "moved_at": "2026-06-08T08:17:20",
+        "updated_at": "2026-06-08T08:17:20"
+      }
+    ]
+  }
+}

@@ -1,0 +1,435 @@
+// ShipStack Pipeline Dashboard - tabbed layout
+let cache=null,decisions={},mediaKits={},socialStatus=[],socialQueue=[],accountStatus={},calendar={};
+let activeTab='discovery';
+const SUBSCORE_KEYS=[
+  ['demand_velocity','demand'],
+  ['buyer_intent','intent'],
+  ['supplier_availability','supply'],
+  ['content_potential','content'],
+  ['low_saturation','satur'],
+  ['shipping_simplicity','ship'],
+  ['margin','margin'],
+];
+
+function pill(r){r=(r||'skip').toLowerCase();return '<span class="pill '+r+'">'+r+'</span>'}
+function fmt(n){return Number(n||0).toFixed(2)}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function pct(n){return Math.round(Number(n||0)*100)}
+
+function switchTab(name){
+  activeTab=name;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('on',p.id==='tab-'+name));
+}
+
+function render(){
+  if(!cache){document.getElementById('meta').textContent='no run found';return}
+  const r=cache;
+  document.getElementById('meta').textContent='Run '+(r.generated_at||'')+' | '+(r.total_signals||0)+' signals -> '+(r.n_reports||0)+' reports | '+(r.elapsed_sec||0)+'s';
+  renderDiscovery(r);
+  renderDecide(r);
+  renderDistribution(r);
+}
+
+function renderDiscovery(r){
+  const byPlat={};
+  for(const rep of(r.reports||[]))for(const s of(rep.top_social_sources||[]))byPlat[s.platform]=(byPlat[s.platform]||0)+1;
+  const max=Math.max(1,...Object.values(byPlat));
+  let bars='';
+  for(const[k,v]of Object.entries(byPlat).sort((a,b)=>b[1]-a[1])){
+    bars+='<div class="bar"><span class="lbl">'+esc(k)+'</span><span class="val" style="width:'+(v/max*180)+'px"></span><span class="n">'+v+'</span></div>';
+  }
+  if(!bars)bars='<div class="empty">no signal sources</div>';
+
+  const counts={};for(const rep of(r.reports||[]))counts[rep.recommendation]=(counts[rep.recommendation]||0)+1;
+  let pills='';
+  for(const k of ['pursue','test','watch','skip','reject']){
+    if(counts[k])pills+='<div class="statcell">'+pill(k)+'<span class="v">'+counts[k]+'</span></div>';
+  }
+  if(!pills)pills='<div class="empty">no analysis yet</div>';
+
+  const reports=r.reports||[];
+  const actionable=reports.filter(rp=>['pursue','test'].includes(rp.recommendation)).length;
+  const watchable=reports.filter(rp=>rp.recommendation==='watch').length;
+
+  let h='<div class="disc-grid">';
+  h+='<div class="panel">';
+  h+='<h3>Signal sources</h3>'+bars;
+  h+='<div class="statcell" style="margin-top:10px"><span class="l">Total signals</span><span class="v">'+(r.total_signals||0)+'</span></div>';
+  h+='<div class="statcell"><span class="l">Sources active</span><span class="v">'+Object.keys(byPlat).length+'</span></div>';
+  h+='<div class="statcell"><span class="l">Generated at</span><span class="v">'+esc(r.generated_at||'-')+'</span></div>';
+  h+='<div class="statcell"><span class="l">Elapsed (s)</span><span class="v">'+(r.elapsed_sec||0)+'</span></div>';
+  h+='</div>';
+
+  h+='<div class="panel">';
+  h+='<h3>Analysis breakdown</h3>'+pills;
+  h+='<div class="statcell" style="margin-top:10px"><span class="l">Clusters scored</span><span class="v">'+(r.n_clusters||r.n_reports||0)+'</span></div>';
+  h+='<div class="statcell"><span class="l">Reports generated</span><span class="v">'+(r.n_reports||0)+'</span></div>';
+  h+='<div class="statcell"><span class="l">Actionable (pursue+test)</span><span class="v">'+actionable+'</span></div>';
+  h+='<div class="statcell"><span class="l">Watchable</span><span class="v">'+watchable+'</span></div>';
+  h+='</div>';
+  h+='</div>';
+
+  document.getElementById('discoveryBody').innerHTML=h;
+  document.getElementById('sDisc').textContent=(r.total_signals||0)+' sig | '+(r.n_reports||0)+' rep';
+  document.getElementById('tabct-discovery').textContent='('+(r.n_reports||0)+')';
+}
+
+function renderDecide(r){
+  const sorted=(r.reports||[]).slice().sort((a,b)=>(b.scores?.overall||0)-(a.scores?.overall||0));
+  let h='';
+  for(let i=0;i<sorted.length;i++){
+    const rep=sorted[i];
+    const k=rep.product_keyword||'?';
+    const sc=rep.scores||{};
+    const ov=sc.overall||0;
+    const cur=decisions[k]?.choice||rep.recommendation;
+    const cat=rep.category||'';
+    h+='<div class="dec-row">';
+    h+='<div class="top">';
+    h+='<span class="ovl">'+fmt(ov)+'</span>';
+    h+='<span class="kw" title="'+esc(k)+'">'+esc(k)+'</span>';
+    if(cat)h+='<span class="cat">'+esc(cat)+'</span>';
+    h+=pill(cur);
+    h+='<span class="counts"><span>signals <b>'+(rep.n_signals||0)+'</b></span><span>suppliers <b>'+(rep.n_suppliers||0)+'</b></span></span>';
+    h+='</div>';
+    h+='<div class="subscores">';
+    for(const[key,lbl]of SUBSCORE_KEYS){
+      const v=Number(sc[key]||0);
+      const cls=v<0.35?'subscore lo':'subscore';
+      h+='<div class="'+cls+'" title="'+key+'">';
+      h+='<span class="sn">'+lbl+'</span>';
+      h+='<span class="sv">'+fmt(v)+'</span>';
+      h+='<span class="sb"><i style="width:'+pct(v)+'%"></i></span>';
+      h+='</div>';
+    }
+    h+='</div>';
+    h+='<div class="actions">';
+    for(const c of ['pursue','test','watch','skip']){
+      h+='<button class="choice '+(cur===c?'on':'')+'" onclick="decide(\''+encodeURIComponent(k)+'\',\''+c+'\')">'+c+'</button>';
+    }
+    h+='<button class="detail" onclick="showDetail('+i+')">Detail</button>';
+    h+='</div>';
+    h+='</div>';
+  }
+  document.getElementById('decideBody').innerHTML=h||'<div class="empty">no candidates</div>';
+  document.getElementById('sDec').textContent=Object.keys(decisions).length+'/'+sorted.length+' decided';
+  document.getElementById('tabct-decide').textContent='('+sorted.length+')';
+  window.__sortedReports=sorted;
+}
+
+function showDetail(idx){
+  const rep=(window.__sortedReports||[])[idx];
+  if(!rep)return;
+  const k=rep.product_keyword||'?';
+  const sc=rep.scores||{};
+  const m=rep.margin||{};
+  const cur=decisions[k]?.choice||rep.recommendation;
+  let h='<div class="m-head">';
+  h+='<span class="kw">'+esc(k)+'</span>';
+  if(rep.category)h+='<span class="cat">'+esc(rep.category)+'</span>';
+  h+=pill(cur);
+  h+='<span class="ovl">'+fmt(sc.overall||0)+'</span>';
+  h+='</div>';
+
+  // scores grid (8 cells: 7 sub + overall)
+  h+='<div class="m-sec"><h3>Score components</h3><div class="m-scores">';
+  const allScores=SUBSCORE_KEYS.slice();
+  allScores.push(['overall','OVERALL']);
+  for(const[key,lbl]of allScores){
+    const v=Number(sc[key]||0);
+    const cls=v<0.35?'subscore lo':'subscore';
+    h+='<div class="'+cls+'"><span class="sn">'+lbl+'</span><span class="sv">'+fmt(v)+'</span><span class="sb"><i style="width:'+pct(v)+'%"></i></span></div>';
+  }
+  h+='</div></div>';
+
+  // margin block
+  h+='<div class="m-sec"><h3>Margin</h3><div class="m-marg">';
+  h+='<div class="cell"><div class="l">Landed cost</div><div class="v">$'+fmt(m.landed_cost)+'</div></div>';
+  h+='<div class="cell"><div class="l">Retail price</div><div class="v">$'+fmt(m.retail_price)+'</div></div>';
+  h+='<div class="cell"><div class="l">Gross $</div><div class="v">$'+fmt(m.gross_margin)+'</div></div>';
+  h+='<div class="cell"><div class="l">Gross %</div><div class="v">'+pct(m.gross_margin_pct)+'%</div></div>';
+  h+='<div class="cell '+(m.passes_margin_floor?'ok':'bad')+'"><div class="l">Margin floor</div><div class="v">'+(m.passes_margin_floor?'PASS':'FAIL')+'</div></div>';
+  h+='<div class="cell"><div class="l">Margin score</div><div class="v">'+fmt(m.margin_score)+'</div></div>';
+  if(m.net_margin!==undefined)h+='<div class="cell '+(Number(m.net_margin)>=0?'ok':'bad')+'"><div class="l">Net $</div><div class="v">$'+fmt(m.net_margin)+'</div></div>';
+  if(m.break_even_cpa!==undefined)h+='<div class="cell"><div class="l">Break-even CPA</div><div class="v">$'+fmt(m.break_even_cpa)+'</div></div>';
+  h+='</div></div>';
+
+  // content hooks
+  const hooks=rep.content_hooks||[];
+  h+='<div class="m-sec"><h3>Content hooks ('+hooks.length+')</h3>';
+  if(hooks.length){h+=hooks.map(x=>'<span class="m-tag">'+esc(x)+'</span>').join('');}
+  else h+='<div class="empty">none</div>';
+  h+='</div>';
+
+  // buyer intent phrases
+  const phrases=rep.buyer_intent_phrases||[];
+  h+='<div class="m-sec"><h3>Buyer intent phrases ('+phrases.length+')</h3>';
+  if(phrases.length){h+='<ul class="m-list">';for(const p of phrases)h+='<li>'+esc(typeof p==='string'?p:JSON.stringify(p))+'</li>';h+='</ul>';}
+  else h+='<div class="empty">none captured</div>';
+  h+='</div>';
+
+  // top social sources
+  const ss=rep.top_social_sources||[];
+  h+='<div class="m-sec"><h3>Top social sources ('+ss.length+')</h3>';
+  if(ss.length){h+='<ul class="m-list">';for(const s of ss){h+='<li><span class="plat">'+esc(s.platform||'?')+'</span>';if(s.url)h+='<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title||s.url)+'</a>';else h+=esc(s.title||'-');h+='</li>';}h+='</ul>';}
+  else h+='<div class="empty">none</div>';
+  h+='</div>';
+
+  // top suppliers
+  const sup=rep.top_suppliers||[];
+  h+='<div class="m-sec"><h3>Top suppliers ('+sup.length+')</h3>';
+  if(sup.length){h+='<ul class="m-list">';for(const s of sup){h+='<li><span class="plat">'+esc(s.supplier||'?')+'</span><span class="price">$'+fmt(s.unit_cost)+'</span>';if(s.url)h+='<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title||s.url)+'</a>';else h+=esc(s.title||'-');h+='</li>';}h+='</ul>';}
+  else h+='<div class="empty">none</div>';
+  h+='</div>';
+
+  // warnings
+  const warns=rep.soft_warnings||[];
+  if(warns.length){
+    h+='<div class="m-sec"><h3>Soft warnings</h3>';
+    for(const w of warns)h+='<div class="m-warn">- '+esc(typeof w==='string'?w:JSON.stringify(w))+'</div>';
+    h+='</div>';
+  }
+  // rejections
+  const rej=rep.rejection_reasons||[];
+  if(rej.length){
+    h+='<div class="m-sec"><h3>Rejection reasons</h3>';
+    for(const x of rej)h+='<div class="m-rej">- '+esc(typeof x==='string'?x:JSON.stringify(x))+'</div>';
+    h+='</div>';
+  }
+  document.getElementById('detailBody').innerHTML=h;
+  document.getElementById('detailModal').classList.add('on');
+}
+
+function closeDetail(ev){
+  if(ev && ev.target && !ev.currentTarget.contains(ev.target))return;
+  document.getElementById('detailModal').classList.remove('on');
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('detailModal').classList.remove('on');});
+
+function renderDistribution(r){
+  const sorted=window.__sortedReports||(r.reports||[]).slice().sort((a,b)=>(b.scores?.overall||0)-(a.scores?.overall||0));
+  const chosen=sorted.filter(rep=>['pursue','test'].includes(decisions[rep.product_keyword]?.choice));
+  renderScrape(chosen);
+  renderMedia(chosen);
+  renderStage6(chosen);
+  document.getElementById('tabct-distribution').textContent='('+chosen.length+')';
+}
+
+function renderScrape(chosen){
+  let h='';
+  for(const rep of chosen){
+    const sup=(rep.top_suppliers||[])[0];
+    h+='<div class="scrape-card"><div class="title">'+esc(rep.product_keyword)+'</div>';
+    if(sup){
+      h+='<div class="price">$'+fmt(sup.unit_cost)+' <span class="meta">'+esc((sup.title||'').slice(0,50))+'</span></div>';
+      h+='<div class="meta">'+(rep.n_suppliers||0)+' suppliers | score '+fmt(rep.scores?.overall)+'</div>';
+      if(sup.url)h+='<div class="meta"><a href="'+esc(sup.url)+'" target="_blank">view supplier</a></div>';
+    } else {
+      h+='<div class="meta">no supplier attached</div>';
+    }
+    h+='</div>';
+  }
+  document.getElementById('scrapeBody').innerHTML=h||'<div class="empty">no PURSUE/TEST picks yet</div>';
+  document.getElementById('s4').textContent=chosen.length+' chosen';
+}
+
+function renderMedia(chosen){
+  let h='';let kitCount=0;
+  for(const rep of chosen){
+    const k=rep.product_keyword;const kit=mediaKits[k];
+    h+='<div class="media-card"><div class="title" title="'+esc(k)+'">'+esc(k)+'</div>';
+    if(kit){
+      kitCount++;
+      if(kit.error){
+        h+='<div class="err">error: '+esc(kit.error)+'</div>';
+        if(kit.image_url)h+='<img class="thumb" src="'+esc(kit.image_url)+'" loading="lazy" alt="">';
+        h+='<button class="gen" onclick="genKit(\''+encodeURIComponent(k)+'\',this)">retry</button>';
+      } else {
+        if(kit.image_url)h+='<img class="thumb" src="'+esc(kit.image_url)+'" loading="lazy" alt="">';
+        if(kit.hook)h+='<div class="hook">'+esc(kit.hook)+'</div>';
+        if(kit.caption)h+='<div class="cap">'+esc(kit.caption)+'</div>';
+        if(kit.hashtags&&kit.hashtags.length)h+='<div class="tags">'+kit.hashtags.map(esc).join(' ')+'</div>';
+        h+='<div class="meta">'+esc(kit.generated_at||'')+'</div>';
+        h+='<button class="gen" onclick="genKit(\''+encodeURIComponent(k)+'\',this)">regenerate</button>';
+        for(const plat of ['tiktok','instagram_reels','youtube_shorts','pinterest']){
+          h+='<button class="prod" onclick="produceVideo(\''+encodeURIComponent(k)+'\',\''+plat+'\',this)">vid:'+plat.slice(0,2)+'</button>';
+        }
+      }
+    } else {
+      h+='<div class="meta">no kit yet</div><button class="gen" onclick="genKit(\''+encodeURIComponent(k)+'\',this)">Generate</button>';
+    }
+    h+='</div>';
+  }
+  document.getElementById('mediaBody').innerHTML=h||'<div class="empty">no PURSUE/TEST picks yet</div>';
+  document.getElementById('s5').textContent=kitCount+'/'+chosen.length+' kits';
+}
+
+function renderStage6(chosen){
+  const tabs={tiktok:'TT',instagram_reels:'IG',youtube_shorts:'YT',pinterest:'P'};
+  let totalQ=0,totalR=0;
+  for(const e of socialQueue){if(e.status==='ready')totalR++;else totalQ++;}
+  let h='';
+  for(const s of socialStatus){
+    h+='<div class="social-row"><span class="dot '+(s.connected?'on':'')+'"></span><span class="pname">'+esc(s.name)+'</span>';
+    if(!s.connected)h+='<a class="conn" href="'+esc(s.connect_url)+'" target="_blank">Connect &#8599;</a>';
+    else h+='<span class="conn">connected</span>';
+    h+='<span class="qcount">'+(s.queued_count||0)+'</span></div>';
+    const ast=accountStatus[s.platform];
+    if(ast){
+      const last5=ast.last_5_pillars||[];
+      let promo=0;for(const p of last5)if(p==='promotion')promo++;
+      const debt=ast.engagement_debt_remaining||0;
+      const tline='W'+(ast.week||1)+' &bull; '+(ast.posts_today||0)+'/'+(ast.daily_cap||0)+' today &bull; debt '+debt+' &bull; mix:promo'+promo+'/'+last5.length;
+      h+='<div class="throttle-row"><span class="tline">'+tline+'</span><button class="engb" onclick="logEng(&#39;'+s.platform+'&#39;,this)" title="log 1 community engagement">+1 eng</button></div>';
+    }
+  }
+  h+='<div class="queue-sum"><b>'+totalQ+'</b> queued, <b>'+totalR+'</b> ready</div>';
+  h+=renderCalendar();
+  const kitChosen=(chosen||[]).filter(rep=>mediaKits[rep.product_keyword]);
+  if(!kitChosen.length){
+    h+='<div class="empty">no media kits yet</div>';
+  } else {
+    const queuedSet=new Set();
+    for(const e of socialQueue){const k=e.kit&&(e.kit.product_keyword||'');queuedSet.add(k+'|'+e.platform);}
+    for(const rep of kitChosen){
+      const k=rep.product_keyword;
+      h+='<div class="push-card"><div class="title" title="'+esc(k)+'">'+esc(k)+'</div><div class="push-btns">';
+      for(const p of Object.keys(tabs)){
+        const isQ=queuedSet.has(k+'|'+p);
+        h+='<button class="ppb '+(isQ?'queued':'')+'" onclick="queuePost(&#39;'+encodeURIComponent(k)+'&#39;,&#39;'+p+'&#39;,this)" title="'+esc(p)+'">'+tabs[p]+(isQ?' &#10003;':'')+'</button>';
+      }
+      h+='</div></div>';
+    }
+  }
+  document.getElementById('pushBody').innerHTML=h;
+  document.getElementById('s6').textContent=totalQ+'q / '+totalR+'r';
+}
+
+function renderCalendar(){
+  const plats=[['tiktok','TT'],['instagram_reels','IG'],['youtube_shorts','YT'],['pinterest','PIN']];
+  let h='<div class="cal-head">7-day plan</div>';
+  for(const [pk,lbl] of plats){
+    const slots=calendar[pk]||[];
+    const byDay={};
+    for(const s of slots){byDay[s.day_index]=byDay[s.day_index]||[];byDay[s.day_index].push(s);}
+    h+='<div class="cal-row"><span class="pn">'+lbl+'</span><div class="strip">';
+    for(let d=0;d<7;d++){
+      const dayslots=byDay[d]||[];
+      const cls=dayslots.length?'day':'day empty';
+      h+='<div class="'+cls+'" title="day '+(d+1)+(dayslots.length?' '+dayslots.map(s=>s.pillar).join(','):' empty')+'">';
+      for(const s of dayslots){h+='<span class="dot2 dot-'+s.pillar+'"></span>';}
+      h+='</div>';
+    }
+    h+='</div><button class="regen" onclick="regenCal(&#39;'+pk+'&#39;,this)">Regen</button></div>';
+  }
+  h+='<div class="cal-legend"><span><span class="dot2 dot-education"></span>edu</span><span><span class="dot2 dot-problem_solution"></span>prob</span><span><span class="dot2 dot-behind_the_scenes"></span>BTS</span><span><span class="dot2 dot-community"></span>comm</span><span><span class="dot2 dot-promotion"></span>promo</span></div>';
+  return h;
+}
+
+async function regenCal(platform,btn){
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  try{
+    const r=await fetch('/api/calendar/regenerate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:platform,days:7})});
+    const j=await r.json();
+    if(!r.ok){alert('regen failed: '+(j.error||r.status));if(btn){btn.disabled=false;btn.textContent='Regen';}return;}
+    load();
+  }catch(e){if(btn){btn.disabled=false;btn.textContent='Regen';}alert('regen failed: '+e.message);}
+}
+
+async function produceVideo(kwEnc, platform, btn){
+  const kw = decodeURIComponent(kwEnc);
+  btn.disabled = true; btn.textContent = 'queuing ' + platform.slice(0,2) + '...';
+  try{
+    const r = await fetch('/api/produce-video', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({product_keyword: kw, platform})});
+    const j = await r.json();
+    if(j.job_id){ btn.textContent = 'queued ' + platform.slice(0,2); pollProm(j.job_id, btn, platform); }
+    else { btn.textContent = 'err'; btn.title = JSON.stringify(j); btn.disabled = false; }
+  } catch(e){ btn.textContent = 'fail'; btn.disabled = false; btn.title = String(e); }
+}
+
+async function pollProm(jobId, btn, platform){
+  for(let i=0;i<180;i++){
+    await new Promise(r=>setTimeout(r, 2000));
+    try{
+      const r = await fetch('/api/job/'+jobId);
+      const j = await r.json();
+      if(j.status==='running'){ btn.textContent='running ' + platform.slice(0,2); }
+      else if(j.status==='done'){
+        const path = j.result && j.result.video_path;
+        const kb = Math.round((j.result && j.result.size_bytes || 0)/1024);
+        if(path){ btn.outerHTML = '<a class="prod done" href="file:///'+path.replace(/\\/g, '/')+'" target="_blank">' + platform.slice(0,2) + ' (' + kb + 'KB)</a>'; }
+        else { btn.textContent = 'done'; }
+        return;
+      } else if(j.status==='error'){ btn.textContent='ERR'; btn.title = j.error || ''; btn.disabled=false; return; }
+    } catch(e){ btn.textContent='poll fail'; }
+  }
+}
+
+async function queuePost(kw,platform,btn){
+  const k=decodeURIComponent(kw);
+  if(btn){btn.disabled=true;}
+  try{
+    const r=await fetch('/api/queue-post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:k,platform:platform})});
+    const j=await r.json();
+    if(!r.ok){alert('queue failed: '+(j.error||r.status));if(btn)btn.disabled=false;return;}
+    const blocked=['throttled','mix_violation','engagement_debt','doctrine_warn'];
+    if(blocked.indexOf(j.status)>=0){
+      const card=btn?btn.closest('.push-card'):null;
+      if(card){
+        let warn=card.querySelector('.reject-line');
+        if(!warn){warn=document.createElement('div');warn.className='reject-line';card.appendChild(warn);}
+        warn.textContent=j.status+': '+(j.rejection_reason||'(no reason)');
+      }
+      if(btn)btn.disabled=false;
+    }
+    load();
+  }catch(e){if(btn)btn.disabled=false;alert('queue failed: '+e.message);}
+}
+
+async function logEng(platform,btn){
+  if(btn){btn.disabled=true;}
+  try{
+    const r=await fetch('/api/log-engagement',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:platform,count:1})});
+    const j=await r.json();
+    if(!r.ok){alert('engagement failed: '+(j.error||r.status));if(btn)btn.disabled=false;return;}
+    load();
+  }catch(e){if(btn)btn.disabled=false;alert('engagement failed: '+e.message);}finally{if(btn)btn.disabled=false;}
+}
+
+async function load(){
+  try{
+    const[r1,r2,r3,r4,r5,r6,r7]=await Promise.all([
+      fetch('/api/latest-run').then(r=>r.json()),
+      fetch('/api/decisions').then(r=>r.json()),
+      fetch('/api/media-kits').then(r=>r.json()),
+      fetch('/api/social-status').then(r=>r.json()),
+      fetch('/api/social-queue').then(r=>r.json()),
+      fetch('/api/account-status').then(r=>r.json()).catch(()=>({})),
+      fetch('/api/calendar').then(r=>r.json()).catch(()=>({}))
+    ]);
+    cache=r1;decisions=r2;mediaKits=r3;socialStatus=r4;socialQueue=r5;accountStatus=r6||{};calendar=r7||{};render();
+  }catch(e){document.getElementById('meta').textContent='error: '+e.message}
+}
+
+async function decide(kw,choice){
+  await fetch('/api/decide',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kw:decodeURIComponent(kw),choice})});
+  load();
+}
+
+async function genKit(kw,btn){
+  const k=decodeURIComponent(kw);
+  if(btn){btn.disabled=true;btn.textContent='generating...';}
+  try{
+    const r=await fetch('/api/generate-media',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:k})});
+    const kit=await r.json();
+    mediaKits[k]=kit;render();
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='retry';}
+    alert('gen failed: '+e.message);
+  }
+}
+
+load();
+setInterval(load,30000);

@@ -6,7 +6,7 @@ outputs post_queue.json for manual posting or Buffer/Later upload.
 Also runs APScheduler to remind you when it's time to post.
 
 Usage:
-    cd "C:\Users\integ\Documents\Claude\Projects\Drop shipping"
+    cd "C:\Users\integ\Documents\Claude\Projects\ShipStack"
     python content_pipeline/post_scheduler.py              # build queue + print today's posts
     python content_pipeline/post_scheduler.py --schedule   # run live scheduler (keeps running)
     python content_pipeline/post_scheduler.py --today      # print today's posts only

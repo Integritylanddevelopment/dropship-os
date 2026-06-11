@@ -1,0 +1,428 @@
+"""
+automation/reddit_browser.py — Reddit browser automation
+Handles login, post submission, commenting, subreddit research.
+Replaces with PRAW API calls once credentials are configured.
+"""
+
+import asyncio
+import json
+import re
+from typing import Optional
+from pathlib import Path
+from loguru import logger
+from datetime import datetime
+
+from .browser import BasePlatformAutomation, HumanBehavior
+
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from config import config
+
+
+class RedditBrowserAutomation(BasePlatformAutomation):
+    """
+    Browser-based Reddit automation.
+    All methods have API equivalents in api_stubs/reddit_api.py
+    ready to activate once you have PRAW credentials.
+    """
+
+    BASE_URL = "https://www.reddit.com"
+
+    def __init__(self, profile_name: str = "reddit_main"):
+        super().__init__(profile_name)
+        self._logged_in = False
+
+    # ─────────────────────────────────────────────
+    # AUTHENTICATION
+    # ─────────────────────────────────────────────
+
+    async def login(self, username: str, password: str) -> bool:
+        """Log into Reddit"""
+        logger.info(f"Logging into Reddit as {username}")
+
+        await self.navigate("https://www.reddit.com/login/")
+        await asyncio.sleep(2)
+
+        try:
+            # Fill username
+            await self.fill_field("#loginUsername", username)
+            await asyncio.sleep(random_delay := __import__('random').uniform(0.5, 1.5))
+
+            # Fill password
+            await self.fill_field("#loginPassword", password)
+            await asyncio.sleep(1)
+
+            # Submit
+            await self.wait_and_click("button[type='submit']")
+            await asyncio.sleep(3)
+
+            # Verify login
+            current_url = self._page.url
+            if "reddit.com" in current_url and "login" not in current_url:
+                self._logged_in = True
+                logger.info(f"✅ Logged in as {username}")
+                return True
+
+            logger.error("Login verification failed")
+            return False
+
+        except Exception as e:
+            logger.error(f"Reddit login error: {e}")
+            return False
+
+    async def check_login_status(self) -> bool:
+        """Check if currently logged in"""
+        try:
+            await self.navigate("https://www.reddit.com")
+            await asyncio.sleep(2)
+            user_menu = await self._page.query_selector("[data-testid='user-menu-button']")
+            self._logged_in = user_menu is not None
+            return self._logged_in
+        except Exception:
+            return False
+
+    # ─────────────────────────────────────────────
+    # RESEARCH: SUBREDDIT ANALYSIS
+    # ─────────────────────────────────────────────
+
+    async def scrape_subreddit_posts(
+        self,
+        subreddit: str,
+        sort: str = "hot",
+        limit: int = 50
+    ) -> list:
+        """
+        Scrape top posts from a subreddit for analysis.
+        Returns list of post data dicts.
+        """
+        logger.info(f"Scraping r/{subreddit} ({sort}, limit={limit})")
+        posts = []
+
+        # Use Reddit's JSON API (no auth required for public data)
+        url = f"https://old.reddit.com/r/{subreddit}/{sort}.json?limit=100"
+
+        try:
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    url,
+                    headers={"User-Agent": config.browser.user_agents[0]},
+                    timeout=15
+                )
+                data = response.json()
+
+                for post in data.get("data", {}).get("children", []):
+                    p = post.get("data", {})
+                    posts.append({
+                        "id": p.get("id"),
+                        "title": p.get("title"),
+                        "selftext": p.get("selftext", "")[:1000],
+                        "score": p.get("score", 0),
+                        "upvote_ratio": p.get("upvote_ratio", 0),
+                        "num_comments": p.get("num_comments", 0),
+                        "url": p.get("url"),
+                        "permalink": p.get("permalink"),
+                        "author": p.get("author"),
+                        "flair": p.get("link_flair_text"),
+                        "is_self": p.get("is_self", False),
+                        "created_utc": p.get("created_utc"),
+                    })
+
+                    if len(posts) >= limit:
+                        break
+
+            logger.info(f"Scraped {len(posts)} posts from r/{subreddit}")
+            return posts
+
+        except Exception as e:
+            logger.error(f"Subreddit scrape failed for r/{subreddit}: {e}")
+            return []
+
+    async def scrape_subreddit_info(self, subreddit: str) -> dict:
+        """Get subreddit metadata: subscribers, description, rules"""
+        url = f"https://old.reddit.com/r/{subreddit}/about.json"
+
+        try:
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    url,
+                    headers={"User-Agent": config.browser.user_agents[0]},
+                    timeout=15
+                )
+                data = response.json()
+                d = data.get("data", {})
+
+                return {
+                    "name": subreddit,
+                    "display_name": d.get("display_name"),
+                    "title": d.get("title"),
+                    "description": d.get("public_description", "")[:500],
+                    "subscribers": d.get("subscribers", 0),
+                    "active_users": d.get("active_user_count", 0),
+                    "rules_url": f"https://old.reddit.com/r/{subreddit}/about/rules",
+                    "over_18": d.get("over18", False),
+                    "allows_images": d.get("allow_images", True),
+                    "allows_polls": d.get("allow_polls", False),
+                }
+        except Exception as e:
+            logger.error(f"Failed to get info for r/{subreddit}: {e}")
+            return {"name": subreddit}
+
+    async def scrape_subreddit_rules(self, subreddit: str) -> list:
+        """Get subreddit rules for moderation awareness"""
+        url = f"https://old.reddit.com/r/{subreddit}/about/rules.json"
+
+        try:
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    url,
+                    headers={"User-Agent": config.browser.user_agents[0]},
+                    timeout=15
+                )
+                data = response.json()
+                rules = []
+                for rule in data.get("rules", []):
+                    rules.append({
+                        "name": rule.get("short_name", ""),
+                        "description": rule.get("description", "")[:200],
+                        "violation_reason": rule.get("violation_reason", ""),
+                    })
+                return rules
+        except Exception as e:
+            logger.error(f"Failed to get rules for r/{subreddit}: {e}")
+            return []
+
+    async def find_high_leverage_threads(
+        self,
+        subreddit: str,
+        keywords: list,
+        min_comments: int = 5,
+        max_hours_old: int = 12
+    ) -> list:
+        """
+        Find active threads where a comment would add value and get visibility.
+        Best threads are: recent, active, on-topic, not yet flooded.
+        """
+        posts = await self.scrape_subreddit_posts(subreddit, sort="new", limit=100)
+        current_time = datetime.utcnow().timestamp()
+
+        leverage_threads = []
+        for post in posts:
+            # Filter by recency
+            created_utc = post.get("created_utc", 0)
+            hours_old = (current_time - created_utc) / 3600
+            if hours_old > max_hours_old:
+                continue
+
+            # Filter by comment count
+            if post.get("num_comments", 0) < min_comments:
+                continue
+
+            # Filter by keyword relevance
+            title = post.get("title", "").lower()
+            body = post.get("selftext", "").lower()
+            relevance = sum(1 for kw in keywords if kw.lower() in title or kw.lower() in body)
+
+            if relevance > 0:
+                post["relevance_score"] = relevance
+                post["hours_old"] = round(hours_old, 1)
+                leverage_threads.append(post)
+
+        # Sort by relevance then recency
+        leverage_threads.sort(key=lambda x: (x["relevance_score"], -x["hours_old"]), reverse=True)
+        logger.info(f"Found {len(leverage_threads)} leverage threads in r/{subreddit}")
+        return leverage_threads[:10]
+
+    async def search_reddit(self, query: str, subreddit: str = None, limit: int = 25) -> list:
+        """Search Reddit for posts matching a query"""
+        if subreddit:
+            url = f"https://old.reddit.com/r/{subreddit}/search.json?q={query}&sort=relevance&limit={limit}"
+        else:
+            url = f"https://www.reddit.com/search.json?q={query}&sort=relevance&limit={limit}"
+
+        try:
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    url,
+                    headers={"User-Agent": config.browser.user_agents[0]},
+                    timeout=15
+                )
+                data = response.json()
+                results = []
+                for post in data.get("data", {}).get("children", []):
+                    p = post.get("data", {})
+                    results.append({
+                        "id": p.get("id"),
+                        "title": p.get("title"),
+                        "selftext": p.get("selftext", "")[:500],
+                        "subreddit": p.get("subreddit"),
+                        "score": p.get("score", 0),
+                        "num_comments": p.get("num_comments", 0),
+                        "permalink": p.get("permalink"),
+                    })
+                return results
+        except Exception as e:
+            logger.error(f"Reddit search failed: {e}")
+            return []
+
+    # ─────────────────────────────────────────────
+    # POSTING (requires login)
+    # ─────────────────────────────────────────────
+
+    async def submit_post(
+        self,
+        subreddit: str,
+        title: str,
+        body: str,
+        post_type: str = "text"
+    ) -> Optional[str]:
+        """
+        Submit a post to a subreddit.
+        Returns post URL if successful.
+        """
+        if not self._logged_in:
+            logger.error("Not logged in. Call login() first.")
+            return None
+
+        logger.info(f"Submitting post to r/{subreddit}: {title[:50]}...")
+
+        try:
+            await self.navigate(f"https://old.reddit.com/r/{subreddit}/submit")
+            await asyncio.sleep(2)
+
+            # Select text post type
+            text_tab = await self._page.query_selector("[value='self']")
+            if text_tab:
+                await text_tab.click()
+                await asyncio.sleep(1)
+
+            # Fill title
+            await self.human.human_type(self._page, "[name='title'], #post-title", title)
+            await asyncio.sleep(1)
+
+            # Fill body
+            if body:
+                body_field = await self._page.query_selector(".public-DraftEditor-content, [name='text'], textarea[name='body']")
+                if body_field:
+                    await body_field.click()
+                    await asyncio.sleep(0.5)
+                    await self._page.keyboard.type(body)
+                    await asyncio.sleep(1)
+
+            # Check for OC/flair requirements
+            await asyncio.sleep(2)
+
+            # Submit
+            submit_btn = await self._page.query_selector("[type='submit'][value='Submit'], button:has-text('Post')")
+            if submit_btn:
+                await submit_btn.click()
+                await asyncio.sleep(4)
+
+                # Get the post URL
+                current_url = self._page.url
+                if "/comments/" in current_url:
+                    logger.info(f"✅ Post submitted: {current_url}")
+                    return current_url
+
+            logger.error("Post submission failed — submit button not found or redirect failed")
+            return None
+
+        except Exception as e:
+            logger.error(f"Post submission error: {e}")
+            await self.browser.screenshot()
+            return None
+
+    async def submit_comment(
+        self,
+        post_url: str,
+        comment_text: str,
+        reply_to_comment_id: str = None
+    ) -> Optional[str]:
+        """
+        Submit a comment on a Reddit post.
+        reply_to_comment_id: if set, replies to a specific comment instead of post root.
+        """
+        if not self._logged_in:
+            logger.error("Not logged in.")
+            return None
+
+        logger.info(f"Commenting on: {post_url[:60]}...")
+
+        try:
+            await self.navigate(post_url)
+            await asyncio.sleep(3)
+
+            if reply_to_comment_id:
+                # Find the specific comment and click reply
+                reply_btn = await self._page.query_selector(
+                    f"[data-thing-id='t1_{reply_to_comment_id}'] button:has-text('Reply')"
+                )
+                if reply_btn:
+                    await reply_btn.click()
+                    await asyncio.sleep(1)
+            else:
+                # Comment on the post itself
+                comment_box = await self._page.query_selector(
+                    ".public-DraftEditor-content, [placeholder='What are your thoughts?']"
+                )
+                if comment_box:
+                    await comment_box.click()
+                    await asyncio.sleep(0.5)
+
+            # Type the comment with human timing
+            await asyncio.sleep(1)
+            # Break into chunks to simulate natural typing
+            chunks = [comment_text[i:i+100] for i in range(0, len(comment_text), 100)]
+            for chunk in chunks:
+                await self._page.keyboard.type(chunk)
+                await asyncio.sleep(__import__('random').uniform(0.3, 1.0))
+
+            await asyncio.sleep(2)
+
+            # Submit
+            submit_btn = await self._page.query_selector("button[type='submit']:has-text('Comment')")
+            if submit_btn:
+                await submit_btn.click()
+                await asyncio.sleep(3)
+                logger.info("✅ Comment submitted")
+                return "success"
+
+            logger.error("Comment submit button not found")
+            return None
+
+        except Exception as e:
+            logger.error(f"Comment submission error: {e}")
+            await self.browser.screenshot()
+            return None
+
+    async def upvote_post(self, post_url: str) -> bool:
+        """Upvote a post (for karma building / warming up)"""
+        if not self._logged_in:
+            return False
+        try:
+            await self.navigate(post_url)
+            await asyncio.sleep(2)
+            upvote_btn = await self._page.query_selector("[aria-label='upvote']")
+            if upvote_btn:
+                await upvote_btn.click()
+                await asyncio.sleep(1)
+                return True
+        except Exception as e:
+            logger.error(f"Upvote failed: {e}")
+        return False
+
+    async def get_current_karma(self) -> dict:
+        """Get current karma score"""
+        try:
+            await self.navigate("https://www.reddit.com/")
+            await asyncio.sleep(2)
+            karma_element = await self._page.query_selector("[id*='karma']")
+            if karma_element:
+                text = await karma_element.text_content()
+                return {"raw_text": text}
+        except Exception as e:
+            logger.error(f"Karma check failed: {e}")
+        return {}

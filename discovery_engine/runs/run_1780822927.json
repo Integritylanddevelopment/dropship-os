@@ -1,0 +1,1424 @@
+{
+  "generated_at": "2026-06-07T09:08:18Z",
+  "elapsed_sec": 370.79,
+  "total_signals": 460,
+  "n_clusters": 30,
+  "n_reports": 30,
+  "reports": [
+    {
+      "product_keyword": "kitchen",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.85,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.077
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=cuXyj6OMdJU",
+          "title": "30 Kitchen Gadgets for Cooking"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=Nm48en3T8rA",
+          "title": "11 Japanese Kitchen Gadgets That Are Genius"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/acrylicpainting/comments/1kpykas/kitchen_gadget_art/",
+          "title": "Kitchen gadget art"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "need",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.156,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.076
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [
+        "problem-solving",
+        "visual-demo"
+      ],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/dropshipping/comments/1kq66av/need_a_huge_help/",
+          "title": "NEED A HUGE HELP!!!!"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpsrul/need_help_identifying_this_jacket/",
+          "title": "Need help identifying this jacket"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpsrul/need_help_identifying_this_jacket/",
+          "title": "Need help identifying this jacket"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "f4m",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.1,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.07
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [
+        "problem-solving"
+      ],
+      "buyer_intent_phrases": [],
+      "n_signals": 5,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/snuffrp2/comments/1kq3ve9/f4m_dollification_rp_batgirl_trapped_in_toymans/",
+          "title": "[F4M] Dollification RP Batgirl Trapped in Toyman's Dollhouse"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/MindControlRP/comments/1kq362f/f4m_dollification_rp_wonder_woman_trapped_in/",
+          "title": "[F4M] Dollification RP: Wonder Woman Trapped in Toyman's Dollhouse"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/Roleplayheaven/comments/1kq2ijp/f4m_dollification_rp_batgirl_trapped_in_toymans/",
+          "title": "[F4M] Dollification RP Batgirl Trapped in Toyman's Dollhouse"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "survived",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.067,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.069
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [
+        "how much"
+      ],
+      "n_signals": 3,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1k9qrk9/so_my_cheap_12_ipad_screen_protector_survived_my/",
+          "title": "So, My Cheap $12 iPad Screen Protector Survived My Toddler"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1k9np91/so_my_cheap_12_ipad_screen_protector_survived_my/",
+          "title": "So, My Cheap $12 iPad Screen Protector Survived My Toddler"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1k9qrk9/so_my_cheap_12_ipad_screen_protector_survived_my/",
+          "title": "So, My Cheap $12 iPad Screen Protector Survived My Toddler"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "only",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.05,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.065
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [
+        "giftable"
+      ],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/MonsterHigh/comments/1kptlqx/selling_dolls_uk_only_repost/",
+          "title": "Selling Dolls! (UK Only) (Repost)"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/MonsterHigh/comments/1kpq1nv/selling_dolls_uk_only/",
+          "title": "Selling Dolls! (UK Only)"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/MonsterHighDolls/comments/1kpq0wg/selling_dolls_uk_only/",
+          "title": "Selling Dolls! (UK Only)"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "brush",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 6,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kg4ulz/steamy_cat_brush/",
+          "title": "Steamy Cat Brush"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kg3yj0/steamy_cat_brush/",
+          "title": "Steamy Cat Brush"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kg3yj0/steamy_cat_brush/",
+          "title": "Steamy Cat Brush"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "keys",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1ke4hes/as_a_musician_this_is_how_i_hang_my_keys/",
+          "title": "As a musician, this is how I hang my keys…"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1ke4ip8/as_a_musician_this_is_how_i_hang_my_keys/",
+          "title": "As a musician, this is how I hang my keys…"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1ke4hes/as_a_musician_this_is_how_i_hang_my_keys/",
+          "title": "As a musician, this is how I hang my keys…"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "toilet",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1kp7tiv/were_out_of_toilet_paper/",
+          "title": "We're out of toilet paper!"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1kp7tiv/were_out_of_toilet_paper/",
+          "title": "We're out of toilet paper!"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1ii17fj/elon_musk_toilet_paper/",
+          "title": "Elon Musk Toilet Paper"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "easier",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1i46hro/wine_pin_air_to_open_your_wine_much_easier_got_it/",
+          "title": "Wine pin air to open your wine much easier got it from whimsyshop.store"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1i46hro/wine_pin_air_to_open_your_wine_much_easier_got_it/",
+          "title": "Wine pin air to open your wine much easier got it from whimsyshop.store"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1i46gn8/wine_pen_air_to_open_your_wine_much_easier/",
+          "title": "Wine pen air to open your wine much easier "
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "diffusers",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1keynhy/tried_a_bunch_of_diffusers_but_this_one_is/",
+          "title": "Tried a Bunch of Diffusers, But This One is Actually Worth It"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1keynhy/tried_a_bunch_of_diffusers_but_this_one_is/",
+          "title": "Tried a Bunch of Diffusers, But This One is Actually Worth It"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1keyk84/tried_a_bunch_of_diffusers_but_this_one_is/",
+          "title": "Tried A Bunch of Diffusers, But This One is Actually Worth It"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "toes",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpzfc1/this_tickle_toes_has_worked_flawlessly_since_we/",
+          "title": "This Tickle Toes has worked flawlessly since we got it 24 years ago."
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpze6n/tickle_toes_has_worked_flawlessly_since_we_got_it/",
+          "title": "Tickle Toes has worked flawlessly since we got it in 2001"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpze6n/tickle_toes_has_worked_flawlessly_since_we_got_it/",
+          "title": "Tickle Toes has worked flawlessly since we got it in 2001"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "led",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=GiivAHPz2mo",
+          "title": "LED Lights - Color Changing Screen - Slow & Smooth (10 Hours)"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=tiHyziBJYqo",
+          "title": "10 Hours Color Changing Screen | Mood LED Lights (Slow & Smooth Gradient) RGB 4K"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=K6CJpuY8DuU",
+          "title": "8 Hours Mood Lights | Gradient LED Lighting"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "apple",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/dropshipping/comments/1kq6s0m/apple_pay_on_shopify/",
+          "title": "Apple Pay on Shopify"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/dropshipping/comments/1kq9uru/apple_pay/",
+          "title": "Apple Pay"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "new",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/dropshipping/comments/1kpv1a9/new/",
+          "title": "New"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/dropshipping/comments/1kq7fbm/new_drop/",
+          "title": "New drop , 🔥?"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "life",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kmlb5k/life/",
+          "title": "Life"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kmg9io/life_is_a_paradox/",
+          "title": "Life is a paradox"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "found",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kisz09/you_finally_found_it/",
+          "title": "You finally found it"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kdrxuy/you_finally_found_it/",
+          "title": "You finally found it"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "crafting",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kdf8xv/crafting_trash_knight/",
+          "title": "Crafting Trash knight"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kdf8xv/crafting_trash_knight/",
+          "title": "Crafting Trash knight"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "day",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9z096/confederate_memorial_day_in_alabama/",
+          "title": "Confederate Memorial Day in Alabama"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9z096/confederate_memorial_day_in_alabama/",
+          "title": "Confederate Memorial Day in Alabama"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "butt",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9oid4/a_bong_butt_plug/",
+          "title": "A Bong Butt Plug"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9ogqy/a_bong_butt_plug/",
+          "title": "A Bong Butt Plug"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "spongebob",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1jdpird/kelp_shake_water_bottle_from_spongebob/",
+          "title": "Kelp Shake water bottle from Spongebob"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1jdpird/kelp_shake_water_bottle_from_spongebob/",
+          "title": "Kelp Shake water bottle from Spongebob"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "off",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1j6nja9/monster_roll_cage_offroad_in_your_living_room/",
+          "title": "Monster Roll Cage: off-road in your living room"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1j6nja9/monster_roll_cage_offroad_in_your_living_room/",
+          "title": "Monster Roll Cage: off-road in your living room"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "cage",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1j6ngb8/monster_roll_cage_the_next_generation_in_full/",
+          "title": "Monster Roll Cage: The next generation in full motion game simulations"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1j6ngb8/monster_roll_cage_the_next_generation_in_full/",
+          "title": "Monster Roll Cage: The next generation in full motion game simulations"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "contact",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1ij9eca/contact_me_for_pure_fiber/",
+          "title": "Contact me for Pure Fiber!!!"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1ij9dyi/contact_me_for_pure_fiber/",
+          "title": "Contact me for Pure Fiber!!!"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "maasai",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1iej2sb/handcarved_soapstone_chess_set_with_african/",
+          "title": "Hand-Carved Soapstone Chess Set with African Maasai Tribe Design"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1iej2sb/handcarved_soapstone_chess_set_with_african/",
+          "title": "Hand-Carved Soapstone Chess Set with African Maasai Tribe Design"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "out",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.1,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.028
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [
+        "problem-solving"
+      ],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/OntarioHomeRenovation/comments/1kpsfzg/how_can_i_max_out_the_new_30_homeenergy_upgrade/",
+          "title": "How Can I Max Out the New 30 % Home-Energy Upgrade Rebates Launching in Ontario This Year?"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/OntarioHomeRenovation/comments/1kp7i20/how_can_i_max_out_the_new_30_homeenergy_upgrade/",
+          "title": "How Can I Max Out the New 30 % Home-Energy Upgrade Rebates Launching in Ontario This Year?"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/OntarioHomeRenovation/comments/1kp7i1g/how_can_i_max_out_the_new_30_homeenergy_upgrade/",
+          "title": "How Can I Max Out the New 30 % Home-Energy Upgrade Rebates Launching in Ontario This Year?"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [
+        "explainability:avg_title_words_high:17.0",
+        "explainability:no_visual_hook_and_long_titles"
+      ],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "cut",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.024
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kh0nis/just_dropped_this_samurai_tee_cut_deep_walk_quiet/",
+          "title": "Just dropped this Samurai tee: Cut Deep. Walk Quiet. ⚔️ Would you wear this?"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kh0lk9/just_dropped_this_samurai_tee_cut_deep_walk_quiet/",
+          "title": "Just dropped this Samurai tee: Cut Deep. Walk Quiet. ⚔️ Would you wear this?"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kh0jja/cut_deep_walk_quiet_samurai_warrior_design/",
+          "title": "Cut Deep. Walk Quiet. – Samurai Warrior Design Graphic T-Shirt"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [
+        "explainability:no_visual_hook_and_long_titles"
+      ],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "bottles",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.024
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpyhm2/water_bottles_with_internal_threading/",
+          "title": "Water Bottles with Internal Threading"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpv9pk/recommended_water_bottles/",
+          "title": "Recommended Water Bottles?"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [
+        "legal:legal_flag:knife"
+      ],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "handmade",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.024
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1klhhgw/my_handmade_cat_biting_ring_does_your_cat_always/",
+          "title": "My handmade cat biting ring... Does your cat always bite like this too?"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1klhhgw/my_handmade_cat_biting_ring_does_your_cat_always/",
+          "title": "My handmade cat biting ring... Does your cat always bite like this too?"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [
+        "explainability:no_visual_hook_and_long_titles"
+      ],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "apparently",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.024
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1jfrpxu/robot_shoes_that_apparently_make_you_walk_at_the/",
+          "title": "Robot shoes that apparently make you walk at the speed of a run"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1jfrpxu/robot_shoes_that_apparently_make_you_walk_at_the/",
+          "title": "Robot shoes that apparently make you walk at the speed of a run"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [
+        "explainability:no_visual_hook_and_long_titles"
+      ],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "without",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.024
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1j07asr/i_never_thought_id_need_an_ai_tool_this_badly/",
+          "title": "I never thought I'd need an AI tool this badly, like, how did I even survive without it?"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/INEEEEDIT/comments/1j07asr/i_never_thought_id_need_an_ai_tool_this_badly/",
+          "title": "I never thought I'd need an AI tool this badly, like, how did I even survive without it?"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [
+        "explainability:avg_title_words_high:18.0",
+        "explainability:no_visual_hook_and_long_titles"
+      ],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "reject"
+    }
+  ]
+}

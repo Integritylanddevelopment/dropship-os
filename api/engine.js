@@ -128,7 +128,7 @@ async function stagePrometheus() {
 
 async function stageRevenue(req) {
   const protocol = req.headers['x-forwarded-proto'] || 'https';
-  const host = req.headers['host'] || 'dropship-os-gamma.vercel.app';
+  const host = req.headers['host'] || 'shipstack-gamma.vercel.app';
   try {
     const r = await fetch(protocol + '://' + host + '/api/metrics', { signal: AbortSignal.timeout(5000) });
     if (r.ok) { const m = await r.json(); return { stage: 'revenue', status: 'done', ...m }; }

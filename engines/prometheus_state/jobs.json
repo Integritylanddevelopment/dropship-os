@@ -1,0 +1,124 @@
+{
+  "8dfecfc77ec6": {
+    "id": "8dfecfc77ec6",
+    "product_keyword": "kitchen",
+    "platform": "tiktok",
+    "status": "error",
+    "queued_at": 1780902353.4486258,
+    "started_at": 1780902353.4496279,
+    "finished_at": 1780902356.4747572,
+    "error": "RuntimeError: broll: all sources failed (pexels/pixabay/pollinations)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_engine.py\", line 90, in _run_job\n    result = prod_pipeline.produce_video(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_lib\\pipeline.py\", line 88, in produce_video\n    broll_paths = broll_mod.fetch_broll(kw, os.path.join(work_dir, \"broll\"),\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_lib\\broll.py\", line 173, in fetch_broll\n    raise RuntimeError(\"broll: all sources failed (pexels/pixabay/pollinations)\")\nRuntimeError: broll: all sources failed (pexels/pixabay/pollinations)\n"
+  },
+  "a91955704e59": {
+    "id": "a91955704e59",
+    "product_keyword": "kitchen",
+    "platform": "tiktok",
+    "status": "error",
+    "queued_at": 1780902545.345018,
+    "started_at": 1780902545.346009,
+    "finished_at": 1780902566.151504,
+    "error": "RuntimeError: ffmpeg compose failed (rc=3221225477): ...able-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper\r\n  libavutil      60. 26.101 / 60. 26.101\r\n  libavcodec     62. 28.101 / 62. 28.101\r\n  libavformat    62. 12.101 / 62. 12.101\r\n  libavdevice    62.  3.101 / 62.  3.101\r\n  libavfilter    11. 14.101 / 11. 14.101\r\n  libswscale      9.  5.101 /  9.  5.101\r\n  libswresample   6.  3.101 /  6.  3.101\r\nFontconfig error: Cannot load default config file: No such file: (null)\r\n",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_engine.py\", line 90, in _run_job\n    result = prod_pipeline.produce_video(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_lib\\pipeline.py\", line 99, in produce_video\n    result = compose_mod.compose_video(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_lib\\compose.py\", line 199, in compose_video\n    raise RuntimeError(f\"ffmpeg compose failed (rc={result.returncode}): ...{tail}\")\nRuntimeError: ffmpeg compose failed (rc=3221225477): ...able-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper\r\n  libavutil      60. 26.101 / 60. 26.101\r\n  libavcodec     62. 28.101 / 62. 28.101\r\n  libavformat    62. 12.101 / 62. 12.101\r\n  libavdevice    62.  3.101 / 62.  3.101\r\n  libavfilter    11. 14.101 / 11. 14.101\r\n  libswscale      9.  5.101 /  9.  5.101\r\n  libswresample   6.  3.101 /  6.  3.101\r\nFontconfig error: Cannot load default config file: No such file: (null)\r\n\n"
+  },
+  "3cc96b110328": {
+    "id": "3cc96b110328",
+    "product_keyword": "kitchen",
+    "platform": "tiktok",
+    "status": "done",
+    "queued_at": 1780902688.3561833,
+    "started_at": 1780902688.3572078,
+    "finished_at": 1780902704.372705,
+    "result": {
+      "ok": true,
+      "platform": "tiktok",
+      "product_keyword": "kitchen",
+      "slug": "kitchen",
+      "video_path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\tiktok.mp4",
+      "duration_sec": 4.152,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "size_bytes": 838094,
+      "had_music": false,
+      "broll_count": 3,
+      "voiceover_text": "Discover the kitchen. The trending pick everyone is talking about.",
+      "captions": [
+        "KITCHEN",
+        "TRENDING NOW",
+        "TAP TO SEE MORE"
+      ],
+      "voice_path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\voice_tiktok.mp3",
+      "broll_paths": [
+        "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\broll\\img_kitchen_0.mp4",
+        "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\broll\\img_kitchen_1.mp4",
+        "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\broll\\img_kitchen_2.mp4"
+      ],
+      "timings": {
+        "voice_sec": 0.5,
+        "broll_sec": 6.45,
+        "music_sec": 0.0,
+        "compose_sec": 9.07,
+        "total_sec": 16.01
+      }
+    }
+  },
+  "fab5e02c75ea": {
+    "id": "fab5e02c75ea",
+    "product_keyword": "kitchen",
+    "platform": "tiktok",
+    "status": "done",
+    "queued_at": 1780919011.516289,
+    "collateral_paths": [
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\youtube_22c7a9a7c6e8.jpg",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\youtube_a2cba829eb29.jpg",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\youtube_2b1e5cf2548a.jpg",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\cjdropshipping_c047a40270bc.jpg",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\cjdropshipping_3d664fbf084a.png",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\cjdropshipping_1c67fced4f01.jpg",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\cjdropshipping_1d600b409c92.png",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\cjdropshipping_24f20dfd5f3f.jpg",
+      "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen\\cjdropshipping_09596db34456.png"
+    ],
+    "started_at": 1780919011.5198264,
+    "finished_at": 1780919027.1713734,
+    "result": {
+      "ok": true,
+      "platform": "tiktok",
+      "product_keyword": "kitchen",
+      "slug": "kitchen",
+      "video_path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\tiktok.mp4",
+      "duration_sec": 4.152,
+      "dimensions": [
+        1080,
+        1920
+      ],
+      "size_bytes": 844047,
+      "had_music": false,
+      "broll_count": 4,
+      "used_collateral": true,
+      "collateral_count": 9,
+      "voiceover_text": "Discover the kitchen. The trending pick everyone is talking about.",
+      "captions": [
+        "KITCHEN",
+        "TRENDING NOW",
+        "TAP TO SEE MORE"
+      ],
+      "voice_path": "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\voice_tiktok.mp3",
+      "broll_paths": [
+        "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\collateral_broll\\collateral_0.mp4",
+        "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\collateral_broll\\collateral_1.mp4",
+        "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\collateral_broll\\collateral_2.mp4",
+        "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\engines\\prometheus_output\\kitchen\\work\\collateral_broll\\collateral_3.mp4"
+      ],
+      "timings": {
+        "voice_sec": 0.56,
+        "broll_sec": 4.85,
+        "music_sec": 0.0,
+        "compose_sec": 10.23,
+        "total_sec": 15.65
+      }
+    }
+  }
+}

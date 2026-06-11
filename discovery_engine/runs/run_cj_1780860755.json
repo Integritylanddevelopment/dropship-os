@@ -1,0 +1,1345 @@
+{
+  "generated_at": "2026-06-07T19:32:35Z",
+  "elapsed_sec": 518.19,
+  "total_signals": 207,
+  "n_clusters": 20,
+  "n_reports": 20,
+  "reports": [
+    {
+      "product_keyword": "best",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.183,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.322
+      },
+      "margin": {
+        "landed_cost": 6.1,
+        "retail_price": 18.3,
+        "platform_fee": 0.83,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 12.2,
+        "gross_margin_pct": 0.667,
+        "net_margin": -0.63,
+        "net_margin_pct": -0.034,
+        "break_even_cpa": 11.37,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666667
+      },
+      "content_hooks": [
+        "problem-solving",
+        "visual-demo"
+      ],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/TravelOne/comments/1kqaz42/best_151r_car_battery_2025_top_picks_reviews/",
+          "title": "Best 151r Car Battery 2025: Top Picks &amp; Reviews"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/TravelOne/comments/1kq98yo/best_armrest_cover_for_car_2025_protect_comfort/",
+          "title": "Best Armrest Cover for Car 2025: Protect &amp; Comfort"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/TravelTwo/comments/1kq8wqr/best_car_seat_nursing_cover_2025_protect_your_baby/",
+          "title": "Best Car Seat Nursing Cover 2025: Protect Your Baby!"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605251227101626500.html",
+          "unit_cost": 0.6,
+          "title": "Pointed-claw Punk-style Trend Best-friend Ring Finger Ring"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606040838251608500.html",
+          "unit_cost": 0.84,
+          "title": "Best-selling Cross Necklace For Women"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2061277017492144130.html",
+          "unit_cost": 1.46,
+          "title": "Summer Best-selling Laser-embossed Sequin Boater Hat, PU Bucket Hat, Fashionable Trend Street Hat, Outdoor Sun Protection Double-sided Sunshade Hat"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "accessories",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.85,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.32
+      },
+      "margin": {
+        "landed_cost": 5.75,
+        "retail_price": 17.25,
+        "platform_fee": 0.8,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 11.5,
+        "gross_margin_pct": 0.667,
+        "net_margin": -1.3,
+        "net_margin_pct": -0.075,
+        "break_even_cpa": 10.7,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=WSYtpIRMs5o",
+          "title": "50 Car Accessories on Amazon You NEED in 2026!"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=NMKLgjbAP9s",
+          "title": "Top 50 New Unique Car Accessories on Amazon 2026"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/pune/comments/1kq7tty/car_market_for_tyre_accessories/",
+          "title": "Car market for tyre accessories"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606050554131607900.html",
+          "unit_cost": 0.25,
+          "title": "Portable Storage Bag For Collectible Jewelry And Accessories"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2062433487669088257.html",
+          "unit_cost": 3.25,
+          "title": "Ins Aesthetic Small Heart Gold Studs Trendy Niche Elegant Female Ear Accessories"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2062431273828392962.html",
+          "unit_cost": 3.49,
+          "title": "Tiny Size Heart Gold Earrings Comfort Fit Can Wear While Sleeping Female Accessories"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "saturation:many_supplier_clones"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "jacket",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.05,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.302
+      },
+      "margin": {
+        "landed_cost": 10.36,
+        "retail_price": 31.08,
+        "platform_fee": 1.2,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 20.72,
+        "gross_margin_pct": 0.667,
+        "net_margin": 7.52,
+        "net_margin_pct": 0.242,
+        "break_even_cpa": 19.52,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [
+        "problem-solving"
+      ],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpsrul/need_help_identifying_this_jacket/",
+          "title": "Need help identifying this jacket"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpsrul/need_help_identifying_this_jacket/",
+          "title": "Need help identifying this jacket"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606050534321621300.html",
+          "unit_cost": 4.86,
+          "title": "Thin Long-sleeve V-neck Sweater Jacket"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606050045441620500.html",
+          "unit_cost": 5.8,
+          "title": "New Minimalist Long-sleeve Hooded Jacket And Pants Womens Sportswear Set"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606060744101630300.html",
+          "unit_cost": 6.97,
+          "title": "Hooded Solid-Color Cardigan With Buttons, Long-Sleeve Casual Jacket"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "pin",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 6.06,
+        "retail_price": 18.18,
+        "platform_fee": 0.83,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 12.12,
+        "gross_margin_pct": 0.667,
+        "net_margin": -0.71,
+        "net_margin_pct": -0.039,
+        "break_even_cpa": 11.29,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 5,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/476748310586500362/",
+          "title": "Pin 476748310586500362"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/1110489220641247311/",
+          "title": "Pin 1110489220641247311"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/1135399756081587097/",
+          "title": "Pin 1135399756081587097"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605281140051618500.html",
+          "unit_cost": 0.56,
+          "title": "Double-layer Necklace Heart Pin Clavicle Chain Peach Heart"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605280833211615500.html",
+          "unit_cost": 0.68,
+          "title": "Ring-shaped Sewing Fabric Storage Pin Cushion Bag"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605130625001613200.html",
+          "unit_cost": 4.86,
+          "title": "Mens Full-grain Leather Belt With A Pin Buckle"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "kitchen",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 7.43,
+        "retail_price": 22.29,
+        "platform_fee": 0.95,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 14.86,
+        "gross_margin_pct": 0.667,
+        "net_margin": 1.91,
+        "net_margin_pct": 0.086,
+        "break_even_cpa": 13.91,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=cuXyj6OMdJU",
+          "title": "30 Kitchen Gadgets for Cooking"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=RD8UtjnyTNM",
+          "title": "80 AMAZON KITCHEN GADGETS THAT ARE WORTH BUYING IN 2025"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=DKnOW5gWDDk",
+          "title": "100 NEWEST Amazon Kitchen Gadgets for Stress-Free Cooking in 2025!"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606060138501609000.html",
+          "unit_cost": 1.93,
+          "title": "Kitchen Degreaser"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606041130451600000.html",
+          "unit_cost": 1.93,
+          "title": "Kitchen Stove Range Hood Stubborn Oil Stain Cleaner"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606040248101602500.html",
+          "unit_cost": 7.86,
+          "title": "Silicone Wood-Grain Kitchen Utensil Set 12 Pieces Non-Stick Spatula"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "pin",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 6.06,
+        "retail_price": 18.18,
+        "platform_fee": 0.83,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 12.12,
+        "gross_margin_pct": 0.667,
+        "net_margin": -0.71,
+        "net_margin_pct": -0.039,
+        "break_even_cpa": 11.29,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 4,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/1070801248937912627/",
+          "title": "Pin 1070801248937912627"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/1136596024729660564/",
+          "title": "Pin 1136596024729660564"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/1126181450616289532/",
+          "title": "Pin 1126181450616289532"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605281140051618500.html",
+          "unit_cost": 0.56,
+          "title": "Double-layer Necklace Heart Pin Clavicle Chain Peach Heart"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605280833211615500.html",
+          "unit_cost": 0.68,
+          "title": "Ring-shaped Sewing Fabric Storage Pin Cushion Bag"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605130625001613200.html",
+          "unit_cost": 4.86,
+          "title": "Mens Full-grain Leather Belt With A Pin Buckle"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "kitchen",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 7.43,
+        "retail_price": 22.29,
+        "platform_fee": 0.95,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 14.86,
+        "gross_margin_pct": 0.667,
+        "net_margin": 1.91,
+        "net_margin_pct": 0.086,
+        "break_even_cpa": 13.91,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=GUD1uXn3-Gs",
+          "title": "20 Must-have Kitchen Gadgets I Bought On Amazon!"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=Zr0Bq1IXLiI",
+          "title": "I Bought Viral Kitchen Gadgets So You Don't Have To"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/599260294209962405/",
+          "title": "kitchen gadgets and tools are displayed in this collage with the words must have kitchen gadgets and tools"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606060138501609000.html",
+          "unit_cost": 1.93,
+          "title": "Kitchen Degreaser"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606041130451600000.html",
+          "unit_cost": 1.93,
+          "title": "Kitchen Stove Range Hood Stubborn Oil Stain Cleaner"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606040248101602500.html",
+          "unit_cost": 7.86,
+          "title": "Silicone Wood-Grain Kitchen Utensil Set 12 Pieces Non-Stick Spatula"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "alabama",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 6.77,
+        "retail_price": 20.31,
+        "platform_fee": 0.89,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 13.54,
+        "gross_margin_pct": 0.667,
+        "net_margin": 0.65,
+        "net_margin_pct": 0.032,
+        "break_even_cpa": 12.65,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 1,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9z096/confederate_memorial_day_in_alabama/",
+          "title": "Confederate Memorial Day in Alabama"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9z096/confederate_memorial_day_in_alabama/",
+          "title": "Confederate Memorial Day in Alabama"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/34D5ED3D-1987-4863-9FDA-18B1CB07D5C4.html",
+          "unit_cost": 1.27,
+          "title": "USA Alabama State Map Stainless Steel Necklace"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "butt",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 6.57,
+        "retail_price": 19.71,
+        "platform_fee": 0.87,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 13.14,
+        "gross_margin_pct": 0.667,
+        "net_margin": 0.27,
+        "net_margin_pct": 0.014,
+        "break_even_cpa": 12.27,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9oid4/a_bong_butt_plug/",
+          "title": "A Bong Butt Plug"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1k9ogqy/a_bong_butt_plug/",
+          "title": "A Bong Butt Plug"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605181113131620200.html",
+          "unit_cost": 1.07,
+          "title": "High-waisted Tummy-control Panties With Strong Tummy-slimming And Butt-lifting Effects"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606020709521635300.html",
+          "unit_cost": 1.65,
+          "title": "Postpartum High-waisted Tummy-control And Butt-lifting Panties"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2605220713311626700.html",
+          "unit_cost": 1.9,
+          "title": "Butt-baring No-pull-down Sports Ribbed Cotton T-pants"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "saturation:many_supplier_clones"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "gadget",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 6.82,
+        "retail_price": 20.46,
+        "platform_fee": 0.89,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 13.64,
+        "gross_margin_pct": 0.667,
+        "net_margin": 0.75,
+        "net_margin_pct": 0.036,
+        "break_even_cpa": 12.75,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=ZSL_Q6Pe-Ao",
+          "title": "Every Cooking Gadget You'll Ever Need"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=2C5NKMM7DZA",
+          "title": "I Tried Every VIRAL Kitchen Gadget"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2604220914161615000.html",
+          "unit_cost": 1.32,
+          "title": "Handheld Insect-Catching Household Tool Spider Bee Clip Gadget"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2054117898363527170.html",
+          "unit_cost": 2.59,
+          "title": "2Pcs Handheld Spiralizer Grater Shredder, Vegetable Fruit Spaghetti Noodle Maker For Zucchini Carrot Radish, Funnel Style Kitchen Gadget"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2051320986009755650.html",
+          "unit_cost": 6.0,
+          "title": "2 Pack Corn Peeler-Stainless Steel Corn Cob Stripper Tool,Labor-Saving And Fast Peeling Tool, Efficient 2026 New Kitchen Gadget"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "kitchen",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.295
+      },
+      "margin": {
+        "landed_cost": 7.43,
+        "retail_price": 22.29,
+        "platform_fee": 0.95,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 14.86,
+        "gross_margin_pct": 0.667,
+        "net_margin": 1.91,
+        "net_margin_pct": 0.086,
+        "break_even_cpa": 13.91,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=Nm48en3T8rA",
+          "title": "11 Japanese Kitchen Gadgets That Are Genius"
+        },
+        {
+          "platform": "pinterest",
+          "url": "https://www.pinterest.com/pin/1133640537478228328/",
+          "title": "the best kitchen gadgets from amazon"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606060138501609000.html",
+          "unit_cost": 1.93,
+          "title": "Kitchen Degreaser"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606041130451600000.html",
+          "unit_cost": 1.93,
+          "title": "Kitchen Stove Range Hood Stubborn Oil Stain Cleaner"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606040248101602500.html",
+          "unit_cost": 7.86,
+          "title": "Silicone Wood-Grain Kitchen Utensil Set 12 Pieces Non-Stick Spatula"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "life",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.5,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.195
+      },
+      "margin": {
+        "landed_cost": 15.5,
+        "retail_price": 46.5,
+        "platform_fee": 1.65,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 31.0,
+        "gross_margin_pct": 0.667,
+        "net_margin": 17.35,
+        "net_margin_pct": 0.373,
+        "break_even_cpa": 29.35,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kmlb5k/life/",
+          "title": "Life"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kmg9io/life_is_a_paradox/",
+          "title": "Life is a paradox"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2059629487061385218.html",
+          "unit_cost": 10.0,
+          "title": "925 Sterling Silver Celtic The Tree Of Life Charms For Bracelets & Necklaces Pendants Beads Jewelry Fit Pan Bracelet Bible Verse Charm Prayer Faith Religious Gifts For Women"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2059651717170380801.html",
+          "unit_cost": 10.0,
+          "title": "925 Sterling Silver Turkish Hayat Agaci \u2013 Tree Of Life Charms For Bracelets & Necklaces Pendants Beads Jewelry Fit Pan Bracelet Charm Ethnic Cultural Symbols Gifts For Women"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2059646712333910017.html",
+          "unit_cost": 10.0,
+          "title": "925 Sterling Silver Mu Lemurian Tree Of Life And Serpent Charms For Bracelets & Necklaces Pendants Beads Jewelry Fit Pan Bracelet Charm Ethnic Cultural Symbols Gifts For Women"
+        }
+      ],
+      "rejection_reasons": [],
+      "soft_warnings": [],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "got",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.118
+      },
+      "margin": {
+        "landed_cost": 6.5,
+        "retail_price": 19.5,
+        "platform_fee": 0.87,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 13.0,
+        "gross_margin_pct": 0.667,
+        "net_margin": 0.13,
+        "net_margin_pct": 0.007,
+        "break_even_cpa": 12.13,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 10,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpzfc1/this_tickle_toes_has_worked_flawlessly_since_we/",
+          "title": "This Tickle Toes has worked flawlessly since we got it 24 years ago."
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpze6n/tickle_toes_has_worked_flawlessly_since_we_got_it/",
+          "title": "Tickle Toes has worked flawlessly since we got it in 2001"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpze6n/tickle_toes_has_worked_flawlessly_since_we_got_it/",
+          "title": "Tickle Toes has worked flawlessly since we got it in 2001"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/1543998679663783936.html",
+          "unit_cost": 1.0,
+          "title": "If You Can Read, This Nurse Teacher Has Already Got Off Work Cotton Socks"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/1455793403374735360.html",
+          "unit_cost": 1.73,
+          "title": "YOU JUST GOT LITT UP MUG English Ceramic Mark Coffee Cup"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/1384317277805088768.html",
+          "unit_cost": 4.21,
+          "title": "Sheep Horn Head Stainless Steel Resin 3D Beer Mug Goblet Game Tankard Coffee Cup Wine Glass Mugs 350ml BEST GOT Gift"
+        }
+      ],
+      "rejection_reasons": [
+        "shipping:shipping_flag:glass",
+        "shipping:shipping_flag:ceramic"
+      ],
+      "soft_warnings": [],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "need",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.118
+      },
+      "margin": {
+        "landed_cost": 9.49,
+        "retail_price": 28.47,
+        "platform_fee": 1.13,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 18.98,
+        "gross_margin_pct": 0.667,
+        "net_margin": 5.85,
+        "net_margin_pct": 0.206,
+        "break_even_cpa": 17.85,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/CarsIndia/comments/1kq5km2/need_suggestion_for_a_new_car_as_im_not_a_car_guy/",
+          "title": "Need Suggestion for a new car as im not a car guy please"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/CarsIndia/comments/1kq5ilz/need_suggestion_for_new_car_as_im_not_a_car_guy/",
+          "title": "Need Suggestion for New car as im not a car guy please"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/CarsIndia/comments/1kq5hgl/hello_people_need_suggestion_for_new_car_as_im/",
+          "title": "Hello People, Need suggestion for new car as im not a car guy!!"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2062432394662825985.html",
+          "unit_cost": 3.99,
+          "title": "Ladies Elegant Small Heart Gold Stud Earrings No Need Take Off At Night Jewelry"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2059539666547699713.html",
+          "unit_cost": 186.68,
+          "title": "23.82 Inch Faux MARS Textural Patterns Coffee Tables For Living Room Apartment No Need Assembly Beige"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2059542991653498882.html",
+          "unit_cost": 235.19,
+          "title": "35.04 Inch Oval Coffee Table Vintage Sturdy Fiberglass Table For Living Room Apartment Office No Need Assembly Beige"
+        }
+      ],
+      "rejection_reasons": [
+        "shipping:shipping_flag:glass",
+        "shipping:shipping_flag:mattress",
+        "shipping:shipping_flag:bed frame",
+        "explainability:no_visual_hook_and_long_titles"
+      ],
+      "soft_warnings": [],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "crafting",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.118
+      },
+      "margin": {
+        "landed_cost": 6.23,
+        "retail_price": 18.69,
+        "platform_fee": 0.84,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 12.46,
+        "gross_margin_pct": 0.667,
+        "net_margin": -0.38,
+        "net_margin_pct": -0.02,
+        "break_even_cpa": 11.62,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kdf8xv/crafting_trash_knight/",
+          "title": "Crafting Trash knight"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kdf8xv/crafting_trash_knight/",
+          "title": "Crafting Trash knight"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2603060413261630500.html",
+          "unit_cost": 0.73,
+          "title": "Silk-screen Flower Wire Stocking Colorful Artificial Flowers Handmade Crafting Materials"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2601030811101611300.html",
+          "unit_cost": 1.51,
+          "title": "Cartoon Art Blue Scenery Book Cute 3D Miniature Scene Sticker Book For DIY Stress-Relief Crafting"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2512220350201615800.html",
+          "unit_cost": 2.63,
+          "title": "3D Raccoon Tree Stump Candle Mold For DIY Crafting"
+        }
+      ],
+      "rejection_reasons": [
+        "legal:legal_flag:gun ",
+        "shipping:shipping_flag:glass",
+        "shipping:shipping_flag:propane"
+      ],
+      "soft_warnings": [],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "bottles",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.118
+      },
+      "margin": {
+        "landed_cost": 5.95,
+        "retail_price": 17.85,
+        "platform_fee": 0.82,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 11.9,
+        "gross_margin_pct": 0.667,
+        "net_margin": -0.92,
+        "net_margin_pct": -0.051,
+        "break_even_cpa": 11.08,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666667
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpyhm2/water_bottles_with_internal_threading/",
+          "title": "Water Bottles with Internal Threading"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpv9pk/recommended_water_bottles/",
+          "title": "Recommended Water Bottles?"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2046224910452547586.html",
+          "unit_cost": 0.45,
+          "title": "Sharp-tipped dispensing bottles-10ml-1 pack"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2043945793987923969.html",
+          "unit_cost": 0.91,
+          "title": "Plant Essential Oil Aromatherapy-White Tea Style-50ml * 2 bottles-1 box"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2046333396044574722.html",
+          "unit_cost": 1.0,
+          "title": "Automatic opening and closing dispensing bottles-630ml-1 piece"
+        }
+      ],
+      "rejection_reasons": [
+        "legal:legal_flag:knife"
+      ],
+      "soft_warnings": [],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "amazon",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.8,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.102
+      },
+      "margin": {
+        "landed_cost": 10.68,
+        "retail_price": 32.04,
+        "platform_fee": 1.23,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 21.36,
+        "gross_margin_pct": 0.667,
+        "net_margin": 8.13,
+        "net_margin_pct": 0.254,
+        "break_even_cpa": 20.13,
+        "passes_margin_floor": true,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 3,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=8gfySsi5JfI",
+          "title": "12 New Coolest Car Gadgets on Amazon You Need Yesterday"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=19BXIdnbM6U",
+          "title": "50 Coolest Car Accessories on Amazon You Need In 2025"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=bSDoq-9CiKY",
+          "title": "15 Coolest Car Gadgets on Amazon That Are Insane"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2062518567750266881.html",
+          "unit_cost": 5.18,
+          "title": "Summer Style, Slimming, Single-shoulder, Pleated And Sexy Satin Side-flowing  Satin Dress From Amazon, Europe And America"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606010352291608500.html",
+          "unit_cost": 37.81,
+          "title": "In Stock Inflatable Lawn Toys For Kids Available On Amazon"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/2606030321251603400.html",
+          "unit_cost": 38.14,
+          "title": "Amazon Foreign Trade Slim-Fit Two-Piece Wedding Prom Formal Wear Business Suit"
+        }
+      ],
+      "rejection_reasons": [
+        "legal:legal_flag:rx "
+      ],
+      "soft_warnings": [],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "musician",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 1.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.7,
+        "margin": 0.667,
+        "overall": 0.083
+      },
+      "margin": {
+        "landed_cost": 6.36,
+        "retail_price": 19.08,
+        "platform_fee": 0.85,
+        "ad_cpa_assumed": 12.0,
+        "gross_margin": 12.72,
+        "gross_margin_pct": 0.667,
+        "net_margin": -0.13,
+        "net_margin_pct": -0.007,
+        "break_even_cpa": 11.87,
+        "passes_margin_floor": false,
+        "margin_score": 0.6666666666666665
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 15,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1ke4hes/as_a_musician_this_is_how_i_hang_my_keys/",
+          "title": "As a musician, this is how I hang my keys\u2026"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1ke4hes/as_a_musician_this_is_how_i_hang_my_keys/",
+          "title": "As a musician, this is how I hang my keys\u2026"
+        }
+      ],
+      "top_suppliers": [
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/E04DA9F2-AAFC-4117-9994-1B91144B1BC3.html",
+          "unit_cost": 0.86,
+          "title": "Musician Singer Sticker"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/1598203990171463680.html",
+          "unit_cost": 0.97,
+          "title": "Musician Rune Symbol Pendant Necklace"
+        },
+        {
+          "supplier": "cjdropshipping",
+          "url": "https://www.cjdropshipping.com/product/1355089732673081344.html",
+          "unit_cost": 1.21,
+          "title": "Creative Musician Gold Iron Ornaments Desk Decorations"
+        }
+      ],
+      "rejection_reasons": [
+        "margin:margin_below_floor:67%"
+      ],
+      "soft_warnings": [],
+      "recommendation": "reject"
+    },
+    {
+      "product_keyword": "finally",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kisz09/you_finally_found_it/",
+          "title": "You finally found it"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kdrxuy/you_finally_found_it/",
+          "title": "You finally found it"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    },
+    {
+      "product_keyword": "didn",
+      "category": "",
+      "scores": {
+        "demand_velocity": 0.0,
+        "buyer_intent": 0.0,
+        "supplier_availability": 0.0,
+        "content_potential": 0.0,
+        "low_saturation": 0.6,
+        "shipping_simplicity": 0.5,
+        "margin": 0,
+        "overall": 0.059
+      },
+      "margin": {
+        "margin_score": 0,
+        "landed_cost": 0,
+        "retail_price": 0,
+        "gross_margin": 0,
+        "gross_margin_pct": 0,
+        "passes_margin_floor": false
+      },
+      "content_hooks": [],
+      "buyer_intent_phrases": [],
+      "n_signals": 2,
+      "n_suppliers": 0,
+      "top_social_sources": [
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=1KWoJRzla5M",
+          "title": "200 Crazy Amazon Kitchen Gadgets You Didn\u2019t Know Existed!"
+        },
+        {
+          "platform": "youtube",
+          "url": "https://www.youtube.com/watch?v=Oq9szZV_REQ",
+          "title": "200+ CRAZY Amazon Kitchen Gadgets You Didn\u2019t Know Existed! *Viral Products 2025*"
+        }
+      ],
+      "top_suppliers": [],
+      "rejection_reasons": [],
+      "soft_warnings": [
+        "margin:no_supplier_data_for_margin_check"
+      ],
+      "recommendation": "skip"
+    }
+  ]
+}

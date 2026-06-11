@@ -1,0 +1,136 @@
+"""pipeline.py - high-level produce_video orchestrator.
+
+produce_video(media_kit, platform) -> dict
+  Per-platform dimensions:
+    tiktok / instagram_reels / youtube_shorts : 1080x1920 (9:16)
+    pinterest                                 : 1000x1500 (2:3)
+"""
+import os, sys, time, re, json, traceback
+from pathlib import Path
+try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
+
+from . import voice as voice_mod
+from . import broll as broll_mod
+from . import music as music_mod
+from . import compose as compose_mod
+
+DIMENSIONS = {
+    "tiktok": (1080, 1920),
+    "instagram_reels": (1080, 1920),
+    "youtube_shorts": (1080, 1920),
+    "pinterest": (1000, 1500),
+}
+
+DEFAULT_DIMENSIONS = (1080, 1920)
+
+
+def _slug(s):
+    s = re.sub(r"[^a-zA-Z0-9]+", "_", (s or "product")).strip("_").lower()
+    return s[:48] or "product"
+
+
+def _voiceover_text(kit):
+    hook = (kit.get("hook") or "").strip()
+    caption = (kit.get("caption") or "").strip()
+    kw = (kit.get("product_keyword") or "this product").strip()
+    if hook and caption:
+        return f"{hook}. {caption}"
+    if hook:
+        return hook
+    if caption:
+        return caption
+    # Fallback - generic but never placeholder text
+    return f"Discover the {kw}. The trending pick everyone is talking about."
+
+
+def _caption_phrases(kit):
+    """Phrases burned on screen during the video."""
+    hook = (kit.get("hook") or "").strip()
+    caption = (kit.get("caption") or "").strip()
+    if hook or caption:
+        text = (hook + ". " + caption).strip(". ")
+        from .compose import _split_captions
+        return _split_captions(text, max_chars=38)
+    kw = (kit.get("product_keyword") or "product").strip()
+    return [kw.upper(), "TRENDING NOW", "TAP TO SEE MORE"]
+
+
+def produce_video(media_kit, platform, output_root=None):
+    """End-to-end produce. Returns dict with status + all asset paths."""
+    if not isinstance(media_kit, dict):
+        raise TypeError("media_kit must be dict")
+    platform = (platform or "tiktok").strip().lower()
+    dims = DIMENSIONS.get(platform, DEFAULT_DIMENSIONS)
+
+    kw = (media_kit.get("product_keyword") or "product").strip()
+    slug = _slug(kw)
+
+    if output_root is None:
+        output_root = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "prometheus_output",
+        )
+    out_dir = os.path.join(output_root, slug)
+    work_dir = os.path.join(out_dir, "work")
+    os.makedirs(work_dir, exist_ok=True)
+
+    t0 = time.time()
+    timings = {}
+
+    vo_text = _voiceover_text(media_kit)
+    voice_path = os.path.join(work_dir, f"voice_{platform}.mp3")
+    t = time.time()
+    voice_mod.generate_voiceover(vo_text, voice_path)
+    timings["voice_sec"] = round(time.time() - t, 2)
+
+    t = time.time()
+    broll_paths = broll_mod.fetch_broll(kw, os.path.join(work_dir, "broll"),
+                                         count=3, dimensions=dims)
+    timings["broll_sec"] = round(time.time() - t, 2)
+
+    t = time.time()
+    music_path = music_mod.pick_music(duration_sec=20.0)
+    timings["music_sec"] = round(time.time() - t, 2)
+
+    captions = _caption_phrases(media_kit)
+    out_path = os.path.join(out_dir, f"{platform}.mp4")
+    t = time.time()
+    result = compose_mod.compose_video(
+        voice_path=voice_path,
+        broll_paths=broll_paths,
+        music_path=music_path,
+        captions=captions,
+        dimensions=dims,
+        out_path=out_path,
+    )
+    timings["compose_sec"] = round(time.time() - t, 2)
+    timings["total_sec"] = round(time.time() - t0, 2)
+
+    return {
+        "ok": True,
+        "platform": platform,
+        "product_keyword": kw,
+        "slug": slug,
+        "video_path": result["path"],
+        "duration_sec": result["duration_sec"],
+        "dimensions": result["dimensions"],
+        "size_bytes": result["size_bytes"],
+        "had_music": result["had_music"],
+        "broll_count": result["broll_count"],
+        "voiceover_text": vo_text,
+        "captions": captions,
+        "voice_path": voice_path,
+        "broll_paths": broll_paths,
+        "timings": timings,
+    }
+
+
+if __name__ == "__main__":
+    kit = {"product_keyword": sys.argv[1] if len(sys.argv) > 1 else "kitchen",
+           "hook": "This kitchen tool will change your life",
+           "caption": "Cuts prep time in half and fits in a drawer.",
+           "hashtags": ["#kitchen", "#cooking"]}
+    plat = sys.argv[2] if len(sys.argv) > 2 else "tiktok"
+    res = produce_video(kit, plat)
+    print(json.dumps(res, indent=2, default=str))

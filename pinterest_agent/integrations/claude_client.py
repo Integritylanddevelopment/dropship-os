@@ -1,6 +1,7 @@
 """
-Pinterest AI Agent — Anthropic Claude Client
+Pinterest AI Agent — Quinn Bridge Client
 Powers all AI content generation: titles, descriptions, board copy, strategies.
+Routes through Quinn bridge (Rule 1: Quinn-First routing).
 """
 import os
 try:
@@ -8,9 +9,12 @@ try:
     load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".env"))
 except ImportError:
     pass
-import anthropic
+import requests
 import json
 from typing import Any
+
+# Quinn bridge routes all LLM calls (Rule 1: Quinn-First)
+QUINN_BRIDGE = "http://localhost:8765"
 
 
 SYSTEM_PROMPT = """You are an expert Pinterest content strategist and SEO copywriter
@@ -38,17 +42,30 @@ class ClaudeClient:
     def __init__(self, api_key: str, model: str = None):
         if model is None:
             model = os.getenv("CLAUDE_MODEL", "claude-opus-4-6")
-        self.client = anthropic.Anthropic(api_key=api_key)
         self.model = model
 
     def _call(self, prompt: str, max_tokens: int = 2000, temperature: float = 0.7) -> str:
-        message = self.client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": prompt}],
+        """
+        Call Quinn bridge instead of Anthropic directly (Rule 1: Quinn-First).
+        Quinn routes to Anthropic or local Ollama based on confidence.
+        """
+        response = requests.post(
+            f"{QUINN_BRIDGE}/chat",
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "stream": False,
+            },
+            timeout=120,
         )
-        return message.content[0].text.strip()
+        response.raise_for_status()
+        result = response.json()
+        return result.get("content", "").strip()
 
     def _call_json(self, prompt: str, max_tokens: int = 3000) -> Any:
         """Call Claude and parse the JSON response."""

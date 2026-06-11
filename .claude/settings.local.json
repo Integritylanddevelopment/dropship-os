@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($f = \"C:\\\\Users\\\\integ\\\\quinn-proxy\\\\quinn_live_dashboard.py\"; $info = Get-Item $f; $proc = Get-Process -Id 45000; Write-Output \"SCRIPT last modified: $\\($info.LastWriteTime\\)\"; Write-Output \"PROCESS started:     $\\($proc.StartTime\\)\"; if \\($info.LastWriteTime -gt $proc.StartTime\\) { Write-Output \"==> Script modified AFTER process start -- restart needed\" } else { Write-Output \"==> Process is current\" })"
+    ]
+  }
+}

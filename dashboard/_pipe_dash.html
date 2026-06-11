@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/><title>ShipStack Pipeline</title>
+<link rel="stylesheet" href="/_pipe_dash.css">
+</head>
+<body>
+<header><h1>ShipStack Pipeline</h1><div class="meta"><span id="meta">loading...</span> | <span class="refresh" onclick="load()">refresh</span></div></header>
+<nav class="tabbar">
+  <button class="tab on" data-tab="discovery" onclick="switchTab('discovery')">Discovery <span class="tabct" id="tabct-discovery"></span></button>
+  <button class="tab" data-tab="decide" onclick="switchTab('decide')">Decide <span class="tabct" id="tabct-decide"></span></button>
+  <button class="tab" data-tab="distribution" onclick="switchTab('distribution')">Distribution <span class="tabct" id="tabct-distribution"></span></button>
+</nav>
+
+<section class="tabpanel on" id="tab-discovery">
+  <div class="stage wide">
+    <h2><span><span class="num">1+2</span>DISCOVERY</span><span id="sDisc" class="meta"></span></h2>
+    <div class="body" id="discoveryBody">loading...</div>
+  </div>
+</section>
+
+<section class="tabpanel" id="tab-decide">
+  <div class="stage wide">
+    <h2><span><span class="num">3</span>DECIDE</span><span id="sDec" class="meta"></span></h2>
+    <div class="body" id="decideBody">loading...</div>
+  </div>
+</section>
+
+<section class="tabpanel" id="tab-distribution">
+  <div class="dist-stack">
+    <div class="stage"><h2><span><span class="num">4</span>SCRAPE</span><span id="s4" class="meta"></span></h2><div class="body" id="scrapeBody">loading...</div></div>
+    <div class="stage"><h2><span><span class="num">5</span>MEDIA GEN</span><span id="s5" class="meta">Prometheus</span></h2><div class="body" id="mediaBody"></div></div>
+    <div class="stage"><h2><span><span class="num">5b</span>PRODUCED OUTPUT</span><span id="s5b" class="meta">select for social</span></h2><div class="body" id="producedBody"></div></div>
+    <div class="stage"><h2><span><span class="num">6</span>SOCIAL PUSH</span><span id="s6" class="meta">Distribution</span></h2><div class="body" id="pushBody"></div></div>
+    <div class="stage"><h2><span><span class="num">6b</span>SOCIAL READY</span><span id="s6b" class="meta">queue for live</span></h2><div class="body" id="socialReadyBody"></div></div>
+  </div>
+</section>
+
+<div id="detailModal" class="modal" onclick="closeDetail(event)">
+  <div class="modal-inner" onclick="event.stopPropagation()">
+    <button class="modal-x" onclick="closeDetail()" aria-label="Close">&times;</button>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<script src="/_pipe_dash.js"></script>
+</body></html>

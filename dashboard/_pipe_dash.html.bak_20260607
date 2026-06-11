@@ -1,0 +1,183 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/><title>ShipStack Pipeline</title>
+<style>
+:root{--bg:#0b0e14;--panel:#141821;--line:#252b38;--ink:#e6e9ef;--dim:#888da3;--acc:#ff8c42;--ok:#5ad28e;--warn:#f5c542;--bad:#e75858}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,sans-serif}
+header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:18px;color:var(--acc)}header .meta{color:var(--dim);font-size:12px}
+.stages{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;padding:14px}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:8px;min-height:240px;display:flex;flex-direction:column}
+.stage h2{margin:0;padding:10px 12px;font-size:13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.stage .num{color:var(--dim);margin-right:6px}
+.stage .body{padding:10px 12px;flex:1;overflow-y:auto;max-height:560px}
+.bar{display:flex;align-items:center;gap:6px;font-size:12px;margin:3px 0}
+.bar .lbl{width:90px;color:var(--dim)}.bar .val{background:var(--acc);height:10px;border-radius:2px;min-width:2px}.bar .n{font-variant-numeric:tabular-nums}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:12px;gap:6px}
+.row:last-child{border-bottom:none}.row .kw{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row .sc{color:var(--dim);font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:1px 6px;border-radius:10px;font-size:10px;text-transform:uppercase}
+.pill.skip{background:#2a2f3c;color:var(--dim)}.pill.watch{background:#3d3a1a;color:var(--warn)}.pill.test{background:#1c3b2a;color:var(--ok)}.pill.pursue{background:#0e2f1a;color:var(--ok);font-weight:700}.pill.reject{background:#3a1c1c;color:var(--bad)}
+button.choice{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:2px 6px;font-size:11px;cursor:pointer;margin-left:4px}
+button.choice:hover{border-color:var(--acc)}button.choice.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
+.empty{color:var(--dim);font-style:italic;font-size:12px;padding:8px 0}
+.scrape-card{padding:8px;border:1px solid var(--line);border-radius:4px;margin-bottom:8px;font-size:12px}
+.scrape-card .title{font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scrape-card .price{color:var(--ok);font-weight:700}.scrape-card .meta{color:var(--dim);font-size:11px;margin-top:3px}
+.media-card{padding:8px;border:1px solid var(--line);border-radius:4px;margin-bottom:10px;font-size:12px}
+.media-card .title{font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.media-card .hook{color:var(--acc);font-weight:600;font-size:12px;margin:4px 0;line-height:1.3}
+.media-card .cap{color:var(--ink);font-size:11px;margin:4px 0;line-height:1.4}
+.media-card .tags{color:var(--ok);font-size:10px;margin-top:4px;word-break:break-all}
+.media-card .thumb{display:block;width:100%;max-height:160px;object-fit:cover;border-radius:3px;margin:6px 0;background:#000}
+.media-card .meta{color:var(--dim);font-size:10px;margin-top:4px}
+.media-card .err{color:var(--bad);font-size:11px;margin-top:4px}
+button.gen{background:var(--acc);color:#000;border:none;border-radius:3px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;margin-top:4px}
+button.gen:hover{filter:brightness(1.1)}button.gen:disabled{background:var(--line);color:var(--dim);cursor:wait}
+.stub{color:var(--dim);font-size:12px;line-height:1.7}.stub .arrow{color:var(--acc)}
+a{color:var(--acc);text-decoration:none}.refresh{cursor:pointer;color:var(--acc);font-size:11px}
+@media(max-width:1400px){.stages{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.stages{grid-template-columns:1fr}}
+.social-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:12px}.social-row:last-child{border-bottom:none}.social-row .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3a3f4d;flex-shrink:0}.social-row .dot.on{background:var(--ok)}.social-row .pname{flex:1;color:var(--ink)}.social-row .conn{color:var(--dim);font-size:10px}.social-row .qcount{color:var(--acc);font-size:10px;font-variant-numeric:tabular-nums;min-width:18px;text-align:right}.queue-sum{padding:6px 8px;background:#0e1119;border:1px solid var(--line);border-radius:3px;margin:8px 0;font-size:11px;color:var(--dim)}.queue-sum b{color:var(--ok)}.push-card{padding:8px;border:1px solid var(--line);border-radius:4px;margin-bottom:8px;font-size:12px}.push-card .title{font-weight:600;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.push-btns{display:flex;gap:4px;flex-wrap:wrap}button.ppb{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;min-width:30px}button.ppb:hover{border-color:var(--acc);color:var(--acc)}button.ppb.queued{background:var(--ok);color:#000;border-color:var(--ok)}button.ppb:disabled{opacity:.6;cursor:wait}
+</style></head>
+<body>
+<header><h1>ShipStack Pipeline</h1><div class="meta"><span id="meta">loading...</span> | <span class="refresh" onclick="load()">refresh</span></div></header>
+<div class="stages">
+<section class="stage"><h2><span><span class="num">1</span>SEARCH</span><span id="s1" class="meta"></span></h2><div class="body" id="searchBody">loading...</div></section>
+<section class="stage"><h2><span><span class="num">2</span>ANALYZE</span><span id="s2" class="meta"></span></h2><div class="body" id="analyzeBody">loading...</div></section>
+<section class="stage"><h2><span><span class="num">3</span>DECIDE</span><span id="s3" class="meta"></span></h2><div class="body" id="decideBody">loading...</div></section>
+<section class="stage"><h2><span><span class="num">4</span>SCRAPE</span><span id="s4" class="meta"></span></h2><div class="body" id="scrapeBody">loading...</div></section>
+<section class="stage"><h2><span><span class="num">5</span>MEDIA GEN</span><span id="s5" class="meta">Prometheus</span></h2><div class="body" id="mediaBody"></div></section>
+<section class="stage"><h2><span><span class="num">6</span>SOCIAL PUSH</span><span id="s6" class="meta">Distribution</span></h2><div class="body" id="pushBody"></div></section>
+</div>
+<script>
+let cache=null,decisions={},mediaKits={},socialStatus=[],socialQueue=[];
+function pill(r){r=(r||'skip').toLowerCase();return '<span class="pill '+r+'">'+r+'</span>'}
+function fmt(n){return Number(n||0).toFixed(2)}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){
+  if(!cache){document.getElementById('meta').textContent='no run found';return}
+  const r=cache;
+  document.getElementById('meta').textContent='Run '+(r.generated_at||'')+' | '+(r.total_signals||0)+' signals -> '+(r.n_reports||0)+' reports | '+(r.elapsed_sec||0)+'s';
+  const byPlat={};for(const rep of(r.reports||[]))for(const s of(rep.top_social_sources||[]))byPlat[s.platform]=(byPlat[s.platform]||0)+1;
+  const max=Math.max(1,...Object.values(byPlat));let h='';
+  for(const[k,v]of Object.entries(byPlat).sort((a,b)=>b[1]-a[1]))h+='<div class="bar"><span class="lbl">'+k+'</span><span class="val" style="width:'+(v/max*120)+'px"></span><span class="n">'+v+'</span></div>';
+  h+='<div class="row" style="margin-top:8px"><span class="kw">Total signals</span><span class="sc">'+(r.total_signals||0)+'</span></div>';
+  h+='<div class="row"><span class="kw">Sources</span><span class="sc">'+Object.keys(byPlat).length+'</span></div>';
+  document.getElementById('searchBody').innerHTML=h||'<div class="empty">no signals yet</div>';
+  document.getElementById('s1').textContent=(r.total_signals||0)+' signals';
+  const counts={};for(const rep of(r.reports||[]))counts[rep.recommendation]=(counts[rep.recommendation]||0)+1;
+  let h2='';for(const k of ['pursue','test','watch','skip','reject'])if(counts[k])h2+='<div class="row">'+pill(k)+'<span class="sc">'+counts[k]+'</span></div>';
+  h2+='<div class="row" style="margin-top:8px"><span class="kw">Clusters scored</span><span class="sc">'+(r.n_clusters||r.n_reports||0)+'</span></div>';
+  document.getElementById('analyzeBody').innerHTML=h2||'<div class="empty">no analysis</div>';
+  document.getElementById('s2').textContent=(r.n_reports||0)+' reports';
+  const sorted=(r.reports||[]).slice().sort((a,b)=>(b.scores?.overall||0)-(a.scores?.overall||0));
+  let h3='';
+  for(const rep of sorted){
+    const k=rep.product_keyword||'?',cur=decisions[k]?.choice||rep.recommendation,sc=rep.scores?.overall||0;
+    h3+='<div class="row" style="flex-direction:column;align-items:stretch;gap:4px"><div style="display:flex;justify-content:space-between"><span class="kw" title="'+esc(k)+'">'+esc(k)+'</span><span class="sc">'+fmt(sc)+' | '+(rep.n_suppliers||0)+'s</span></div><div style="display:flex;gap:4px;flex-wrap:wrap">';
+    for(const c of ['pursue','test','watch','skip'])h3+='<button class="choice '+(cur===c?'on':'')+'" onclick="decide(\''+encodeURIComponent(k)+'\',\''+c+'\')">'+c+'</button>';
+    h3+='</div></div>';
+  }
+  document.getElementById('decideBody').innerHTML=h3||'<div class="empty">no candidates</div>';
+  document.getElementById('s3').textContent=Object.keys(decisions).length+'/'+sorted.length+' decided';
+  const chosen=sorted.filter(rep=>['pursue','test'].includes(decisions[rep.product_keyword]?.choice));
+  let h4='';
+  for(const rep of chosen){
+    const sup=(rep.top_suppliers||[])[0];
+    h4+='<div class="scrape-card"><div class="title">'+esc(rep.product_keyword)+'</div>';
+    if(sup){h4+='<div class="price">$'+fmt(sup.unit_cost)+' <span class="meta">'+esc((sup.title||'').slice(0,50))+'</span></div><div class="meta">'+(rep.n_suppliers||0)+' suppliers | score '+fmt(rep.scores?.overall)+'</div>';if(sup.url)h4+='<div class="meta"><a href="'+sup.url+'" target="_blank">view supplier</a></div>'}
+    else h4+='<div class="meta">no supplier attached</div>';
+    h4+='</div>';
+  }
+  document.getElementById('scrapeBody').innerHTML=h4||'<div class="empty">no PURSUE/TEST picks yet</div>';
+  document.getElementById('s4').textContent=chosen.length+' chosen';
+  let h5='';let kitCount=0;
+  for(const rep of chosen){
+    const k=rep.product_keyword;const kit=mediaKits[k];
+    h5+='<div class="media-card"><div class="title" title="'+esc(k)+'">'+esc(k)+'</div>';
+    if(kit){
+      kitCount++;
+      if(kit.error){h5+='<div class="err">error: '+esc(kit.error)+'</div>';if(kit.image_url)h5+='<img class="thumb" src="'+esc(kit.image_url)+'" loading="lazy" alt="">';h5+='<button class="gen" onclick="genKit(\''+encodeURIComponent(k)+'\',this)">retry</button>'}
+      else{
+        if(kit.image_url)h5+='<img class="thumb" src="'+esc(kit.image_url)+'" loading="lazy" alt="">';
+        if(kit.hook)h5+='<div class="hook">'+esc(kit.hook)+'</div>';
+        if(kit.caption)h5+='<div class="cap">'+esc(kit.caption)+'</div>';
+        if(kit.hashtags&&kit.hashtags.length)h5+='<div class="tags">'+kit.hashtags.map(esc).join(' ')+'</div>';
+        h5+='<div class="meta">'+esc(kit.generated_at||'')+'</div>';
+        h5+='<button class="gen" onclick="genKit(\''+encodeURIComponent(k)+'\',this)">regenerate</button>';
+      }
+    } else {
+      h5+='<div class="meta">no kit yet</div><button class="gen" onclick="genKit(\''+encodeURIComponent(k)+'\',this)">Generate</button>';
+    }
+    h5+='</div>';
+  }
+  document.getElementById('mediaBody').innerHTML=h5||'<div class="empty">no PURSUE/TEST picks yet</div>';
+  document.getElementById('s5').textContent=kitCount+'/'+chosen.length+' kits';
+  renderStage6(chosen);
+}
+function renderStage6(chosen){
+  const tabs={tiktok:'TT',instagram_reels:'IG',youtube_shorts:'YT',pinterest:'P'};
+  let totalQ=0,totalR=0;
+  for(const e of socialQueue){if(e.status==='ready')totalR++;else totalQ++;}
+  let h='';
+  for(const s of socialStatus){
+    h+='<div class="social-row"><span class="dot '+(s.connected?'on':'')+'"></span><span class="pname">'+esc(s.name)+'</span>';
+    if(!s.connected)h+='<a class="conn" href="'+esc(s.connect_url)+'" target="_blank">Connect &#8599;</a>';
+    else h+='<span class="conn">connected</span>';
+    h+='<span class="qcount">'+(s.queued_count||0)+'</span></div>';
+  }
+  h+='<div class="queue-sum"><b>'+totalQ+'</b> queued, <b>'+totalR+'</b> ready</div>';
+  const kitChosen=(chosen||[]).filter(rep=>mediaKits[rep.product_keyword]);
+  if(!kitChosen.length){h+='<div class="empty">no media kits yet</div>';}
+  else{
+    const queuedSet=new Set();
+    for(const e of socialQueue){const k=e.kit&&(e.kit.product_keyword||'');queuedSet.add(k+'|'+e.platform);}
+    for(const rep of kitChosen){
+      const k=rep.product_keyword;
+      h+='<div class="push-card"><div class="title" title="'+esc(k)+'">'+esc(k)+'</div><div class="push-btns">';
+      for(const p of Object.keys(tabs)){
+        const isQ=queuedSet.has(k+'|'+p);
+        h+='<button class="ppb '+(isQ?'queued':'')+'" onclick="queuePost(&#39;'+encodeURIComponent(k)+'&#39;,&#39;'+p+'&#39;,this)" title="'+esc(p)+'">'+tabs[p]+(isQ?' &#10003;':'')+'</button>';
+      }
+      h+='</div></div>';
+    }
+  }
+  document.getElementById('pushBody').innerHTML=h;
+  document.getElementById('s6').textContent=totalQ+'q / '+totalR+'r';
+}
+async function queuePost(kw,platform,btn){
+  const k=decodeURIComponent(kw);
+  if(btn){btn.disabled=true;}
+  try{
+    const r=await fetch('/api/queue-post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:k,platform:platform})});
+    const j=await r.json();
+    if(!r.ok){alert('queue failed: '+(j.error||r.status));if(btn)btn.disabled=false;return;}
+    load();
+  }catch(e){if(btn)btn.disabled=false;alert('queue failed: '+e.message);}
+}
+async function load(){
+  try{
+    const[r1,r2,r3,r4,r5]=await Promise.all([
+      fetch('/api/latest-run').then(r=>r.json()),
+      fetch('/api/decisions').then(r=>r.json()),
+      fetch('/api/media-kits').then(r=>r.json()),
+      fetch('/api/social-status').then(r=>r.json()),
+      fetch('/api/social-queue').then(r=>r.json())
+    ]);
+    cache=r1;decisions=r2;mediaKits=r3;socialStatus=r4;socialQueue=r5;render();
+  }catch(e){document.getElementById('meta').textContent='error: '+e.message}
+}
+async function decide(kw,choice){await fetch('/api/decide',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kw:decodeURIComponent(kw),choice})});load()}
+async function genKit(kw,btn){
+  const k=decodeURIComponent(kw);
+  if(btn){btn.disabled=true;btn.textContent='generating...';}
+  try{
+    const r=await fetch('/api/generate-media',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:k})});
+    const kit=await r.json();
+    mediaKits[k]=kit;render();
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='retry';}
+    alert('gen failed: '+e.message);
+  }
+}
+load();setInterval(load,30000);
+</script></body></html>

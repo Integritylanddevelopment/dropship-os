@@ -7,7 +7,7 @@
 //
 // Setup (one time):
 //   1. Stripe dashboard → Developers → Webhooks → Add endpoint
-//      URL: https://dropship-os-gamma.vercel.app/api/webhook
+//      URL: https://shipstack-gamma.vercel.app/api/webhook
 //      Events: checkout.session.completed, payment_intent.succeeded
 //   2. Copy the "Signing secret" (whsec_...) into Vercel env vars:
 //      STRIPE_WEBHOOK_SECRET = whsec_...

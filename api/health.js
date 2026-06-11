@@ -1,4 +1,4 @@
-// dropship-os/api/health.js
+// ShipStack/api/health.js
 // Quinn Bridge health check endpoint for Vercel
 // GET /api/health -> {"status": "connected"|"disconnected"|"no_endpoint", ...}
 

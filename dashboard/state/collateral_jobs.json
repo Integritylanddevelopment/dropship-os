@@ -1,0 +1,36 @@
+{
+  "7130a6667902": {
+    "id": "7130a6667902",
+    "product_keyword": "kitchen",
+    "status": "done",
+    "queued_at": 1780918968.320107,
+    "started_at": 1780918968.321,
+    "finished_at": 1780918972.418346,
+    "result": {
+      "product_keyword": "kitchen",
+      "slug": "kitchen",
+      "folder": "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\kitchen",
+      "added": 12,
+      "total_items": 12,
+      "errors": [],
+      "scraped_at": "2026-06-08T06:42:52"
+    }
+  },
+  "4c98c176d69b": {
+    "id": "4c98c176d69b",
+    "product_keyword": "_test_only",
+    "status": "done",
+    "queued_at": 1780919554.7711208,
+    "started_at": 1780919554.7738311,
+    "finished_at": 1780919554.7780864,
+    "result": {
+      "product_keyword": "_test_only",
+      "slug": "test_only",
+      "folder": "C:\\Users\\integ\\Documents\\Claude\\Projects\\ShipStack\\dashboard\\state\\collateral\\test_only",
+      "added": 0,
+      "total_items": 0,
+      "errors": [],
+      "scraped_at": "2026-06-08T06:52:34"
+    }
+  }
+}

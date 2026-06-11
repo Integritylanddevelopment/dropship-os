@@ -1,0 +1,641 @@
+// ShipStack Pipeline Dashboard - tabbed layout
+let cache=null,decisions={},mediaKits={},socialStatus=[],socialQueue=[],accountStatus={},calendar={};
+let collateralIndex={};        // slug -> {count, total_size, thumb_url, product_keyword, updated_at}
+let collateralLists={};        // product_keyword -> {items, total_size, ...}
+let collateralJobs={};         // product_keyword -> job_id (active)
+let expandedSlug=null;         // currently expanded folder
+let activeTab='discovery';
+const SUBSCORE_KEYS=[
+  ['demand_velocity','demand'],
+  ['buyer_intent','intent'],
+  ['supplier_availability','supply'],
+  ['content_potential','content'],
+  ['low_saturation','satur'],
+  ['shipping_simplicity','ship'],
+  ['margin','margin'],
+];
+
+function pill(r){r=(r||'skip').toLowerCase();return '<span class="pill '+r+'">'+r+'</span>'}
+function fmt(n){return Number(n||0).toFixed(2)}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function pct(n){return Math.round(Number(n||0)*100)}
+function kb(n){n=Number(n||0);if(n<1024)return n+'B';if(n<1024*1024)return Math.round(n/1024)+'KB';return (n/1024/1024).toFixed(1)+'MB'}
+function slugify(s){return (s||'product').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,48)||'product'}
+
+function switchTab(name){
+  activeTab=name;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('on',p.id==='tab-'+name));
+}
+
+function render(){
+  if(!cache){document.getElementById('meta').textContent='no run found';return}
+  const r=cache;
+  document.getElementById('meta').textContent='Run '+(r.generated_at||'')+' | '+(r.total_signals||0)+' signals -> '+(r.n_reports||0)+' reports | '+(r.elapsed_sec||0)+'s';
+  renderDiscovery(r);
+  renderDecide(r);
+  renderDistribution(r);
+}
+
+function renderDiscovery(r){
+  const byPlat={};
+  for(const rep of(r.reports||[]))for(const s of(rep.top_social_sources||[]))byPlat[s.platform]=(byPlat[s.platform]||0)+1;
+  const max=Math.max(1,...Object.values(byPlat));
+  let bars='';
+  for(const[k,v]of Object.entries(byPlat).sort((a,b)=>b[1]-a[1])){
+    bars+='<div class="bar"><span class="lbl">'+esc(k)+'</span><span class="val" style="width:'+(v/max*180)+'px"></span><span class="n">'+v+'</span></div>';
+  }
+  if(!bars)bars='<div class="empty">no signal sources</div>';
+
+  const counts={};for(const rep of(r.reports||[]))counts[rep.recommendation]=(counts[rep.recommendation]||0)+1;
+  let pills='';
+  for(const k of ['pursue','test','watch','skip','reject']){
+    if(counts[k])pills+='<div class="statcell">'+pill(k)+'<span class="v">'+counts[k]+'</span></div>';
+  }
+  if(!pills)pills='<div class="empty">no analysis yet</div>';
+
+  const reports=r.reports||[];
+  const actionable=reports.filter(rp=>['pursue','test'].includes(rp.recommendation)).length;
+  const watchable=reports.filter(rp=>rp.recommendation==='watch').length;
+
+  let h='<div class="disc-grid">';
+  h+='<div class="panel">';
+  h+='<h3>Signal sources</h3>'+bars;
+  h+='<div class="statcell" style="margin-top:10px"><span class="l">Total signals</span><span class="v">'+(r.total_signals||0)+'</span></div>';
+  h+='<div class="statcell"><span class="l">Sources active</span><span class="v">'+Object.keys(byPlat).length+'</span></div>';
+  h+='<div class="statcell"><span class="l">Generated at</span><span class="v">'+esc(r.generated_at||'-')+'</span></div>';
+  h+='<div class="statcell"><span class="l">Elapsed (s)</span><span class="v">'+(r.elapsed_sec||0)+'</span></div>';
+  h+='</div>';
+
+  h+='<div class="panel">';
+  h+='<h3>Analysis breakdown</h3>'+pills;
+  h+='<div class="statcell" style="margin-top:10px"><span class="l">Clusters scored</span><span class="v">'+(r.n_clusters||r.n_reports||0)+'</span></div>';
+  h+='<div class="statcell"><span class="l">Reports generated</span><span class="v">'+(r.n_reports||0)+'</span></div>';
+  h+='<div class="statcell"><span class="l">Actionable (pursue+test)</span><span class="v">'+actionable+'</span></div>';
+  h+='<div class="statcell"><span class="l">Watchable</span><span class="v">'+watchable+'</span></div>';
+  h+='</div>';
+  h+='</div>';
+
+  document.getElementById('discoveryBody').innerHTML=h;
+  document.getElementById('sDisc').textContent=(r.total_signals||0)+' sig | '+(r.n_reports||0)+' rep';
+  document.getElementById('tabct-discovery').textContent='('+(r.n_reports||0)+')';
+}
+
+function renderDecide(r){
+  const sorted=(r.reports||[]).slice().sort((a,b)=>(b.scores?.overall||0)-(a.scores?.overall||0));
+  let h='';
+  for(let i=0;i<sorted.length;i++){
+    const rep=sorted[i];
+    const k=rep.product_keyword||'?';
+    const sc=rep.scores||{};
+    const ov=sc.overall||0;
+    const cur=decisions[k]?.choice||rep.recommendation;
+    const cat=rep.category||'';
+    h+='<div class="dec-row">';
+    h+='<div class="top">';
+    h+='<span class="ovl">'+fmt(ov)+'</span>';
+    h+='<span class="kw" title="'+esc(k)+'">'+esc(k)+'</span>';
+    if(cat)h+='<span class="cat">'+esc(cat)+'</span>';
+    h+=pill(cur);
+    h+='<span class="counts"><span>signals <b>'+(rep.n_signals||0)+'</b></span><span>suppliers <b>'+(rep.n_suppliers||0)+'</b></span></span>';
+    h+='</div>';
+    h+='<div class="subscores">';
+    for(const[key,lbl]of SUBSCORE_KEYS){
+      const v=Number(sc[key]||0);
+      const cls=v<0.35?'subscore lo':'subscore';
+      h+='<div class="'+cls+'" title="'+key+'">';
+      h+='<span class="sn">'+lbl+'</span>';
+      h+='<span class="sv">'+fmt(v)+'</span>';
+      h+='<span class="sb"><i style="width:'+pct(v)+'%"></i></span>';
+      h+='</div>';
+    }
+    h+='</div>';
+    h+='<div class="actions">';
+    for(const c of ['pursue','test','watch','skip']){
+      h+='<button class="choice '+(cur===c?'on':'')+'" onclick="decide(\''+encodeURIComponent(k)+'\',\''+c+'\')">'+c+'</button>';
+    }
+    h+='<button class="detail" onclick="showDetail('+i+')">Detail</button>';
+    h+='</div>';
+    h+='</div>';
+  }
+  document.getElementById('decideBody').innerHTML=h||'<div class="empty">no candidates</div>';
+  document.getElementById('sDec').textContent=Object.keys(decisions).length+'/'+sorted.length+' decided';
+  document.getElementById('tabct-decide').textContent='('+sorted.length+')';
+  window.__sortedReports=sorted;
+}
+
+function showDetail(idx){
+  const rep=(window.__sortedReports||[])[idx];
+  if(!rep)return;
+  const k=rep.product_keyword||'?';
+  const sc=rep.scores||{};
+  const m=rep.margin||{};
+  const cur=decisions[k]?.choice||rep.recommendation;
+  let h='<div class="m-head">';
+  h+='<span class="kw">'+esc(k)+'</span>';
+  if(rep.category)h+='<span class="cat">'+esc(rep.category)+'</span>';
+  h+=pill(cur);
+  h+='<span class="ovl">'+fmt(sc.overall||0)+'</span>';
+  h+='</div>';
+
+  h+='<div class="m-sec"><h3>Score components</h3><div class="m-scores">';
+  const allScores=SUBSCORE_KEYS.slice();
+  allScores.push(['overall','OVERALL']);
+  for(const[key,lbl]of allScores){
+    const v=Number(sc[key]||0);
+    const cls=v<0.35?'subscore lo':'subscore';
+    h+='<div class="'+cls+'"><span class="sn">'+lbl+'</span><span class="sv">'+fmt(v)+'</span><span class="sb"><i style="width:'+pct(v)+'%"></i></span></div>';
+  }
+  h+='</div></div>';
+
+  h+='<div class="m-sec"><h3>Margin</h3><div class="m-marg">';
+  h+='<div class="cell"><div class="l">Landed cost</div><div class="v">$'+fmt(m.landed_cost)+'</div></div>';
+  h+='<div class="cell"><div class="l">Retail price</div><div class="v">$'+fmt(m.retail_price)+'</div></div>';
+  h+='<div class="cell"><div class="l">Gross $</div><div class="v">$'+fmt(m.gross_margin)+'</div></div>';
+  h+='<div class="cell"><div class="l">Gross %</div><div class="v">'+pct(m.gross_margin_pct)+'%</div></div>';
+  h+='<div class="cell '+(m.passes_margin_floor?'ok':'bad')+'"><div class="l">Margin floor</div><div class="v">'+(m.passes_margin_floor?'PASS':'FAIL')+'</div></div>';
+  h+='<div class="cell"><div class="l">Margin score</div><div class="v">'+fmt(m.margin_score)+'</div></div>';
+  if(m.net_margin!==undefined)h+='<div class="cell '+(Number(m.net_margin)>=0?'ok':'bad')+'"><div class="l">Net $</div><div class="v">$'+fmt(m.net_margin)+'</div></div>';
+  if(m.break_even_cpa!==undefined)h+='<div class="cell"><div class="l">Break-even CPA</div><div class="v">$'+fmt(m.break_even_cpa)+'</div></div>';
+  h+='</div></div>';
+
+  const hooks=rep.content_hooks||[];
+  h+='<div class="m-sec"><h3>Content hooks ('+hooks.length+')</h3>';
+  if(hooks.length){h+=hooks.map(x=>'<span class="m-tag">'+esc(x)+'</span>').join('');}
+  else h+='<div class="empty">none</div>';
+  h+='</div>';
+
+  const phrases=rep.buyer_intent_phrases||[];
+  h+='<div class="m-sec"><h3>Buyer intent phrases ('+phrases.length+')</h3>';
+  if(phrases.length){h+='<ul class="m-list">';for(const p of phrases)h+='<li>'+esc(typeof p==='string'?p:JSON.stringify(p))+'</li>';h+='</ul>';}
+  else h+='<div class="empty">none captured</div>';
+  h+='</div>';
+
+  const ss=rep.top_social_sources||[];
+  h+='<div class="m-sec"><h3>Top social sources ('+ss.length+')</h3>';
+  if(ss.length){h+='<ul class="m-list">';for(const s of ss){h+='<li><span class="plat">'+esc(s.platform||'?')+'</span>';if(s.url)h+='<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title||s.url)+'</a>';else h+=esc(s.title||'-');h+='</li>';}h+='</ul>';}
+  else h+='<div class="empty">none</div>';
+  h+='</div>';
+
+  const sup=rep.top_suppliers||[];
+  h+='<div class="m-sec"><h3>Top suppliers ('+sup.length+')</h3>';
+  if(sup.length){h+='<ul class="m-list">';for(const s of sup){h+='<li><span class="plat">'+esc(s.supplier||'?')+'</span><span class="price">$'+fmt(s.unit_cost)+'</span>';if(s.url)h+='<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title||s.url)+'</a>';else h+=esc(s.title||'-');h+='</li>';}h+='</ul>';}
+  else h+='<div class="empty">none</div>';
+  h+='</div>';
+
+  const warns=rep.soft_warnings||[];
+  if(warns.length){
+    h+='<div class="m-sec"><h3>Soft warnings</h3>';
+    for(const w of warns)h+='<div class="m-warn">- '+esc(typeof w==='string'?w:JSON.stringify(w))+'</div>';
+    h+='</div>';
+  }
+  const rej=rep.rejection_reasons||[];
+  if(rej.length){
+    h+='<div class="m-sec"><h3>Rejection reasons</h3>';
+    for(const x of rej)h+='<div class="m-rej">- '+esc(typeof x==='string'?x:JSON.stringify(x))+'</div>';
+    h+='</div>';
+  }
+  document.getElementById('detailBody').innerHTML=h;
+  document.getElementById('detailModal').classList.add('on');
+}
+
+function closeDetail(ev){
+  if(ev && ev.target && !ev.currentTarget.contains(ev.target))return;
+  document.getElementById('detailModal').classList.remove('on');
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('detailModal').classList.remove('on');});
+
+function renderDistribution(r){
+  const sorted=window.__sortedReports||(r.reports||[]).slice().sort((a,b)=>(b.scores?.overall||0)-(a.scores?.overall||0));
+  const chosen=sorted.filter(rep=>['pursue','test'].includes(decisions[rep.product_keyword]?.choice));
+  renderScrape(chosen);
+  renderMedia(chosen);
+  renderStage6(chosen);
+  document.getElementById('tabct-distribution').textContent='('+chosen.length+')';
+}
+
+function renderScrape(chosen){
+  let h='';let scrapedCount=0;
+  for(const rep of chosen){
+    const k=rep.product_keyword;
+    const slug=slugify(k);
+    const sup=(rep.top_suppliers||[])[0];
+    const social=(rep.top_social_sources||[]).length;
+    const idxEntry=collateralIndex[slug];
+    const activeJob=collateralJobs[k];
+    h+='<div class="scrape-card"><div class="title">'+esc(k)+'</div>';
+    if(sup){
+      h+='<div class="price">$'+fmt(sup.unit_cost)+' <span class="meta">'+esc((sup.title||'').slice(0,40))+'</span></div>';
+    }
+    h+='<div class="meta">'+(rep.n_suppliers||0)+' sup | '+social+' soc | score '+fmt(rep.scores?.overall)+'</div>';
+    if(idxEntry){
+      scrapedCount++;
+      h+='<div class="scrape-status ok">scraped: '+idxEntry.count+' items, '+kb(idxEntry.total_size)+'</div>';
+      if(idxEntry.thumb_url)h+='<img class="thumb" src="'+esc(idxEntry.thumb_url)+'" loading="lazy" alt="">';
+    }
+    if(activeJob){
+      h+='<div class="scrape-status running">scraping... job '+activeJob.slice(0,6)+'</div>';
+      h+='<button class="gen" disabled>scraping</button>';
+    } else {
+      h+='<button class="gen" onclick="scrapeCollateral(\''+encodeURIComponent(k)+'\',this)">'+(idxEntry?'Re-scrape':'Scrape collateral')+'</button>';
+    }
+    h+='</div>';
+  }
+  document.getElementById('scrapeBody').innerHTML=h||'<div class="empty">no PURSUE/TEST picks yet</div>';
+  document.getElementById('s4').textContent=scrapedCount+'/'+chosen.length+' scraped';
+}
+
+async function scrapeCollateral(kwEnc,btn){
+  const kw=decodeURIComponent(kwEnc);
+  if(btn){btn.disabled=true;btn.textContent='starting...';}
+  try{
+    const r=await fetch('/api/collateral/scrape',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:kw})});
+    const j=await r.json();
+    if(!j.job_id){alert('scrape failed: '+(j.error||'no job_id'));if(btn){btn.disabled=false;btn.textContent='Scrape collateral';}return;}
+    collateralJobs[kw]=j.job_id;
+    pollScrape(kw,j.job_id);
+    renderDistribution(cache);
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='Scrape collateral';}
+    alert('scrape failed: '+e.message);
+  }
+}
+
+async function pollScrape(kw,jobId){
+  for(let i=0;i<90;i++){
+    await new Promise(r=>setTimeout(r,2000));
+    try{
+      const r=await fetch('/api/collateral/job/'+jobId);
+      const j=await r.json();
+      if(j.status==='done'||j.status==='error'){
+        delete collateralJobs[kw];
+        await refreshCollateral();
+        return;
+      }
+    }catch(e){}
+  }
+  delete collateralJobs[kw];
+  await refreshCollateral();
+}
+
+async function refreshCollateral(){
+  try{
+    const r=await fetch('/api/collateral/index');
+    collateralIndex=await r.json();
+  }catch(e){collateralIndex={};}
+  render();
+}
+
+function renderMedia(chosen){
+  // Folder grid. Each folder = product with scraped collateral.
+  // Also include chosen products without collateral as "empty" folders.
+  const slugs={};
+  for(const rep of chosen){
+    const k=rep.product_keyword;
+    const slug=slugify(k);
+    slugs[slug]={product_keyword:k,from_decision:true,...(collateralIndex[slug]||{})};
+  }
+  // Also include any slug in collateralIndex not in chosen (orphan history)
+  for(const [s,v] of Object.entries(collateralIndex)){
+    if(!slugs[s])slugs[s]={...v,from_decision:false};
+  }
+  const entries=Object.entries(slugs).sort((a,b)=>(b[1].count||0)-(a[1].count||0));
+  let h='<div class="folder-grid">';
+  let withItems=0;
+  for(const [slug,info] of entries){
+    const k=info.product_keyword||slug;
+    const count=info.count||0;
+    if(count>0)withItems++;
+    const sel=expandedSlug===slug?'sel':'';
+    h+='<div class="folder-tile '+sel+'" onclick="toggleFolder(\''+esc(slug)+'\',\''+encodeURIComponent(k)+'\')">';
+    if(info.thumb_url)h+='<div class="folder-thumb"><img src="'+esc(info.thumb_url)+'" loading="lazy" alt=""></div>';
+    else h+='<div class="folder-thumb empty">[ ]</div>';
+    h+='<div class="folder-name">'+esc(k)+'</div>';
+    h+='<div class="folder-meta">'+count+' items'+(info.total_size?(' &middot; '+kb(info.total_size)):'')+'</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+
+  if(expandedSlug){
+    const info=slugs[expandedSlug]||{};
+    const k=info.product_keyword||expandedSlug;
+    h+=renderFolderPanel(expandedSlug,k);
+  }
+
+  document.getElementById('mediaBody').innerHTML=h||'<div class="empty">no PURSUE/TEST picks yet</div>';
+  document.getElementById('s5').textContent=withItems+' folders';
+}
+
+function renderFolderPanel(slug,kw){
+  const lst=collateralLists[kw];
+  let h='<div class="folder-panel"><div class="folder-panel-head">';
+  h+='<span class="pname">'+esc(kw)+'</span>';
+  h+='<span class="meta">'+(lst?lst.total_items+' items, '+kb(lst.total_size):'(loading...)')+'</span>';
+  h+='<button class="closex" onclick="event.stopPropagation();toggleFolder(\''+esc(slug)+'\',\''+encodeURIComponent(kw)+'\')">close</button>';
+  h+='</div>';
+
+  if(!lst){
+    h+='<div class="empty">loading collateral list...</div></div>';
+    fetchCollateralList(kw);
+    return h;
+  }
+
+  h+='<div class="collateral-grid">';
+  for(const it of lst.items){
+    h+='<div class="coll-item" title="'+esc(it.source_platform||'')+(it.caption?' - '+esc(it.caption).slice(0,80):'')+'">';
+    if(it.type==='image' && it.filename){
+      h+='<img src="/api/collateral/file/'+esc(slug)+'/'+encodeURIComponent(it.filename)+'" loading="lazy" alt="">';
+    } else if(it.type==='video' && it.filename){
+      h+='<video src="/api/collateral/file/'+esc(slug)+'/'+encodeURIComponent(it.filename)+'" muted preload="metadata"></video>';
+      h+='<span class="vbadge">VID</span>';
+    } else if(it.type==='text'){
+      h+='<div class="text-card">'+esc((it.caption||'').slice(0,140))+'</div>';
+    } else {
+      h+='<div class="text-card">'+esc(it.type)+'</div>';
+    }
+    h+='<span class="plat-badge">'+esc(it.source_platform||'')+'</span>';
+    h+='<button class="del" onclick="event.stopPropagation();delCollateral(\''+esc(slug)+'\',\''+esc(it.id)+'\',\''+encodeURIComponent(kw)+'\')">x</button>';
+    h+='</div>';
+  }
+  h+='</div>';
+
+  h+='<div class="folder-actions">';
+  h+='<div class="add-row"><input type="text" id="addUrl_'+esc(slug)+'" placeholder="Paste URL to scrape and add"><button onclick="event.stopPropagation();addByUrl(\''+encodeURIComponent(kw)+'\',\''+esc(slug)+'\')">Add by URL</button></div>';
+  h+='<div class="add-row"><input type="file" id="addFile_'+esc(slug)+'" accept="image/*,video/*,*"><button onclick="event.stopPropagation();uploadFile(\''+encodeURIComponent(kw)+'\',\''+esc(slug)+'\')">Upload file</button></div>';
+  h+='<div class="compile-row"><b>Compile to Prometheus:</b>';
+  for(const plat of ['tiktok','instagram_reels','youtube_shorts','pinterest']){
+    h+='<button class="prod" onclick="event.stopPropagation();compileCollateral(\''+encodeURIComponent(kw)+'\',\''+plat+'\',this)">'+plat.slice(0,2).toUpperCase()+'</button>';
+  }
+  h+='</div>';
+  h+='</div></div>';
+  return h;
+}
+
+async function toggleFolder(slug,kwEnc){
+  const kw=decodeURIComponent(kwEnc);
+  if(expandedSlug===slug){
+    expandedSlug=null;
+  } else {
+    expandedSlug=slug;
+    if(!collateralLists[kw])fetchCollateralList(kw);
+  }
+  renderDistribution(cache);
+}
+
+async function fetchCollateralList(kw){
+  try{
+    const r=await fetch('/api/collateral/list?product_keyword='+encodeURIComponent(kw));
+    const j=await r.json();
+    collateralLists[kw]=j;
+    renderDistribution(cache);
+  }catch(e){}
+}
+
+async function delCollateral(slug,itemId,kwEnc){
+  const kw=decodeURIComponent(kwEnc);
+  if(!confirm('Delete this collateral item?'))return;
+  try{
+    await fetch('/api/collateral/'+encodeURIComponent(slug)+'/'+encodeURIComponent(itemId),{method:'DELETE'});
+    await fetchCollateralList(kw);
+    await refreshCollateral();
+  }catch(e){alert('delete failed: '+e.message);}
+}
+
+async function addByUrl(kwEnc,slug){
+  const kw=decodeURIComponent(kwEnc);
+  const inp=document.getElementById('addUrl_'+slug);
+  const url=(inp&&inp.value||'').trim();
+  if(!url){alert('paste a URL first');return;}
+  try{
+    const r=await fetch('/api/collateral/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:kw,source_url:url})});
+    const j=await r.json();
+    if(j.error){alert('add failed: '+j.error);return;}
+    if(inp)inp.value='';
+    await fetchCollateralList(kw);
+    await refreshCollateral();
+  }catch(e){alert('add failed: '+e.message);}
+}
+
+async function uploadFile(kwEnc,slug){
+  const kw=decodeURIComponent(kwEnc);
+  const inp=document.getElementById('addFile_'+slug);
+  if(!inp||!inp.files||!inp.files.length){alert('pick a file first');return;}
+  const fd=new FormData();
+  fd.append('product_keyword',kw);
+  fd.append('file',inp.files[0]);
+  try{
+    const r=await fetch('/api/collateral/add',{method:'POST',body:fd});
+    const j=await r.json();
+    if(j.error){alert('upload failed: '+j.error);return;}
+    inp.value='';
+    await fetchCollateralList(kw);
+    await refreshCollateral();
+  }catch(e){alert('upload failed: '+e.message);}
+}
+
+async function compileCollateral(kwEnc,platform,btn){
+  const kw=decodeURIComponent(kwEnc);
+  if(btn){btn.disabled=true;btn.textContent='compiling...';}
+  try{
+    const r=await fetch('/api/collateral/compile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:kw,platform:platform})});
+    const j=await r.json();
+    if(j.error){alert('compile failed: '+j.error);if(btn){btn.disabled=false;btn.textContent=platform.slice(0,2).toUpperCase();}return;}
+    if(j.job_id){
+      if(btn){btn.textContent='job '+j.job_id.slice(0,6);}
+      pollPromCompile(j.job_id,btn,platform);
+    }
+  }catch(e){if(btn){btn.disabled=false;btn.textContent=platform.slice(0,2).toUpperCase();}alert('compile failed: '+e.message);}
+}
+
+async function pollPromCompile(jobId,btn,platform){
+  for(let i=0;i<240;i++){
+    await new Promise(r=>setTimeout(r,2500));
+    try{
+      const r=await fetch('/api/job/'+jobId);
+      const j=await r.json();
+      if(j.status==='done'){
+        const path=j.result&&j.result.video_path;
+        const sz=j.result&&j.result.size_bytes||0;
+        if(btn){
+          btn.textContent='done '+kb(sz);
+          btn.title=path||'';
+        }
+        return;
+      } else if(j.status==='error'){
+        if(btn){btn.textContent='ERR';btn.title=j.error||'';btn.disabled=false;}
+        return;
+      } else if(btn){btn.textContent=j.status+' '+i;}
+    }catch(e){}
+  }
+  if(btn){btn.textContent='timeout';btn.disabled=false;}
+}
+
+function renderStage6(chosen){
+  const tabs={tiktok:'TT',instagram_reels:'IG',youtube_shorts:'YT',pinterest:'P'};
+  let totalQ=0,totalR=0;
+  for(const e of socialQueue){if(e.status==='ready')totalR++;else totalQ++;}
+  let h='';
+  for(const s of socialStatus){
+    h+='<div class="social-row"><span class="dot '+(s.connected?'on':'')+'"></span><span class="pname">'+esc(s.name)+'</span>';
+    if(!s.connected)h+='<a class="conn" href="'+esc(s.connect_url)+'" target="_blank">Connect &#8599;</a>';
+    else h+='<span class="conn">connected</span>';
+    h+='<span class="qcount">'+(s.queued_count||0)+'</span></div>';
+    const ast=accountStatus[s.platform];
+    if(ast){
+      const last5=ast.last_5_pillars||[];
+      let promo=0;for(const p of last5)if(p==='promotion')promo++;
+      const debt=ast.engagement_debt_remaining||0;
+      const tline='W'+(ast.week||1)+' &bull; '+(ast.posts_today||0)+'/'+(ast.daily_cap||0)+' today &bull; debt '+debt+' &bull; mix:promo'+promo+'/'+last5.length;
+      h+='<div class="throttle-row"><span class="tline">'+tline+'</span><button class="engb" onclick="logEng(&#39;'+s.platform+'&#39;,this)" title="log 1 community engagement">+1 eng</button></div>';
+    }
+  }
+  h+='<div class="queue-sum"><b>'+totalQ+'</b> queued, <b>'+totalR+'</b> ready</div>';
+  h+=renderCalendar();
+  const kitChosen=(chosen||[]).filter(rep=>mediaKits[rep.product_keyword]);
+  if(!kitChosen.length){
+    h+='<div class="empty">no media kits yet</div>';
+  } else {
+    const queuedSet=new Set();
+    for(const e of socialQueue){const k=e.kit&&(e.kit.product_keyword||'');queuedSet.add(k+'|'+e.platform);}
+    for(const rep of kitChosen){
+      const k=rep.product_keyword;
+      h+='<div class="push-card"><div class="title" title="'+esc(k)+'">'+esc(k)+'</div><div class="push-btns">';
+      for(const p of Object.keys(tabs)){
+        const isQ=queuedSet.has(k+'|'+p);
+        h+='<button class="ppb '+(isQ?'queued':'')+'" onclick="queuePost(&#39;'+encodeURIComponent(k)+'&#39;,&#39;'+p+'&#39;,this)" title="'+esc(p)+'">'+tabs[p]+(isQ?' &#10003;':'')+'</button>';
+      }
+      h+='</div></div>';
+    }
+  }
+  document.getElementById('pushBody').innerHTML=h;
+  document.getElementById('s6').textContent=totalQ+'q / '+totalR+'r';
+}
+
+function renderCalendar(){
+  const plats=[['tiktok','TT'],['instagram_reels','IG'],['youtube_shorts','YT'],['pinterest','PIN']];
+  let h='<div class="cal-head">7-day plan</div>';
+  for(const [pk,lbl] of plats){
+    const slots=calendar[pk]||[];
+    const byDay={};
+    for(const s of slots){byDay[s.day_index]=byDay[s.day_index]||[];byDay[s.day_index].push(s);}
+    h+='<div class="cal-row"><span class="pn">'+lbl+'</span><div class="strip">';
+    for(let d=0;d<7;d++){
+      const dayslots=byDay[d]||[];
+      const cls=dayslots.length?'day':'day empty';
+      h+='<div class="'+cls+'" title="day '+(d+1)+(dayslots.length?' '+dayslots.map(s=>s.pillar).join(','):' empty')+'">';
+      for(const s of dayslots){h+='<span class="dot2 dot-'+s.pillar+'"></span>';}
+      h+='</div>';
+    }
+    h+='</div><button class="regen" onclick="regenCal(&#39;'+pk+'&#39;,this)">Regen</button></div>';
+  }
+  h+='<div class="cal-legend"><span><span class="dot2 dot-education"></span>edu</span><span><span class="dot2 dot-problem_solution"></span>prob</span><span><span class="dot2 dot-behind_the_scenes"></span>BTS</span><span><span class="dot2 dot-community"></span>comm</span><span><span class="dot2 dot-promotion"></span>promo</span></div>';
+  return h;
+}
+
+async function regenCal(platform,btn){
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  try{
+    const r=await fetch('/api/calendar/regenerate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:platform,days:7})});
+    const j=await r.json();
+    if(!r.ok){alert('regen failed: '+(j.error||r.status));if(btn){btn.disabled=false;btn.textContent='Regen';}return;}
+    load();
+  }catch(e){if(btn){btn.disabled=false;btn.textContent='Regen';}alert('regen failed: '+e.message);}
+}
+
+async function produceVideo(kwEnc, platform, btn){
+  const kw = decodeURIComponent(kwEnc);
+  btn.disabled = true; btn.textContent = 'queuing ' + platform.slice(0,2) + '...';
+  try{
+    const r = await fetch('/api/produce-video', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({product_keyword: kw, platform})});
+    const j = await r.json();
+    if(j.job_id){ btn.textContent = 'queued ' + platform.slice(0,2); pollProm(j.job_id, btn, platform); }
+    else { btn.textContent = 'err'; btn.title = JSON.stringify(j); btn.disabled = false; }
+  } catch(e){ btn.textContent = 'fail'; btn.disabled = false; btn.title = String(e); }
+}
+
+async function pollProm(jobId, btn, platform){
+  for(let i=0;i<180;i++){
+    await new Promise(r=>setTimeout(r, 2000));
+    try{
+      const r = await fetch('/api/job/'+jobId);
+      const j = await r.json();
+      if(j.status==='running'){ btn.textContent='running ' + platform.slice(0,2); }
+      else if(j.status==='done'){
+        const path = j.result && j.result.video_path;
+        const kb = Math.round((j.result && j.result.size_bytes || 0)/1024);
+        if(path){ btn.outerHTML = '<a class="prod done" href="file:///'+path.replace(/\\/g, '/')+'" target="_blank">' + platform.slice(0,2) + ' (' + kb + 'KB)</a>'; }
+        else { btn.textContent = 'done'; }
+        return;
+      } else if(j.status==='error'){ btn.textContent='ERR'; btn.title = j.error || ''; btn.disabled=false; return; }
+    } catch(e){ btn.textContent='poll fail'; }
+  }
+}
+
+async function queuePost(kw,platform,btn){
+  const k=decodeURIComponent(kw);
+  if(btn){btn.disabled=true;}
+  try{
+    const r=await fetch('/api/queue-post',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:k,platform:platform})});
+    const j=await r.json();
+    if(!r.ok){alert('queue failed: '+(j.error||r.status));if(btn)btn.disabled=false;return;}
+    const blocked=['throttled','mix_violation','engagement_debt','doctrine_warn'];
+    if(blocked.indexOf(j.status)>=0){
+      const card=btn?btn.closest('.push-card'):null;
+      if(card){
+        let warn=card.querySelector('.reject-line');
+        if(!warn){warn=document.createElement('div');warn.className='reject-line';card.appendChild(warn);}
+        warn.textContent=j.status+': '+(j.rejection_reason||'(no reason)');
+      }
+      if(btn)btn.disabled=false;
+    }
+    load();
+  }catch(e){if(btn)btn.disabled=false;alert('queue failed: '+e.message);}
+}
+
+async function logEng(platform,btn){
+  if(btn){btn.disabled=true;}
+  try{
+    const r=await fetch('/api/log-engagement',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform:platform,count:1})});
+    const j=await r.json();
+    if(!r.ok){alert('engagement failed: '+(j.error||r.status));if(btn)btn.disabled=false;return;}
+    load();
+  }catch(e){if(btn)btn.disabled=false;alert('engagement failed: '+e.message);}finally{if(btn)btn.disabled=false;}
+}
+
+async function load(){
+  try{
+    const[r1,r2,r3,r4,r5,r6,r7,r8]=await Promise.all([
+      fetch('/api/latest-run').then(r=>r.json()),
+      fetch('/api/decisions').then(r=>r.json()),
+      fetch('/api/media-kits').then(r=>r.json()),
+      fetch('/api/social-status').then(r=>r.json()),
+      fetch('/api/social-queue').then(r=>r.json()),
+      fetch('/api/account-status').then(r=>r.json()).catch(()=>({})),
+      fetch('/api/calendar').then(r=>r.json()).catch(()=>({})),
+      fetch('/api/collateral/index').then(r=>r.json()).catch(()=>({}))
+    ]);
+    cache=r1;decisions=r2;mediaKits=r3;socialStatus=r4;socialQueue=r5;accountStatus=r6||{};calendar=r7||{};collateralIndex=r8||{};render();
+  }catch(e){document.getElementById('meta').textContent='error: '+e.message}
+}
+
+async function decide(kw,choice){
+  await fetch('/api/decide',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kw:decodeURIComponent(kw),choice})});
+  load();
+}
+
+async function genKit(kw,btn){
+  const k=decodeURIComponent(kw);
+  if(btn){btn.disabled=true;btn.textContent='generating...';}
+  try{
+    const r=await fetch('/api/generate-media',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_keyword:k})});
+    const kit=await r.json();
+    mediaKits[k]=kit;render();
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='retry';}
+    alert('gen failed: '+e.message);
+  }
+}
+
+load();
+setInterval(load,30000);
