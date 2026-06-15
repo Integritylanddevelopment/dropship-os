@@ -1,3 +1,33 @@
+﻿# SHIPSTACK SESSION RULE — READ FIRST, EVERY SESSION
+
+## YOUR WORKING DIRECTORY IS SHIPSTACK. NOT QUINN.
+
+If you are reading this file, you are a ShipStack agent.
+Your folder is: `C:\Users\integ\Documents\Claude\Projects\ShipStack\`
+
+**YOU MUST NOT:**
+- Read, write, or touch any file in `C:\Users\integ\quinn-proxy\`
+- Access `C:\Users\integ\quinn-proxy\.env` (contains Quinn's API keys — not yours)
+- Access any Quinn config, bridge code, MCP server, launcher, or memory file
+- Start any Quinn service, restart any Quinn service, or kill any Quinn port
+- Use Quinn's Anthropic API key — ShipStack has no API key of its own
+
+**HOW TO USE QUINN FROM SHIPSTACK:**
+- Call the Quinn HTTP Bridge at `http://127.0.0.1:8765/v1/chat/completions`
+- That's it. That's the only interaction point. Quinn handles the rest.
+- Quinn does the AI work. ShipStack uses the answer. Quinn's files stay untouched.
+
+**IF SHIPSTACK NEEDS SOMETHING QUINN DOESN'T DO:**
+- STOP. Do not modify Quinn.
+- Tell Alex what ShipStack needs and why.
+- Wait for Alex's explicit written approval before any Quinn change is made.
+- Quinn adapts on Alex's schedule — not ShipStack's schedule.
+
+**WHY:** Quinn's `.env` contains the Anthropic API key. ShipStack agents initialized
+from the ShipStack folder cannot see that file. Keep it that way. Never select
+`quinn-proxy` as your working folder during a ShipStack session.
+
+---
 # SHIPSTACK DIRECTIVE
 
 **Owner:** Alex Alexander
@@ -15,48 +45,48 @@ This document defines ShipStack's architecture, project blueprint, and engineeri
 
 # SHIPSTACK RULES
 
-## Rule 1 — ShipStack Operates Through Quinn Only
+## Rule 1 â€” ShipStack Operates Through Quinn Only
 
 All AI inference requests route through Quinn HTTP bridge at `http://127.0.0.1:8765`. Never call Anthropic directly. ShipStack calls Quinn; Quinn handles routing to Anthropic or local Ollama.
 
-## Rule 2 — Lane: ShipStack/ is ShipStack's House
+## Rule 2 â€” Lane: ShipStack/ is ShipStack's House
 
 All ShipStack code and assets live in `C:\Users\integ\Documents\Claude\Projects\ShipStack\` only. Do not write files to parent folder, Quinn's folder, or anywhere else. If you need Quinn to change something, write `HANDOFF_TO_QUINN_<DATE>_<TOPIC>.md` and Quinn reads it next session.
 
-## Rule 3 — Badge Protocol Per Tool Call
+## Rule 3 â€” Badge Protocol Per Tool Call
 
 Before every tool use: call `shipstack_badge()` to get a fresh one-shot token. The badge reads `CLAUDE.md`, returns current rules + recent actions. After the tool executes, call `shipstack_log_action()` to log the result synchronously. This happens per tool, not per session.
 
-## Rule 4 — No Direct Anthropic API Keys
+## Rule 4 â€” No Direct Anthropic API Keys
 
 No ANTHROPIC_API_KEY in any ShipStack code, env file, or config. All LLM calls go through Quinn bridge. This is auditable: `grep -r "api.anthropic.com\|ANTHROPIC_API_KEY" .` must return zero results.
 
-## Rule 5 — HTTP Service, Not MCP
+## Rule 5 â€” HTTP Service, Not MCP
 
 ShipStack runs on :8889 as a Python HTTP service (FastAPI / Flask / Express). It is NOT an MCP server. Quinn is the MCP server on this machine. ShipStack exposes HTTP routes; Quinn calls those routes with badge tokens in the header.
 
-## Rule 6 — Port Registry
+## Rule 6 â€” Port Registry
 
-- **3000** — Vercel frontend (dropship-os-gamma.vercel.app)
-- **8889** — ShipStack Engine (engines/shipstack_engine.py)
-- **8766** — Prometheus Engine (engines/prometheus_engine.py)
-- **8867** — Social AI Agent (agents/social_ai_agent.py)
-- **8890** — ShipStack Dashboard (engines/shipstack_dashboard.py)
-- **8765** — Quinn HTTP bridge (you call it, don't bind to it)
+- **3000** â€” Vercel frontend (dropship-os-gamma.vercel.app)
+- **8889** â€” ShipStack Engine (engines/shipstack_engine.py)
+- **8766** â€” Prometheus Engine (engines/prometheus_engine.py)
+- **8867** â€” Social AI Agent (agents/social_ai_agent.py)
+- **8890** â€” ShipStack Dashboard (engines/shipstack_dashboard.py)
+- **8765** â€” Quinn HTTP bridge (you call it, don't bind to it)
 
-## Rule 7 — No Scheduled Tasks
+## Rule 7 â€” No Scheduled Tasks
 
 NEVER use `Register-ScheduledTask`, `schtasks.exe /create`, or any scheduler. Global Directive #6 forbids it. If a service needs to run automatically, add it to `LAUNCH_SHIPSTACK.ps1` or similar one-click launcher.
 
-## Rule 8 — Prometheus Ownership
+## Rule 8 â€” Prometheus Ownership
 
 Prometheus (video generation engine) is ShipStack's. Files: `prometheus_engine.py`, `prometheus_monitor.py`. Port: 8766. Update Blueprint whenever Prometheus changes. Depends on Quinn bridge for LLM calls.
 
-## Rule 9 — Handoff Direction is ONE-WAY
+## Rule 9 â€” Handoff Direction is ONE-WAY
 
-Quinn writes `HANDOFF_FROM_QUINN_<DATE>.md` to `C:\Users\integ\quinn-proxy\handoff_outbox\`. You read it and reply with `HANDOFF_TO_QUINN_<DATE>.md` in `ShipStack/handoffs/`. ShipStack NEVER initiates `HANDOFF_FROM_SHIPSTACK_*` docs. The conversation flows: Quinn → ShipStack → Quinn.
+Quinn writes `HANDOFF_FROM_QUINN_<DATE>.md` to `C:\Users\integ\quinn-proxy\handoff_outbox\`. You read it and reply with `HANDOFF_TO_QUINN_<DATE>.md` in `ShipStack/handoffs/`. ShipStack NEVER initiates `HANDOFF_FROM_SHIPSTACK_*` docs. The conversation flows: Quinn â†’ ShipStack â†’ Quinn.
 
-## Rule 10 — Naming Conventions (Match Quinn's Standard)
+## Rule 10 â€” Naming Conventions (Match Quinn's Standard)
 
 - Top-level docs: `UPPER_SNAKE_CASE.md` (CLAUDE.md, BUILD_PLAN.md, SHIPSTACK_RULES.md)
 - Handoffs: `HANDOFF_<DIRECTION>_<YYYY-MM-DD>[_<TOPIC>].md`
@@ -66,19 +96,19 @@ Quinn writes `HANDOFF_FROM_QUINN_<DATE>.md` to `C:\Users\integ\quinn-proxy\hando
 - PowerShell scripts: `UPPER_SNAKE_CASE.ps1` (verb-first if action)
 - Dates: ALWAYS ISO-8601 (`2026-06-03`). Never `JUNE_03`, never `06-03`.
 
-## Rule 11 — UTF-8 Everywhere
+## Rule 11 â€” UTF-8 Everywhere
 
 First line of every Python script: `import sys; sys.stdout.reconfigure(encoding='utf-8', errors='replace')` (Global Directive #17). This prevents console output encoding errors on Windows.
 
-## Rule 12 — Kill Before Launch
+## Rule 12 â€” Kill Before Launch
 
-On startup, any service must kill anything stale listening on its port. Example: `netstat -ano | find "8889"` → kill the PID. Then bind fresh. No two instances fighting over the same port (Global Directive #5).
+On startup, any service must kill anything stale listening on its port. Example: `netstat -ano | find "8889"` â†’ kill the PID. Then bind fresh. No two instances fighting over the same port (Global Directive #5).
 
 ---
 
-# BLUEPRINT — LIVE ARCHITECTURE (Reorganized 2026-06-04)
+# BLUEPRINT â€” LIVE ARCHITECTURE (Reorganized 2026-06-04)
 
-## engines/ subfolder — Core HTTP microservices
+## engines/ subfolder â€” Core HTTP microservices
 
 | Component | Type | File | Port | Health Check | Depends On | Status | Notes |
 |-----------|------|------|------|--------------|-----------|--------|-------|
@@ -87,7 +117,7 @@ On startup, any service must kill anything stale listening on its port. Example:
 | Social AI Agent (root file) | python | agents/social_ai_agent.py | 8867 | http://127.0.0.1:8867/health | Quinn HTTP Bridge | active | Social media orchestration. TikTok, Instagram, Pinterest, YouTube. No badge requirement. |
 | ShipStack Dashboard | python | engines/shipstack_dashboard.py | 8890 | http://127.0.0.1:8890 (self) | - | active | Real-time monitoring UI. Shows service health, recent actions, metrics. |
 
-## agents/ subfolder — Decision & research agents
+## agents/ subfolder â€” Decision & research agents
 
 | Component | Type | File | Port | Depends On | Status | Notes |
 |-----------|------|------|------|-----------|--------|-------|
@@ -95,7 +125,7 @@ On startup, any service must kill anything stale listening on its port. Example:
 | Product Research | python | agents/product_research.py | - | internal | active | Supplier aggregation (Zendrop, AutoDS, AliExpress). SQLite cache, 24-hour TTL. |
 | Analytics Engine | python | agents/analytics_engine.py | - | internal | active | Metrics computation from shipstack_actions.jsonl. Success rates, trends. |
 
-## badge/ subfolder — Authentication & logging
+## badge/ subfolder â€” Authentication & logging
 
 | Component | Type | File | Port | Status | Notes |
 |-----------|------|------|------|--------|-------|
@@ -103,7 +133,7 @@ On startup, any service must kill anything stale listening on its port. Example:
 | Action Logger | python | badge/shipstack_log_action.py | - | active | JSONL logging to logs/shipstack_actions.jsonl. Synchronous writes. |
 | Config Validator | python | badge/validate_config.py | - | active | Pre-flight checks: ports available, files exist, no Anthropic API leaks. |
 
-## frontend/ subfolder — HTML/UI
+## frontend/ subfolder â€” HTML/UI
 
 | Component | Type | File | Status | Notes |
 |-----------|------|------|--------|-------|
@@ -113,7 +143,7 @@ On startup, any service must kill anything stale listening on its port. Example:
 | Thank You | html | frontend/thank-you.html | active | Post-conversion. |
 | Metrics Store | json | frontend/metrics.json | active | Analytics dashboard data. |
 
-## scripts/ subfolder — Launchers & deployment
+## scripts/ subfolder â€” Launchers & deployment
 
 | Component | Type | File | Status | Notes |
 |-----------|------|------|--------|-------|
@@ -123,7 +153,7 @@ On startup, any service must kill anything stale listening on its port. Example:
 | set_vercel_envs.py | python | scripts/set_vercel_envs.py | active | Configure Vercel environment. |
 | consolidate_shipstack_env.py | python | scripts/consolidate_shipstack_env.py | active | Merge env vars. |
 
-## docs/ subfolder — Documentation
+## docs/ subfolder â€” Documentation
 
 | Component | Type | File | Status |
 |-----------|------|------|--------|
@@ -158,11 +188,11 @@ On startup, any service must kill anything stale listening on its port. Example:
 
 | Original File | Quarantined As | Date | Reason | Replaced By |
 |---------------|---------------|------|--------|-------------|
-| _(empty — populated during cleanup)_ | | | | |
+| _(empty â€” populated during cleanup)_ | | | | |
 
 ---
 
-# DIRECTORIES — WHERE THINGS LIVE
+# DIRECTORIES â€” WHERE THINGS LIVE
 
 | Purpose | Path |
 |---------|------|
@@ -180,17 +210,17 @@ On startup, any service must kill anything stale listening on its port. Example:
 
 ---
 
-# THINGS THAT ARE DELETED FOREVER — DO NOT RECREATE
+# THINGS THAT ARE DELETED FOREVER â€” DO NOT RECREATE
 
 - Quinn-owned files (seed_strategy_books.py, sync_cowork_sessions.py, quinn_fs_interceptor.py, verify_qdrant_partitions.py, ingest_now.py)
 - Scheduled task scripts (SCHEDULE_DAILY.ps1, SCHEDULE_CALENDAR.ps1)
 - Prometheus ownership in Quinn (moved to ShipStack 2026-06-03)
-- MCP server attempt (shipstack_mcp.py — ShipStack is HTTP, not MCP)
+- MCP server attempt (shipstack_mcp.py â€” ShipStack is HTTP, not MCP)
 - Direct Claude Code modifications (disable_claude_code.ps1 and variants)
 
 ---
 
-# GUARDRAILS — IN EFFECT 2026-06-03
+# GUARDRAILS â€” IN EFFECT 2026-06-03
 
 ## Badge Protocol (B1)
 
@@ -218,8 +248,8 @@ All ShipStack files must live under `C:\Users\integ\Documents\Claude\Projects\Sh
 
 | Date | Change |
 |------|--------|
-| 2026-06-04 | v1.1 — Blueprint updated post-reorg. New structure: engines/, agents/, badge/, frontend/, scripts/, docs/, handoffs/, tests/, _archive/. Old `dropship-os/` subdir removed. Folder renamed `Drop shipping/` → `ShipStack/`. Path updated in Rules 2-4, 9. All file references corrected. |
-| 2026-06-03 | v1.0 — initial CLAUDE.md for ShipStack. Blueprint, rules, guardrails established. Tier 0 cleanup complete. |
+| 2026-06-04 | v1.1 â€” Blueprint updated post-reorg. New structure: engines/, agents/, badge/, frontend/, scripts/, docs/, handoffs/, tests/, _archive/. Old `dropship-os/` subdir removed. Folder renamed `Drop shipping/` â†’ `ShipStack/`. Path updated in Rules 2-4, 9. All file references corrected. |
+| 2026-06-03 | v1.0 â€” initial CLAUDE.md for ShipStack. Blueprint, rules, guardrails established. Tier 0 cleanup complete. |
 
 ---
 
@@ -233,3 +263,4 @@ All ShipStack files must live under `C:\Users\integ\Documents\Claude\Projects\Sh
 - **Tier 6:** Dashboard
 - **Tier 7:** Optional file/command tools (skip unless real use case)
 - **Tier 8:** Verification + smoke tests
+

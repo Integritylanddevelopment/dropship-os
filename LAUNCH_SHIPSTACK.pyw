@@ -1,4 +1,4 @@
-"""LAUNCH_SHIPSTACK.pyw - One-click ShipStack stack launcher.
+﻿"""LAUNCH_SHIPSTACK.pyw - One-click ShipStack stack launcher.
 
 ShipStack only. Quinn is a separate system and must already be running
 (quinn_http_bridge on :8765) before launching ShipStack.
@@ -33,14 +33,14 @@ except Exception:
 
 try:
     from dotenv import load_dotenv
-    load_dotenv(Path(r"C:\Users\integ\quinn-proxy\.env"))
+    load_dotenv(Path(r"C:\Users\integ\Documents\Claude\Projects\ShipStack\.env"))
 except ImportError:
     pass
 
 # --- Config ----------------------------------------------------------------
 SHIPSTACK_DIR = Path(os.environ.get("SHIPSTACK_DIR", r"C:\Users\integ\Documents\Claude\Projects\ShipStack"))
 QUINN_DIR     = Path(os.environ.get("QUINN_DIR", r"C:\Users\integ\quinn-proxy"))
-LOG_FILE      = QUINN_DIR / "logs" / "launcher_shipstack.log"
+LOG_FILE      = SHIPSTACK_DIR / "logs" / "launcher_shipstack.log"
 
 CREATE_NO_WINDOW = 0x08000000
 
@@ -156,8 +156,8 @@ def launch_service(svc):
         kill_port(port)
     kill_stale_python(chosen.name)
 
-    log_path = QUINN_DIR / "logs" / f"{log_name}.log"
-    err_path = QUINN_DIR / "logs" / f"{log_name}.err"
+    log_path = SHIPSTACK_DIR / "logs" / f"{log_name}.log"
+    err_path = SHIPSTACK_DIR / "logs" / f"{log_name}.err"
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
     try:
@@ -184,13 +184,13 @@ def show_popup(up, total, down_names, took_total):
     try:
         import tkinter as tk
         root = tk.Tk()
-        root.title("ShipStack — Launch Complete")
+        root.title("ShipStack â€” Launch Complete")
         root.resizable(False, False)
         root.attributes("-topmost", True)
         root.configure(bg="#1a1a2e")
 
         color = "#4caf50" if up == total else "#ff9800" if up >= total * 0.7 else "#f44336"
-        tk.Label(root, text=f"✓ {up} / {total} ShipStack services UP",
+        tk.Label(root, text=f"âœ“ {up} / {total} ShipStack services UP",
                  font=("Segoe UI", 13, "bold"), fg=color, bg="#1a1a2e").pack(pady=(12, 4))
 
         if down_names:
@@ -207,13 +207,13 @@ def show_popup(up, total, down_names, took_total):
         root.geometry(f"{w}x{h}+{(sw-w)//2}+{sh-200}")
 
         countdown = [8]
-        lbl = tk.Label(root, text="Closing in 8s…", font=("Segoe UI", 8), fg="#555", bg="#1a1a2e")
+        lbl = tk.Label(root, text="Closing in 8sâ€¦", font=("Segoe UI", 8), fg="#555", bg="#1a1a2e")
         lbl.pack(pady=(0, 8))
         def tick():
             countdown[0] -= 1
             if countdown[0] <= 0:
                 root.destroy(); return
-            lbl.config(text=f"Closing in {countdown[0]}s…")
+            lbl.config(text=f"Closing in {countdown[0]}sâ€¦")
             root.after(1000, tick)
         root.after(1000, tick)
         root.mainloop()
@@ -227,7 +227,7 @@ def main():
 
     # Verify Quinn bridge is up before starting ShipStack
     if not url_responds("http://127.0.0.1:8765/health", timeout=3):
-        log("WARN: Quinn HTTP Bridge (:8765) not responding — ShipStack may not work correctly")
+        log("WARN: Quinn HTTP Bridge (:8765) not responding â€” ShipStack may not work correctly")
 
     for svc in SERVICES:
         ok, took, note = launch_service(svc)
