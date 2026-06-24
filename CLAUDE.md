@@ -1,266 +1,163 @@
-﻿# SHIPSTACK SESSION RULE — READ FIRST, EVERY SESSION
+# CLAUDE.md
 
-## YOUR WORKING DIRECTORY IS SHIPSTACK. NOT QUINN.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-If you are reading this file, you are a ShipStack agent.
-Your folder is: `C:\Users\integ\Documents\Claude\Projects\ShipStack\`
+## Critical Boundary
 
-**YOU MUST NOT:**
-- Read, write, or touch any file in `C:\Users\integ\quinn-proxy\`
-- Access `C:\Users\integ\quinn-proxy\.env` (contains Quinn's API keys — not yours)
-- Access any Quinn config, bridge code, MCP server, launcher, or memory file
-- Start any Quinn service, restart any Quinn service, or kill any Quinn port
-- Use Quinn's Anthropic API key — ShipStack has no API key of its own
+**This is the ShipStack project.** Do not read, write, or touch any file in `C:\Users\integ\quinn-proxy\`. Quinn's `.env` contains the Anthropic API key -- ShipStack has no key of its own. All LLM calls go through the Quinn HTTP bridge at `http://127.0.0.1:8765/v1/chat/completions`. Never call Anthropic directly, never import `anthropic`, never set `ANTHROPIC_API_KEY` in ShipStack code. `grep -r "api.anthropic.com\|ANTHROPIC_API_KEY" .` must return zero results.
 
-**HOW TO USE QUINN FROM SHIPSTACK:**
-- Call the Quinn HTTP Bridge at `http://127.0.0.1:8765/v1/chat/completions`
-- That's it. That's the only interaction point. Quinn handles the rest.
-- Quinn does the AI work. ShipStack uses the answer. Quinn's files stay untouched.
+If ShipStack needs something Quinn doesn't do, write `HANDOFF_TO_QUINN_<YYYY-MM-DD>_<TOPIC>.md` in `ShipStack/handoffs/` and wait for Alex's approval.
 
-**IF SHIPSTACK NEEDS SOMETHING QUINN DOESN'T DO:**
-- STOP. Do not modify Quinn.
-- Tell Alex what ShipStack needs and why.
-- Wait for Alex's explicit written approval before any Quinn change is made.
-- Quinn adapts on Alex's schedule — not ShipStack's schedule.
+## Commands
 
-**WHY:** Quinn's `.env` contains the Anthropic API key. ShipStack agents initialized
-from the ShipStack folder cannot see that file. Keep it that way. Never select
-`quinn-proxy` as your working folder during a ShipStack session.
+### Launch all services
+```powershell
+.\scripts\LAUNCH_SHIPSTACK.ps1
+```
+Kills stale processes on ports 8889/8766/8867/8890, then starts all 4 Python services.
 
----
-# SHIPSTACK DIRECTIVE
+### Start individual services
+```powershell
+python engines/shipstack_engine.py       # :8889
+python engines/prometheus_engine.py      # :8766
+python agents/social_ai_agent.py         # :8867
+python engines/shipstack_dashboard.py    # :8890
+```
 
-**Owner:** Alex Alexander
-**Last updated:** 2026-06-04
-**Document version:** 1.1
-**Replaces:** all prior CLAUDE.md versions
+### Run tests
+```bash
+python tests/test_integration.py
+```
+7 suites: badge system, health checks, decision engine, product research, analytics, badge-gated endpoints, Anthropic leak audit. No pytest -- uses Python unittest.
 
----
+### Verify stack health
+```bash
+python tests/verify_stack.py
+```
 
-# READ THIS BEFORE EVERY TOOL CALL
+### Frontend dev server (Vercel local)
+```bash
+npx serve . --listen 3000 --no-clipboard
+```
 
-This document defines ShipStack's architecture, project blueprint, and engineering rules. ShipStack is a dropshipping discovery and automation engine built on top of Quinn's infrastructure. Every ShipStack agent must operate under the 17 Universal Global Directives (read via `quinn_badge()`) plus the ShipStack-specific rules below.
+### Node backend
+```bash
+npm start          # node server.js
+npm run dev        # nodemon server.js
+```
 
----
+### Deploy
+```powershell
+.\scripts\DEPLOY.ps1
+.\scripts\PUSH_SHIPSTACK_TO_GITHUB.ps1
+python scripts/set_vercel_envs.py
+```
 
-# SHIPSTACK RULES
+### Environment setup
+Copy `.env.example` to `.env` and fill in API keys. Local overrides go in `.env.local`. Both are git-ignored.
 
-## Rule 1 â€” ShipStack Operates Through Quinn Only
+## Architecture
 
-All AI inference requests route through Quinn HTTP bridge at `http://127.0.0.1:8765`. Never call Anthropic directly. ShipStack calls Quinn; Quinn handles routing to Anthropic or local Ollama.
+ShipStack is a dropshipping discovery and automation platform with a dual-stack architecture:
 
-## Rule 2 â€” Lane: ShipStack/ is ShipStack's House
+**Python/Flask microservices** (the primary runtime):
+- `engines/shipstack.py` (21KB) + `engines/shipstack_engine.py` -- main engine on :8889, product scoring and research APIs
+- `engines/prometheus_engine.py` -- video production on :8766 (ffmpeg, edge_tts, pexels, pixabay). Max 3 concurrent jobs, state in `engines/prometheus_state/jobs.json`. Library code in `engines/prometheus_lib/`
+- `agents/social_ai_agent.py` -- social media orchestration on :8867 (TikTok, Instagram, Pinterest, YouTube)
+- `engines/shipstack_dashboard.py` -- monitoring dashboard on :8890
+- `dashboard/pipeline_dashboard.py` (27KB) -- pipeline dashboard on :8891
 
-All ShipStack code and assets live in `C:\Users\integ\Documents\Claude\Projects\ShipStack\` only. Do not write files to parent folder, Quinn's folder, or anywhere else. If you need Quinn to change something, write `HANDOFF_TO_QUINN_<DATE>_<TOPIC>.md` and Quinn reads it next session.
+**Node.js/Express + Vercel serverless** (frontend + API layer):
+- `api/*.js` -- ES module serverless functions deployed to Vercel (`dropship-os-gamma.vercel.app`)
+- `api/_quinnRouter.js` -- Quinn-first LLM router: tries Quinn bridge, falls back to Anthropic
+- `api/_config.js` -- shared env config
+- `api/engine.js` -- product scoring + channel recommendations
+- `frontend/index.html` (154KB) -- main landing page, static HTML
+- Routing defined in `vercel.json`
 
-## Rule 3 â€” Badge Protocol Per Tool Call
+**LLM routing pattern:** All AI calls go to Quinn HTTP bridge at `http://127.0.0.1:8765`, which routes to Ollama (local models) or Anthropic (fallback). The `api/_quinnRouter.js` and `api/_fallbackController.js` handle this chain for the JS layer.
 
-Before every tool use: call `shipstack_badge()` to get a fresh one-shot token. The badge reads `CLAUDE.md`, returns current rules + recent actions. After the tool executes, call `shipstack_log_action()` to log the result synchronously. This happens per tool, not per session.
+**Authentication:** Badge protocol via `badge/shipstack_badge.py` -- one-shot SHA256 tokens with 60-second TTL. Every tool call gets a fresh badge, then logs via `badge/shipstack_log_action.py` to `logs/shipstack_actions.jsonl` (JSONL format).
 
-## Rule 4 â€” No Direct Anthropic API Keys
+**Data stores:**
+- SQLite at `agents/data/products.db` -- product cache with 24-hour TTL
+- Qdrant collections: `dropship_intel`, `project_ship_stack_ai` -- managed by Quinn
+- JSONL action log: `logs/shipstack_actions.jsonl`
+- Job state: `engines/prometheus_state/jobs.json`
 
-No ANTHROPIC_API_KEY in any ShipStack code, env file, or config. All LLM calls go through Quinn bridge. This is auditable: `grep -r "api.anthropic.com\|ANTHROPIC_API_KEY" .` must return zero results.
+**Key internal agents** (no HTTP ports, called by the engines):
+- `agents/decision_engine.py` -- product scoring (cost/margin, niche, competition, reviews)
+- `agents/product_research.py` -- supplier aggregation (Zendrop/AutoDS/AliExpress stubs, SQLite cache)
+- `agents/analytics_engine.py` -- KPI computation from action logs
+- `agents/product_onboarding_agent.py` (46KB) -- product onboarding workflow
+- `agents/db.py` (41KB) -- SQLite operations
 
-## Rule 5 â€” HTTP Service, Not MCP
+**Integrations** (`integrations/`): `aliexpress_connector.py`, `supplier_connector.py`, `social_poster.py`, `stripe_checkout.py`, plus JS scrapers `amazon-api.js` and `tiktok-shopify-scraper.js`.
 
-ShipStack runs on :8889 as a Python HTTP service (FastAPI / Flask / Express). It is NOT an MCP server. Quinn is the MCP server on this machine. ShipStack exposes HTTP routes; Quinn calls those routes with badge tokens in the header.
+**Social AI** (`social_ai_agent/`): Full automation tree with `main.py`, platform-specific posters (`pinterest_poster.py`, `tiktok_poster.py`), scheduler, content generation, and research modules.
 
-## Rule 6 â€” Port Registry
+**Discovery Engine** (`discovery_engine/`): Product discovery pipeline with `pipeline.py`, `cli.py`, scoring and signals subsystems.
 
-- **3000** â€” Vercel frontend (dropship-os-gamma.vercel.app)
-- **8889** â€” ShipStack Engine (engines/shipstack_engine.py)
-- **8766** â€” Prometheus Engine (engines/prometheus_engine.py)
-- **8867** â€” Social AI Agent (agents/social_ai_agent.py)
-- **8890** â€” ShipStack Dashboard (engines/shipstack_dashboard.py)
-- **8765** â€” Quinn HTTP bridge (you call it, don't bind to it)
+## Port Registry
 
-## Rule 7 â€” No Scheduled Tasks
+| Port | Service | Owner |
+|------|---------|-------|
+| 3000 | Vercel frontend | Vercel |
+| 8765 | Quinn HTTP bridge | Quinn (do not bind) |
+| 8766 | Prometheus Engine | ShipStack |
+| 8867 | Social AI Agent | ShipStack |
+| 8889 | ShipStack Engine | ShipStack |
+| 8890 | ShipStack Dashboard | ShipStack |
+| 8891 | Pipeline Dashboard | ShipStack |
 
-NEVER use `Register-ScheduledTask`, `schtasks.exe /create`, or any scheduler. Global Directive #6 forbids it. If a service needs to run automatically, add it to `LAUNCH_SHIPSTACK.ps1` or similar one-click launcher.
+## Project Rules
 
-## Rule 8 â€” Prometheus Ownership
+1. **Quinn-only LLM access.** All inference through `http://127.0.0.1:8765`. No direct Anthropic calls.
+2. **Lane enforcement.** All files stay under this project directory. Writes outside refuse with path validation error.
+3. **Badge per tool call.** Call `shipstack_badge()` before each tool use, `shipstack_log_action()` after.
+4. **HTTP, not MCP.** ShipStack exposes HTTP routes. Quinn is the MCP server.
+5. **Kill before launch.** Before binding a port, kill anything stale on it: `netstat -ano | find ":PORT"` then kill PID.
+6. **No scheduled tasks.** Never use `Register-ScheduledTask` or `schtasks.exe /create`. Add to `LAUNCH_SHIPSTACK.ps1` instead.
+7. **UTF-8 everywhere.** First line of every Python script: `import sys; sys.stdout.reconfigure(encoding='utf-8', errors='replace')`.
+8. **No secrets in code.** Patterns `sk-ant-`, `sk_live_`, `ghp_` etc. in source files cause write refusal. Only `.env`/`.env.local` are exempt (git-ignored).
+9. **Handoff protocol.** Quinn to ShipStack to Quinn. Write `HANDOFF_TO_QUINN_<YYYY-MM-DD>_<TOPIC>.md` in `handoffs/`. Never initiate `HANDOFF_FROM_SHIPSTACK_*`.
 
-Prometheus (video generation engine) is ShipStack's. Files: `prometheus_engine.py`, `prometheus_monitor.py`. Port: 8766. Update Blueprint whenever Prometheus changes. Depends on Quinn bridge for LLM calls.
+## Naming Conventions
 
-## Rule 9 â€” Handoff Direction is ONE-WAY
-
-Quinn writes `HANDOFF_FROM_QUINN_<DATE>.md` to `C:\Users\integ\quinn-proxy\handoff_outbox\`. You read it and reply with `HANDOFF_TO_QUINN_<DATE>.md` in `ShipStack/handoffs/`. ShipStack NEVER initiates `HANDOFF_FROM_SHIPSTACK_*` docs. The conversation flows: Quinn â†’ ShipStack â†’ Quinn.
-
-## Rule 10 â€” Naming Conventions (Match Quinn's Standard)
-
-- Top-level docs: `UPPER_SNAKE_CASE.md` (CLAUDE.md, BUILD_PLAN.md, SHIPSTACK_RULES.md)
+- Top-level docs: `UPPER_SNAKE_CASE.md`
 - Handoffs: `HANDOFF_<DIRECTION>_<YYYY-MM-DD>[_<TOPIC>].md`
-- Instructions: `INSTRUCTIONS_<DIRECTION>_<YYYY-MM-DD>_<TOPIC>.md`
-- Session summaries: `SESSION_SUMMARY_<YYYY-MM-DD>.md`
 - Python modules: `lower_snake_case.py`
-- PowerShell scripts: `UPPER_SNAKE_CASE.ps1` (verb-first if action)
-- Dates: ALWAYS ISO-8601 (`2026-06-03`). Never `JUNE_03`, never `06-03`.
+- PowerShell scripts: `UPPER_SNAKE_CASE.ps1`
+- Dates: ISO-8601 only (`2026-06-03`), never `JUNE_03`
 
-## Rule 11 â€” UTF-8 Everywhere
+## Session Startup Ritual
 
-First line of every Python script: `import sys; sys.stdout.reconfigure(encoding='utf-8', errors='replace')` (Global Directive #17). This prevents console output encoding errors on Windows.
+1. Confirm working directory is ShipStack (not quinn-proxy)
+2. Confirm Quinn bridge is reachable at :8765
+3. Read this CLAUDE.md
+4. Read `memory/working/current_goal.md` for current mission state
+5. Restate goal/state/next action/blockers to Alex before starting work
 
-## Rule 12 â€” Kill Before Launch
+## Known Gaps
 
-On startup, any service must kill anything stale listening on its port. Example: `netstat -ano | find "8889"` â†’ kill the PID. Then bind fresh. No two instances fighting over the same port (Global Directive #5).
+- `engines/shipstack_engine.py` is referenced in the launcher but may not exist -- `engines/shipstack.py` (21KB) is the actual implementation
+- `agents/product_research.py` has `NotImplementedError` gates on all real supplier API calls (Zendrop, AutoDS, AliExpress)
+- TikTok OAuth flow pending scope approval
+- Meta API credentials empty
 
----
-
-# BLUEPRINT â€” LIVE ARCHITECTURE (Reorganized 2026-06-04)
-
-## engines/ subfolder â€” Core HTTP microservices
-
-| Component | Type | File | Port | Health Check | Depends On | Status | Notes |
-|-----------|------|------|------|--------------|-----------|--------|-------|
-| ShipStack Engine | python | engines/shipstack_engine.py | 8889 | http://127.0.0.1:8889/health | Quinn HTTP Bridge | active | Decision + product research APIs. No badge requirement. Public endpoints. |
-| Prometheus Engine | python | engines/prometheus_engine.py | 8766 | http://127.0.0.1:8766/health | Quinn HTTP Bridge | active | Video generation. Routes to Runway ML, ElevenLabs, Suno. No badge requirement. |
-| Social AI Agent (root file) | python | agents/social_ai_agent.py | 8867 | http://127.0.0.1:8867/health | Quinn HTTP Bridge | active | Social media orchestration. TikTok, Instagram, Pinterest, YouTube. No badge requirement. |
-| ShipStack Dashboard | python | engines/shipstack_dashboard.py | 8890 | http://127.0.0.1:8890 (self) | - | active | Real-time monitoring UI. Shows service health, recent actions, metrics. |
-
-## agents/ subfolder â€” Decision & research agents
-
-| Component | Type | File | Port | Depends On | Status | Notes |
-|-----------|------|------|------|-----------|--------|-------|
-| Decision Engine | python | agents/decision_engine.py | - | internal | active | Product scoring (margin, reviews, niche, competition). Callable by shipstack_engine.py. |
-| Product Research | python | agents/product_research.py | - | internal | active | Supplier aggregation (Zendrop, AutoDS, AliExpress). SQLite cache, 24-hour TTL. |
-| Analytics Engine | python | agents/analytics_engine.py | - | internal | active | Metrics computation from shipstack_actions.jsonl. Success rates, trends. |
-
-## badge/ subfolder â€” Authentication & logging
-
-| Component | Type | File | Port | Status | Notes |
-|-----------|------|------|------|--------|-------|
-| Badge System | python | badge/shipstack_badge.py | - | active | One-shot token generation. 60-second TTL. Internal use only (not gating public endpoints). |
-| Action Logger | python | badge/shipstack_log_action.py | - | active | JSONL logging to logs/shipstack_actions.jsonl. Synchronous writes. |
-| Config Validator | python | badge/validate_config.py | - | active | Pre-flight checks: ports available, files exist, no Anthropic API leaks. |
-
-## frontend/ subfolder â€” HTML/UI
-
-| Component | Type | File | Status | Notes |
-|-----------|------|------|--------|-------|
-| Main Landing | html | frontend/index.html | active | 150K. Product showcase. |
-| Launcher OS | html | frontend/launcher_os.html | active | Desktop launcher widget. Links to all 4 services. |
-| Privacy Policy | html | frontend/privacy.html | active | Legal compliance. |
-| Thank You | html | frontend/thank-you.html | active | Post-conversion. |
-| Metrics Store | json | frontend/metrics.json | active | Analytics dashboard data. |
-
-## scripts/ subfolder â€” Launchers & deployment
-
-| Component | Type | File | Status | Notes |
-|-----------|------|------|--------|-------|
-| LAUNCH_SHIPSTACK.ps1 | powershell | scripts/LAUNCH_SHIPSTACK.ps1 | active | Kills old processes on 8889/8766/8867/8890. Starts all 4 services. |
-| DEPLOY.ps1 | powershell | scripts/DEPLOY.ps1 | active | Deployment orchestration. |
-| PUSH_SHIPSTACK_TO_GITHUB.ps1 | powershell | scripts/PUSH_SHIPSTACK_TO_GITHUB.ps1 | active | Git push. |
-| set_vercel_envs.py | python | scripts/set_vercel_envs.py | active | Configure Vercel environment. |
-| consolidate_shipstack_env.py | python | scripts/consolidate_shipstack_env.py | active | Merge env vars. |
-
-## docs/ subfolder â€” Documentation
-
-| Component | Type | File | Status |
-|-----------|------|------|--------|
-| BUILD_PLAN.md | markdown | docs/BUILD_PLAN.md | active |
-| SYSTEM_ARCHITECTURE.md | markdown | docs/SYSTEM_ARCHITECTURE.md | active |
-| QUICKSTART.md | markdown | docs/QUICKSTART.md | active |
-| BADGE_PROTOCOL_EXAMPLE.md | markdown | docs/BADGE_PROTOCOL_EXAMPLE.md | active |
-| (7 others) | markdown | docs/*.md | active |
-
-## Preserved subdirectories (not reorganized)
-
-| Folder | Purpose | Status |
-|--------|---------|--------|
-| api/ | Vercel serverless functions | active |
-| social_ai_agent/ | Full social AI implementation tree | active |
-| integrations/ | Supplier/platform connectors | active |
-| content_pipeline/ | Content generation pipeline | active |
-| pinterest_agent/ | Pinterest-specific automation | active |
-| dropship-agent/ | Dropship research agent | active |
-| roi-product-finder/ | ROI calculation | active |
-| landing-pages/ | Marketing pages | active |
-| decision-engine/ | Scoring engine (with dash) | active |
-| asset_machine/ | Asset generation | active |
-| prometheus_output/ | Video output storage | active |
-| shipstack-privacy/ | Privacy docs | active |
-| data/ | Data cache | active |
-| logs/ | Runtime logs | active |
-
----
-
-# QUARANTINE REGISTRY
-
-| Original File | Quarantined As | Date | Reason | Replaced By |
-|---------------|---------------|------|--------|-------------|
-| _(empty â€” populated during cleanup)_ | | | | |
-
----
-
-# DIRECTORIES â€” WHERE THINGS LIVE
-
-| Purpose | Path |
-|---------|------|
-| Active ShipStack code | `C:\Users\integ\Documents\Claude\Projects\ShipStack\` |
-| Core engines | `C:\Users\integ\Documents\Claude\Projects\ShipStack\engines\` |
-| Decision agents | `C:\Users\integ\Documents\Claude\Projects\ShipStack\agents\` |
-| Badge/auth | `C:\Users\integ\Documents\Claude\Projects\ShipStack\badge\` |
-| Frontend HTML | `C:\Users\integ\Documents\Claude\Projects\ShipStack\frontend\` |
-| Launch scripts | `C:\Users\integ\Documents\Claude\Projects\ShipStack\scripts\` |
-| Documentation | `C:\Users\integ\Documents\Claude\Projects\ShipStack\docs\` |
-| Quinn handoffs | `C:\Users\integ\Documents\Claude\Projects\ShipStack\handoffs\` |
-| Test suites | `C:\Users\integ\Documents\Claude\Projects\ShipStack\tests\` |
-| Archive/backup | `C:\Users\integ\Documents\Claude\Projects\ShipStack\_archive\` |
-| Runtime logs | `C:\Users\integ\Documents\Claude\Projects\ShipStack\logs\` |
-
----
-
-# THINGS THAT ARE DELETED FOREVER â€” DO NOT RECREATE
+## Do Not Recreate
 
 - Quinn-owned files (seed_strategy_books.py, sync_cowork_sessions.py, quinn_fs_interceptor.py, verify_qdrant_partitions.py, ingest_now.py)
 - Scheduled task scripts (SCHEDULE_DAILY.ps1, SCHEDULE_CALENDAR.ps1)
-- Prometheus ownership in Quinn (moved to ShipStack 2026-06-03)
-- MCP server attempt (shipstack_mcp.py â€” ShipStack is HTTP, not MCP)
+- MCP server attempt (shipstack_mcp.py)
 - Direct Claude Code modifications (disable_claude_code.ps1 and variants)
 
----
+## Tech Stack
 
-# GUARDRAILS â€” IN EFFECT 2026-06-03
-
-## Badge Protocol (B1)
-
-Every tool call requires a fresh badge token from `shipstack_badge()`. The badge is one-shot, expires in 60 seconds, and cannot be reused. Tokens are validated before tool execution; missing or expired tokens cause a 403 Forbidden response.
-
-## Action Logging (B2)
-
-Every tool execution logs to `dropship-os/logs/shipstack_actions.jsonl` (JSONL format). Log entry includes: timestamp, tool_name, action, target, result summary, badge_token (last 8 chars). Synchronous: log write completes before next tool begins.
-
-## Secret Scanner (B3)
-
-Do not commit API keys, passwords, or secrets. If a secret is found in code (sk-ant-, sk_live_, ghp_, etc.), the file write/edit refuses. Exception: .env and .env.local files are exempt from scan (they are git-ignored).
-
-## Rate Limits (B4)
-
-Currently unlimited for ShipStack tools (no gates). If abuse patterns emerge, rate limits will be added. Check via `shipstack_show_rate_limits()` (future tool).
-
-## Directories Rule (B5)
-
-All ShipStack files must live under `C:\Users\integ\Documents\Claude\Projects\ShipStack\`. Writes outside this directory refuse with a path validation error. Path validation uses `startswith(ShipStack_path)`.
-
----
-
-# CHANGELOG
-
-| Date | Change |
-|------|--------|
-| 2026-06-04 | v1.1 â€” Blueprint updated post-reorg. New structure: engines/, agents/, badge/, frontend/, scripts/, docs/, handoffs/, tests/, _archive/. Old `dropship-os/` subdir removed. Folder renamed `Drop shipping/` â†’ `ShipStack/`. Path updated in Rules 2-4, 9. All file references corrected. |
-| 2026-06-03 | v1.0 â€” initial CLAUDE.md for ShipStack. Blueprint, rules, guardrails established. Tier 0 cleanup complete. |
-
----
-
-# NEXT STEPS
-
-- **Tier 1 (in progress):** Rewrite SHIPSTACK_RULES.md (already done), rewrite SHIPSTACK_DIRECTIVES.md, audit .env/.gitignore
-- **Tier 2:** Build badge system (shipstack_badge.py, shipstack_log_action.py)
-- **Tier 3:** ShipStack engine on :8889
-- **Tier 4:** Prometheus on :8766
-- **Tier 5:** Social AI integration
-- **Tier 6:** Dashboard
-- **Tier 7:** Optional file/command tools (skip unless real use case)
-- **Tier 8:** Verification + smoke tests
-
+- **Backend:** Python 3 (Flask), Node.js 18+ (Express, ES modules)
+- **Frontend:** Static HTML, deployed via Vercel
+- **LLM:** Quinn bridge to Ollama (qwen2.5:7b) with Anthropic fallback
+- **Database:** SQLite (product cache), Qdrant (vector search)
+- **Video:** ffmpeg, edge_tts, Pexels/Pixabay APIs, Runway ML, ElevenLabs
+- **Deployment:** Vercel (frontend/API), PowerShell launchers (local services)
+- **Package managers:** npm (Node deps), pip (Python deps via requirements.txt)
