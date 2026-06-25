@@ -26,14 +26,11 @@ python engines/shipstack_dashboard.py    # :8890
 
 ### Run tests
 ```bash
-python tests/test_integration.py
+python tests/test_integration.py         # 7 unit test suites (badge, health, scoring, research, analytics, auth, leak audit)
+python tests/test_mvp_pipeline.py        # 10 E2E smoke tests (services, discovery, scoring, posting, leak audit)
+python tests/verify_stack.py             # quick service health check
 ```
-7 suites: badge system, health checks, decision engine, product research, analytics, badge-gated endpoints, Anthropic leak audit. No pytest -- uses Python unittest.
-
-### Verify stack health
-```bash
-python tests/verify_stack.py
-```
+No pytest -- uses Python unittest and custom test runners.
 
 ### Frontend dev server (Vercel local)
 ```bash
@@ -75,6 +72,8 @@ ShipStack is a dropshipping discovery and automation platform with a dual-stack 
 - `frontend/index.html` (154KB) -- main landing page, static HTML
 - Routing defined in `vercel.json`
 
+**Pipeline glue** (`engines/pipeline_glue.py`): Orchestrates the full MVP loop -- discover products, score them, generate content (image cards + video), post to social platforms. CLI: `python engines/pipeline_glue.py --query "..." --limit 5 --post`
+
 **LLM routing pattern:** All AI calls go to Quinn HTTP bridge at `http://127.0.0.1:8765`, which routes to Ollama (local models) or Anthropic (fallback). The `api/_quinnRouter.js` and `api/_fallbackController.js` handle this chain for the JS layer.
 
 **Authentication:** Badge protocol via `badge/shipstack_badge.py` -- one-shot SHA256 tokens with 60-second TTL. Every tool call gets a fresh badge, then logs via `badge/shipstack_log_action.py` to `logs/shipstack_actions.jsonl` (JSONL format).
@@ -87,16 +86,18 @@ ShipStack is a dropshipping discovery and automation platform with a dual-stack 
 
 **Key internal agents** (no HTTP ports, called by the engines):
 - `agents/decision_engine.py` -- product scoring (cost/margin, niche, competition, reviews)
-- `agents/product_research.py` -- supplier aggregation (Zendrop/AutoDS/AliExpress stubs, SQLite cache)
+- `agents/product_research.py` -- supplier aggregation (Zendrop live, AutoDS gated, AliExpress scraper). SQLite cache with 24-hour TTL
 - `agents/analytics_engine.py` -- KPI computation from action logs
 - `agents/product_onboarding_agent.py` (46KB) -- product onboarding workflow
 - `agents/db.py` (41KB) -- SQLite operations
 
 **Integrations** (`integrations/`): `aliexpress_connector.py`, `supplier_connector.py`, `social_poster.py`, `stripe_checkout.py`, plus JS scrapers `amazon-api.js` and `tiktok-shopify-scraper.js`.
 
-**Social AI** (`social_ai_agent/`): Full automation tree with `main.py`, platform-specific posters (`pinterest_poster.py`, `tiktok_poster.py`), scheduler, content generation, and research modules.
+**Social AI** (`social_ai_agent/`): Full automation tree with `main.py`, platform-specific posters (`pinterest_poster.py`, `tiktok_poster.py`), scheduler, content generation, and research modules. The Flask service on :8867 wraps these into HTTP endpoints (`/post/pinterest`, `/post/youtube`, `/post/tiktok`, `/post/auto`, `/generate-card`).
 
-**Discovery Engine** (`discovery_engine/`): Product discovery pipeline with `pipeline.py`, `cli.py`, scoring and signals subsystems.
+**Discovery Engine** (`discovery_engine/`): Product discovery pipeline with `pipeline.py`, `cli.py`, scoring and signals subsystems. Scrapes Reddit, YouTube, Etsy, Pinterest, Amazon -- no API keys needed.
+
+**Platform credential status:** Pinterest (ready -- token + board ID set), YouTube (ready -- all OAuth creds set), TikTok (needs OAuth token -- run `python scripts/tiktok_oauth.py`), Meta/Instagram (not configured).
 
 ## Port Registry
 
@@ -140,10 +141,10 @@ ShipStack is a dropshipping discovery and automation platform with a dual-stack 
 
 ## Known Gaps
 
-- `engines/shipstack_engine.py` is referenced in the launcher but may not exist -- `engines/shipstack.py` (21KB) is the actual implementation
-- `agents/product_research.py` has `NotImplementedError` gates on all real supplier API calls (Zendrop, AutoDS, AliExpress)
-- TikTok OAuth flow pending scope approval
-- Meta API credentials empty
+- TikTok OAuth token not yet obtained -- run `python scripts/tiktok_oauth.py` to complete the flow
+- Meta/Instagram API credentials empty -- not configured for MVP
+- AutoDS supplier API gated (returns [] gracefully) -- no API key available
+- Vercel serverless functions can't reach local Python services without an ngrok/Cloudflare tunnel -- falls back to static data in production
 
 ## Do Not Recreate
 
