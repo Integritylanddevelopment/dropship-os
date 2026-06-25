@@ -13,8 +13,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class AttentionTracker {
 
-  constructor(anthropicClient) {
-    this.ai = anthropicClient;
+  constructor(quinnClient) {
+    this.ai = quinnClient;
     this.platformData = null;
   }
 
@@ -76,7 +76,7 @@ Return a JSON array ranked from CHEAPEST to MOST EXPENSIVE CAC:
 ]`;
 
     const r = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 1200,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -117,7 +117,7 @@ Return JSON only (no markdown):
 }`;
 
     const r = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 600,
       messages: [{ role: 'user', content: prompt }],
     });

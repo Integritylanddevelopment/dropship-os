@@ -8,8 +8,8 @@ import config from '../config.js';
 
 export class CompetitionAnalyzer {
 
-  constructor(anthropicClient) {
-    this.ai = anthropicClient;
+  constructor(quinnClient) {
+    this.ai = quinnClient;
   }
 
   // ── Main: Full Competition Analysis ──────────────────────
@@ -64,7 +64,7 @@ Return JSON only (no markdown):
 }`;
 
     const r = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 600,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -99,7 +99,7 @@ Return JSON only (no markdown):
 }`;
 
     const r = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 600,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -135,7 +135,7 @@ Return JSON only (no markdown):
 }`;
 
     const r = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 600,
       messages: [{ role: 'user', content: prompt }],
     });

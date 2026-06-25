@@ -2,11 +2,28 @@
 // MATCHER — Pairs products to best channels via Claude
 // ============================================================
 
-import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config.js';
 import { scoreMatches, labelWinners } from './scorer.js';
 
-const client = new Anthropic({ apiKey: config.anthropic.apiKey });
+// Quinn bridge wrapper — mimics Anthropic SDK interface, routes through Quinn
+function createQuinnClient() {
+  return {
+    messages: {
+      async create(params) {
+        const body = { ...params };
+        const r = await fetch(`${config.quinn.bridgeUrl}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(120000),
+        });
+        if (!r.ok) throw new Error(`Quinn bridge error: ${r.status}`);
+        return r.json();
+      }
+    }
+  };
+}
+const client = createQuinnClient();
 
 // ── Tool definitions ─────────────────────────────────────────
 const MATCH_TOOLS = [
@@ -101,8 +118,8 @@ For each match, give a specific content strategy and exact first test action. Re
     if (onProgress) onProgress(`Analyzing product-channel matches... (${aiMatches.length} found)`);
 
     const response = await client.messages.create({
-      model:      config.anthropic.model,
-      max_tokens: config.anthropic.maxTokens,
+      model:      config.quinn.model,
+      max_tokens: config.quinn.maxTokens,
       system:     systemPrompt,
       tools:      MATCH_TOOLS,
       messages,

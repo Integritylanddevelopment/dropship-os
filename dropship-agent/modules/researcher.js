@@ -9,8 +9,8 @@ import config from '../config.js';
 
 export class Researcher {
 
-  constructor(anthropicClient) {
-    this.ai = anthropicClient;
+  constructor(quinnClient) {
+    this.ai = quinnClient;
     this.serpApiBase = 'https://serpapi.com/search';
   }
 
@@ -52,7 +52,7 @@ Return a JSON object with these exact fields (no markdown, pure JSON):
 }`;
 
     const response = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 512,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -84,7 +84,7 @@ Return JSON only (no markdown):
 }`;
 
     const response = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 512,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -117,7 +117,7 @@ Return JSON only (no markdown):
 }`;
 
     const response = await this.ai.messages.create({
-      model: config.anthropic.model,
+      model: config.quinn.model,
       max_tokens: 600,
       messages: [{ role: 'user', content: prompt }],
     });

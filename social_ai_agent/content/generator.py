@@ -58,7 +58,7 @@ class ContentGenerator:
             return await self._generate_openai(prompt, system, max_tokens)
         else:
             logger.error("No AI client configured. Add your API key to .env")
-            return "[AI not configured — add ANTHROPIC_API_KEY or OPENAI_API_KEY to .env]"
+            return "[AI not configured — start Quinn bridge at http://127.0.0.1:8765 or add OPENAI_API_KEY to .env]"
 
     async def _generate_anthropic(self, prompt: str, system: str, max_tokens: int) -> str:
         """

@@ -12,7 +12,7 @@ load_dotenv()
 @dataclass
 class PinterestConfig:
     # === API KEYS ===
-    anthropic_api_key: str = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY", ""))
+    quinn_bridge_url: str = field(default_factory=lambda: os.getenv("QUINN_BRIDGE_URL", "http://127.0.0.1:8765"))
     pinterest_access_token: str = field(default_factory=lambda: os.getenv("PINTEREST_ACCESS_TOKEN", ""))
     pinterest_ad_account_id: Optional[str] = field(default_factory=lambda: os.getenv("PINTEREST_AD_ACCOUNT_ID"))
 
@@ -47,8 +47,8 @@ class PinterestConfig:
     def validate(self) -> list[str]:
         """Return list of missing required config values."""
         missing = []
-        if not self.anthropic_api_key:
-            missing.append("ANTHROPIC_API_KEY")
+        if not self.quinn_bridge_url:
+            missing.append("QUINN_BRIDGE_URL")
         if not self.pinterest_access_token:
             missing.append("PINTEREST_ACCESS_TOKEN")
         if not self.website_url or self.website_url == "https://yourstore.com":

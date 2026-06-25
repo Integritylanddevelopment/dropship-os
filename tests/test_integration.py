@@ -24,7 +24,7 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
-DROPSHIP_OS_ROOT = Path(__file__).parent
+DROPSHIP_OS_ROOT = Path(__file__).resolve().parent.parent
 SHIPSTACK_ENDPOINT = "http://localhost:8889"
 PROMETHEUS_ENDPOINT = "http://localhost:8766"
 SOCIAL_ENDPOINT = "http://localhost:8867"
@@ -94,7 +94,7 @@ class IntegrationTest:
         logger.info("\n=== Test 3: Decision Engine ===")
         
         try:
-            sys.path.insert(0, str(DROPSHIP_OS_ROOT))
+            sys.path.insert(0, str(DROPSHIP_OS_ROOT / "engines"))
             from decision_engine import DecisionEngine, Product
             
             engine = DecisionEngine()
@@ -126,7 +126,7 @@ class IntegrationTest:
         logger.info("\n=== Test 4: Product Research ===")
         
         try:
-            sys.path.insert(0, str(DROPSHIP_OS_ROOT))
+            sys.path.insert(0, str(DROPSHIP_OS_ROOT / "agents"))
             from product_research import ProductResearcher
             
             researcher = ProductResearcher()
@@ -148,7 +148,7 @@ class IntegrationTest:
         logger.info("\n=== Test 5: Analytics Engine ===")
         
         try:
-            sys.path.insert(0, str(DROPSHIP_OS_ROOT))
+            sys.path.insert(0, str(DROPSHIP_OS_ROOT / "agents"))
             from analytics_engine import AnalyticsEngine
             
             analytics = AnalyticsEngine()

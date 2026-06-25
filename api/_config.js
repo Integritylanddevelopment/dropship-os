@@ -36,7 +36,7 @@ export const env = {
     apiUrl:      process.env.FALLBACK_API_URL || '',
     model:       process.env.FALLBACK_MODEL || '',
     timeoutMs:   Number(process.env.FALLBACK_TIMEOUT_MS || 60000),
-    apiKey:      process.env.ANTHROPIC_API_KEY || '',
+    // apiKey removed — all LLM calls route through Quinn bridge
   },
 
   app: {

@@ -253,7 +253,7 @@ program
     console.log('  node index.js history              View scan history');
     console.log('\nSetup:');
     console.log('  1. npm install');
-    console.log('  2. Set ANTHROPIC_API_KEY environment variable');
+    console.log('  2. Start Quinn bridge at http://127.0.0.1:8765');
     console.log('  3. (Optional) Set SERP_API_KEY for live web search');
     console.log('  4. node index.js scan\n');
   });

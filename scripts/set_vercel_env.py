@@ -10,10 +10,7 @@ TEAM  = "team_qd9zTuDQ41euDNXJwHVVPocq"
 BASE  = f"https://api.vercel.com/v10/projects/{PROJ}/env"
 HDRS  = {"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json"}
 
-ANT_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-
 patches = [
-    ("7m1lrUKqenElQFtP", "ANTHROPIC_API_KEY",   ANT_KEY),
     ("GPECdWV5RL3uHKdX", "STRIPE_SECRET_KEY",   os.getenv("STRIPE_SECRET_KEY", "")),
     ("1a1SQbDCAF8y2SRG", "QUINN_BRIDGE_SECRET", os.getenv("QUINN_BRIDGE_SECRET", "")),
 ]

@@ -2,7 +2,7 @@
 // Dropship OS — Memory Search API (Vercel Edge Function)
 //
 // Routes semantic search queries through Quinn bridge to Qdrant.
-// Falls back to Claude direct if bridge is offline.
+// Falls back to Quinn bridge LLM if Qdrant search is offline.
 //
 // POST /api/search
 //   body: { query: string, collection?: string, top_k?: number }
@@ -10,7 +10,7 @@
 // Vercel env vars:
 //   QUINN_ENDPOINT       — ngrok URL for Quinn bridge
 //   QUINN_BRIDGE_SECRET  — bridge auth token
-//   ANTHROPIC_API_KEY    — fallback when Quinn is offline
+//   QUINN_BRIDGE_URL     — fallback LLM endpoint (default http://127.0.0.1:8765)
 // ═══════════════════════════════════════════════════════════════
 
 export const config = { runtime: 'edge' };
@@ -37,7 +37,7 @@ export default async function handler(req) {
 
   const endpoint = process.env.QUINN_ENDPOINT;
   const secret   = process.env.QUINN_BRIDGE_SECRET;
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const quinnBridgeUrl = process.env.QUINN_BRIDGE_URL || 'http://127.0.0.1:8765';
 
   // ── Route 1: Quinn bridge /search ─────────────────────────────
   if (endpoint) {
@@ -66,53 +66,45 @@ export default async function handler(req) {
     }
   }
 
-  // ── Route 2: Fallback — answer from configured fallback provider ─
-  const fallbackUrl = process.env.FALLBACK_API_URL;
-  const fallbackModel = process.env.FALLBACK_MODEL;
-  if (anthropicKey && fallbackUrl && fallbackModel) {
-    try {
-      const res = await fetch(fallbackUrl, {
-        method: 'POST',
-        headers: {
-          'x-api-key': anthropicKey,
-          'anthropic-version': '2023-06-01',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: fallbackModel,
-          max_tokens: 600,
-          messages: [{
-            role: 'user',
-            content: `You are the ShipStack AI memory system. Answer this dropshipping question concisely using Gary Vee, Hormozi, and Kamil Sattar frameworks:
+  // ── Route 2: Fallback — answer via Quinn bridge LLM ──────────────
+  try {
+    const res = await fetch(`${quinnBridgeUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: process.env.FALLBACK_MODEL || 'qwen2.5:7b',
+        max_tokens: 600,
+        messages: [{
+          role: 'user',
+          content: `You are the ShipStack AI memory system. Answer this dropshipping question concisely using Gary Vee, Hormozi, and Kamil Sattar frameworks:
 
 Query: ${query}
 
 Respond as 3-5 short bullet points. Be specific and tactical.`,
-          }],
-        }),
-        signal: AbortSignal.timeout(15000),
-      });
+        }],
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
 
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.content?.[0]?.text || '';
-        return json(200, {
-          results: [{
-            text,
-            project: 'claude_fallback',
-            section: 'AI Response',
-            score: 1.0,
-            source: 'anthropic_direct',
-          }],
-          source: 'claude_fallback',
-          collection,
-          query,
-          message: 'Quinn bridge offline — answered via Claude. Start Quinn bridge for Qdrant search.',
-        });
-      }
-    } catch (e) {
-      // Fall through
+    if (res.ok) {
+      const data = await res.json();
+      const text = data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || '';
+      return json(200, {
+        results: [{
+          text,
+          project: 'quinn_fallback',
+          section: 'AI Response',
+          score: 1.0,
+          source: 'quinn_bridge',
+        }],
+        source: 'quinn_fallback',
+        collection,
+        query,
+        message: 'Quinn Qdrant search offline -- answered via Quinn bridge LLM. Start Quinn bridge /search for Qdrant results.',
+      });
     }
+  } catch (e) {
+    // Fall through
   }
 
   return json(503, {

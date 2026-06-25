@@ -11,7 +11,7 @@
 // Vercel env vars required:
 //   QUINN_ENDPOINT         — ngrok URL for local machine
 //   QUINN_BRIDGE_SECRET    — auth token
-//   ANTHROPIC_API_KEY      — Claude for script generation fallback
+//   QUINN_BRIDGE_URL       — Quinn bridge for script generation fallback
 // ═══════════════════════════════════════════════════════════════
 
 export const config = { runtime: 'edge' };
@@ -35,7 +35,7 @@ export default async function handler(req) {
     const localStatus = await probeLocalEngine();
     return json(200, {
       prometheus_local: localStatus,
-      claude_available: !!process.env.ANTHROPIC_API_KEY,
+      quinn_available: !!process.env.QUINN_ENDPOINT,
       quinn_endpoint: process.env.QUINN_ENDPOINT || null,
     });
   }
@@ -85,16 +85,17 @@ export default async function handler(req) {
     });
   }
 
-  // ── Fallback: generate script via Claude if engine offline ────
-  if (process.env.ANTHROPIC_API_KEY) {
-    const scriptText = await generateScriptViaClaude(product, niche || 'general');
+  // ── Fallback: generate script via Quinn bridge if engine offline ──
+  const quinnBridgeUrl = process.env.QUINN_BRIDGE_URL || 'http://127.0.0.1:8765';
+  const scriptText = await generateScriptViaQuinn(product, niche || 'general', quinnBridgeUrl);
+  if (scriptText) {
     return json(200, {
-      source: 'claude_fallback',
+      source: 'quinn_fallback',
       status: 'script_only',
       product,
       niche: niche || 'general',
       script: scriptText,
-      message: 'Local Prometheus Engine offline. Script generated via Claude. Start prometheus_engine.py --api-mode to enable full video pipeline.',
+      message: 'Local Prometheus Engine offline. Script generated via Quinn bridge. Start prometheus_engine.py --api-mode to enable full video pipeline.',
     });
   }
 
@@ -140,23 +141,14 @@ async function probeLocalEngine() {
   return result ? { online: true, tools: result.tools } : { online: false };
 }
 
-// ── Generate script via Claude API ───────────────────────────
-async function generateScriptViaClaude(product, niche) {
-  const key = process.env.ANTHROPIC_API_KEY;
-  const fallbackUrl = process.env.FALLBACK_API_URL;
-  const fallbackModel = process.env.FALLBACK_MODEL;
-  if (!key || !fallbackUrl || !fallbackModel) return null;
-
+// ── Generate script via Quinn bridge ─────────────────────────
+async function generateScriptViaQuinn(product, niche, quinnUrl) {
   try {
-    const res = await fetch(fallbackUrl, {
+    const res = await fetch(`${quinnUrl}/v1/chat/completions`, {
       method: 'POST',
-      headers: {
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: fallbackModel,
+        model: process.env.FALLBACK_MODEL || 'qwen2.5:7b',
         max_tokens: 400,
         messages: [{
           role: 'user',
@@ -170,7 +162,7 @@ Gary Vee style: raw, authentic, max 80 words.`
 
     if (!res.ok) return null;
     const data = await res.json();
-    return data.content?.[0]?.text || null;
+    return data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || null;
   } catch {
     return null;
   }

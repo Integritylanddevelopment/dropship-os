@@ -68,12 +68,12 @@ class PinterestAPIConfig:
 
 @dataclass
 class AIConfig:
-    """AI content generation — supports OpenAI and Anthropic"""
-    provider: str = field(default_factory=lambda: os.getenv("AI_PROVIDER", "anthropic"))
+    """AI content generation — routes through Quinn bridge (Rule 1: Quinn-First)"""
+    provider: str = field(default_factory=lambda: os.getenv("AI_PROVIDER", "quinn"))
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
-    anthropic_api_key: str = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY", ""))
+    quinn_bridge_url: str = field(default_factory=lambda: os.getenv("QUINN_BRIDGE_URL", "http://127.0.0.1:8765"))
     model_openai: str = field(default_factory=lambda: os.getenv("MODEL_OPENAI", "gpt-4o"))
-    model_anthropic: str = field(default_factory=lambda: os.getenv("MODEL_ANTHROPIC", "claude-opus-4-5"))
+    model: str = field(default_factory=lambda: os.getenv("SHIPSTACK_MODEL", "qwen2.5:7b"))
     max_tokens: int = 2000
     temperature: float = 0.72
 
@@ -81,7 +81,7 @@ class AIConfig:
     def is_configured(self) -> bool:
         if self.provider == "openai":
             return bool(self.openai_api_key)
-        return bool(self.anthropic_api_key)
+        return bool(self.quinn_bridge_url)
 
 
 @dataclass

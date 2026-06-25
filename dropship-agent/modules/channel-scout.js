@@ -2,7 +2,6 @@
 // CHANNEL SCOUT AGENT — Finds cheapest content distribution
 // ============================================================
 
-import Anthropic from '@anthropic-ai/sdk';
 import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -10,7 +9,26 @@ import { config } from '../config.js';
 import { search, formatSearchResults } from './web-search.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const client    = new Anthropic({ apiKey: config.anthropic.apiKey });
+
+// Quinn bridge wrapper — mimics Anthropic SDK interface, routes through Quinn
+function createQuinnClient() {
+  return {
+    messages: {
+      async create(params) {
+        const body = { ...params };
+        const r = await fetch(`${config.quinn.bridgeUrl}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(120000),
+        });
+        if (!r.ok) throw new Error(`Quinn bridge error: ${r.status}`);
+        return r.json();
+      }
+    }
+  };
+}
+const client = createQuinnClient();
 
 // Load platform baseline data
 let platformData = { platforms: {} };
@@ -198,8 +216,8 @@ Scoring rules (1-10):
     if (onProgress) onProgress(`Researching channels... (found ${channels.length} so far)`);
 
     const response = await client.messages.create({
-      model:      config.anthropic.model,
-      max_tokens: config.anthropic.maxTokens,
+      model:      config.quinn.model,
+      max_tokens: config.quinn.maxTokens,
       system:     systemPrompt,
       tools:      CHANNEL_TOOLS,
       messages,

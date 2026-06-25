@@ -39,10 +39,11 @@ When generating content, always output clean JSON as specified in each prompt.""
 
 
 class ClaudeClient:
-    def __init__(self, api_key: str, model: str = None):
+    def __init__(self, bridge_url: str = None, model: str = None):
         if model is None:
             model = os.getenv("CLAUDE_MODEL", "claude-opus-4-6")
         self.model = model
+        self.bridge_url = bridge_url or QUINN_BRIDGE
 
     def _call(self, prompt: str, max_tokens: int = 2000, temperature: float = 0.7) -> str:
         """
@@ -50,7 +51,7 @@ class ClaudeClient:
         Quinn routes to Anthropic or local Ollama based on confidence.
         """
         response = requests.post(
-            f"{QUINN_BRIDGE}/chat",
+            f"{self.bridge_url}/chat",
             json={
                 "model": self.model,
                 "messages": [

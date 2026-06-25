@@ -4,11 +4,28 @@
 // UGC briefs, and platform-specific copy for each product
 // ============================================================
 
-import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config.js';
 import { search, formatSearchResults } from './web-search.js';
 
-const client = new Anthropic({ apiKey: config.anthropic.apiKey });
+// Quinn bridge wrapper — mimics Anthropic SDK interface, routes through Quinn
+function createQuinnClient() {
+  return {
+    messages: {
+      async create(params) {
+        const body = { ...params };
+        const r = await fetch(`${config.quinn.bridgeUrl}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(120000),
+        });
+        if (!r.ok) throw new Error(`Quinn bridge error: ${r.status}`);
+        return r.json();
+      }
+    }
+  };
+}
+const client = createQuinnClient();
 
 // ── Tool Definitions ─────────────────────────────────────────
 const CONTENT_TOOLS = [
@@ -161,8 +178,8 @@ Be extremely specific — give actual scripts, real hook lines, real hashtags. N
     if (onProgress) onProgress(`Generating content strategy for ${productName}...`);
 
     const response = await client.messages.create({
-      model:      config.anthropic.model,
-      max_tokens: config.anthropic.maxTokens,
+      model:      config.quinn.model,
+      max_tokens: config.quinn.maxTokens,
       system:     systemPrompt,
       tools:      CONTENT_TOOLS,
       messages,
@@ -228,7 +245,7 @@ Rules:
 - No generic hooks — be product-specific`;
 
   const r = await client.messages.create({
-    model: config.anthropic.model,
+    model: config.quinn.model,
     max_tokens: 600,
     messages: [{ role: 'user', content: prompt }],
   });

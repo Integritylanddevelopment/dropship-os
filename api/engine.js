@@ -1,13 +1,11 @@
 // api/engine.js -- ShipStack Engine Intelligence Layer
 // Handles all /api/engine/* routes
-// Priority: local engine (SHIPSTACK_ENGINE_URL) > Quinn bridge > Anthropic fallback
+// Priority: local engine (SHIPSTACK_ENGINE_URL) > Quinn bridge (Rule 1: Quinn-only)
 // NO EMOJIS -- plain text labels only
 
 const QUINN_ENDPOINT = process.env.QUINN_ENDPOINT || '';
 const QUINN_SECRET   = process.env.QUINN_BRIDGE_SECRET || '';
-const ANTHROPIC_KEY  = process.env.ANTHROPIC_API_KEY || '';
-const FALLBACK_URL   = process.env.FALLBACK_API_URL || '';
-const FALLBACK_MODEL = process.env.FALLBACK_MODEL || '';
+// Removed: direct Anthropic fallback (Rule 1: Quinn-only routing)
 const ENGINE_URL     = process.env.SHIPSTACK_ENGINE_URL || '';
 
 // ── Intelligence: Quinn first, Anthropic fallback ─────────────────────────────
@@ -27,22 +25,7 @@ async function ask(query) {
       }
     } catch (e) { /* Quinn offline */ }
   }
-  if (ANTHROPIC_KEY) {
-    try {
-      const r = await fetch(FALLBACK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: FALLBACK_MODEL, max_tokens: 900,
-          messages: [{ role: 'user', content: query }] }),
-        signal: AbortSignal.timeout(15000)
-      });
-      if (r.ok) {
-        const d = await r.json();
-        return { text: (d.content || [])[0]?.text || '', source: 'claude' };
-      }
-    } catch (e) { /* Anthropic offline */ }
-  }
-  return { text: 'Intelligence stack offline. Start Quinn bridge or add ANTHROPIC_API_KEY.', source: 'offline' };
+  return { text: 'Intelligence stack offline. Start Quinn bridge at http://127.0.0.1:8765.', source: 'offline' };
 }
 
 // ── Static baseline data (5 live products + 7 channels) ─────────────────────
@@ -148,7 +131,7 @@ function stageStatus() {
     activity_log: [
       '[ENGINE] ShipStack intelligence layer online',
       '[ENGINE] Quinn bridge: ' + (QUINN_ENDPOINT ? 'connected' : 'offline - start Quinn bridge'),
-      '[ENGINE] Anthropic: ' + (ANTHROPIC_KEY ? 'connected' : 'no key - add ANTHROPIC_API_KEY'),
+      '[ENGINE] LLM routing: Quinn-only (Rule 1)',
       '[ENGINE] Local engine 8889: ' + (ENGINE_URL ? 'connected via ' + ENGINE_URL : 'offline')
     ],
     timestamp: new Date().toISOString()

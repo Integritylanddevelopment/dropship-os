@@ -17,7 +17,6 @@ VERCEL_TOKEN = os.environ["VERCEL_TOKEN"]
 PROJECT_ID = os.environ.get("VERCEL_PROJECT_ID", "prj_n2WcwKIhw3eagVoSeqHeyHyH7TZL")
 
 ENV_VARS = {
-    "ANTHROPIC_API_KEY": os.environ["ANTHROPIC_API_KEY"],
     "STRIPE_SECRET_KEY": os.environ["STRIPE_SECRET_KEY"],
     "QUINN_BRIDGE_SECRET": os.environ["QUINN_BRIDGE_SECRET"],
 }

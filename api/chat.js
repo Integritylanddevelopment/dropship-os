@@ -7,10 +7,8 @@
 // Required Vercel env vars:
 //   QUINN_ENDPOINT        = https://your-ngrok-url.ngrok.io
 //   QUINN_BRIDGE_SECRET   = your-secret-token
-//   ANTHROPIC_API_KEY     = sk-ant-...  (fallback)
 //   FALLBACK_ENABLED      = true
-//   FALLBACK_API_URL      = https://api.anthropic.com/v1/messages
-//   FALLBACK_MODEL        = claude-sonnet-4-5
+//   FALLBACK_MODEL        = qwen2.5:7b
 //   APP_PRIMARY_PROFILE   = quinn
 // ============================================================
 

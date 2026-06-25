@@ -6,9 +6,9 @@ export const config = {
 
   // ── API Keys ──────────────────────────────────────────────
   // Set these as environment variables or replace directly
-  anthropic: {
-    apiKey: process.env.ANTHROPIC_API_KEY || 'YOUR_ANTHROPIC_API_KEY',
-    model: 'claude-sonnet-4-6',
+  quinn: {
+    bridgeUrl: process.env.QUINN_BRIDGE_URL || 'http://127.0.0.1:8765',
+    model: process.env.SHIPSTACK_MODEL || 'qwen2.5:7b',
     maxTokens: 8096,
   },
 
@@ -119,8 +119,8 @@ config.paths = {
 
 export function validateConfig() {
   const errors = [];
-  if (!config.anthropic.apiKey || config.anthropic.apiKey === 'YOUR_ANTHROPIC_API_KEY') {
-    errors.push('ANTHROPIC_API_KEY is not set. Add it to your .env file or environment variables.');
+  if (!config.quinn.bridgeUrl) {
+    errors.push('Quinn bridge URL is not set. Start Quinn bridge at http://127.0.0.1:8765.');
   }
   return errors;
 }

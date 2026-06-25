@@ -61,7 +61,7 @@ class PinterestOrchestrator:
 
         # Initialize integrations
         self.pinterest = PinterestAPI(config.pinterest_access_token)
-        self.claude = ClaudeClient(config.anthropic_api_key)
+        self.claude = ClaudeClient(config.quinn_bridge_url)
 
         # Initialize agents
         self.research = ResearchAgent(self.pinterest, self.claude, self.db)
@@ -103,7 +103,7 @@ class PinterestOrchestrator:
             print(f"  ✅ Claude API connected: {test}")
         except Exception as e:
             print(f"  ❌ Claude API error: {e}")
-            print("  → Check ANTHROPIC_API_KEY in your .env file")
+            print("  → Check Quinn bridge is running at http://127.0.0.1:8765")
             return
 
         # Step 3: Sync existing boards from Pinterest

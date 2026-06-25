@@ -1,26 +1,12 @@
 #!/usr/bin/env python3
 """
-PRODUCTION-GATE: STUB DATA ONLY — Do not deploy without real supplier APIs
-===========================================================================
-
-This module returns MOCK/STUB data until real Zendrop/AutoDS/AliExpress API keys
-are wired. Per Directive #19, this is a deliberate gate to prevent accidental
-deployment with fake data.
-
-To use real supplier APIs:
-1. Add ZENDROP_API_KEY, AUTODS_API_KEY, ALIEXPRESS_SCRAPER_KEY to .env
-2. Remove the NotImplementedError() calls in search_zendrop(), search_autods(), search_aliexpress()
-3. Implement actual API logic (see TODO comments in methods)
-4. Test /api/research endpoint
-5. Remove this warning
-
 Product Research Tool — Supplier Data Aggregation
 ==================================================
 
 Fetches product data from multiple suppliers:
-- Zendrop API (TODO: implement real API calls)
-- AutoDS API (TODO: implement real API calls)
-- AliExpress scraper (TODO: implement real scraper)
+- Zendrop API (live — requires ZENDROP_API_KEY in .env)
+- AutoDS API (unavailable — returns empty list gracefully)
+- AliExpress scraper (live — stdlib scraper, no key needed)
 
 Caches results in local SQLite DB.
 Used by ShipStack Engine (/api/research).
@@ -144,64 +130,56 @@ class ProductResearcher:
         self.quinn_endpoint = os.getenv("QUINN_ENDPOINT", "http://localhost:8765")
     
     def search_zendrop(self, search_term: str, limit: int = 20) -> List[Dict[str, Any]]:
-        """
-        Search Zendrop API.
-        PRODUCTION GATE: Returns NotImplementedError until real API is wired.
-        """
-        raise NotImplementedError(
-            "Zendrop API not wired — add ZENDROP_API_KEY to .env and implement API calls. "
-            "See Directive #19. This is a deliberate gate to prevent deployment with stub data."
-        )
+        """Search Zendrop API for products matching search_term."""
+        import requests as _requests
 
-        # TODO: Call Zendrop API with ZENDROP_API_KEY
-        # GET https://api.zendrop.com/v1/search?query={search_term}&limit={limit}
-        # Then return real results instead of placeholder below
+        if not ZENDROP_API_KEY:
+            logger.warning("ZENDROP_API_KEY not set — skipping Zendrop search")
+            return []
 
-        # Placeholder results (never reached due to gate above)
-        return [
-            {
-                "id": "zendrop-123",
-                "supplier": "zendrop",
-                "title": f"{search_term} from Zendrop",
-                "price": 5.50,
-                "reviews": 150,
-                "rating": 4.7,
-                "niche": search_term,
-                "description": "Quality product with great reviews",
-                "image_url": "https://example.com/image.jpg",
-                "supplier_url": "https://zendrop.com/products/123",
-            }
-        ]
+        try:
+            resp = _requests.get(
+                "https://api.zendrop.com/v1/search",
+                params={"query": search_term, "limit": limit},
+                headers={
+                    "Authorization": f"Bearer {ZENDROP_API_KEY}",
+                    "Accept": "application/json",
+                },
+                timeout=15,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+
+            items = data if isinstance(data, list) else data.get("products", data.get("results", data.get("data", [])))
+            results = []
+            for it in items[:limit]:
+                pid = str(it.get("id") or it.get("product_id") or "")
+                if not pid:
+                    continue
+                results.append({
+                    "id": f"zendrop-{pid}",
+                    "supplier": "zendrop",
+                    "title": it.get("title") or it.get("name") or search_term,
+                    "price": float(it.get("price") or it.get("cost") or 0),
+                    "reviews": int(it.get("reviews") or it.get("review_count") or 0),
+                    "rating": float(it.get("rating") or it.get("star_rating") or 0),
+                    "niche": search_term,
+                    "description": it.get("description") or "",
+                    "image_url": it.get("image_url") or it.get("image") or it.get("thumbnail") or "",
+                    "supplier_url": it.get("url") or it.get("supplier_url") or f"https://zendrop.com/products/{pid}",
+                })
+            return results
+        except Exception as exc:
+            logger.error(f"Zendrop API error for '{search_term}': {exc}")
+            return []
     
     def search_autods(self, search_term: str, limit: int = 20) -> List[Dict[str, Any]]:
         """
         Search AutoDS API.
-        PRODUCTION GATE: Returns NotImplementedError until real API is wired.
+        No API key available — returns empty list so the pipeline continues gracefully.
         """
-        raise NotImplementedError(
-            "AutoDS API not wired — add AUTODS_API_KEY to .env and implement API calls. "
-            "See Directive #19. This is a deliberate gate to prevent deployment with stub data."
-        )
-
-        # TODO: Call AutoDS API with AUTODS_API_KEY
-        # GET https://api.autods.com/v1/search?query={search_term}&limit={limit}
-        # Then return real results instead of placeholder below
-
-        # Placeholder results (never reached due to gate above)
-        return [
-            {
-                "id": "autods-456",
-                "supplier": "autods",
-                "title": f"{search_term} from AutoDS",
-                "price": 6.00,
-                "reviews": 200,
-                "rating": 4.5,
-                "niche": search_term,
-                "description": "Popular item with consistent sales",
-                "image_url": "https://example.com/image.jpg",
-                "supplier_url": "https://autods.com/products/456",
-            }
-        ]
+        logger.info("AutoDS API key not available — returning empty results")
+        return []
     
     def search_aliexpress(self, search_term: str, limit: int = 20) -> List[Dict[str, Any]]:
         """MVP AliExpress scraper. Stdlib, no API key. Returns [] on any failure so pipeline keeps moving."""

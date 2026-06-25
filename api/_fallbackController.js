@@ -1,5 +1,5 @@
 // ============================================================
-// api/_fallbackController.js — Anthropic fallback (Quinn-failed path)
+// api/_fallbackController.js — Quinn bridge fallback (Quinn-failed path)
 //
 // Only called when Quinn bridge is unreachable or returns an error.
 // All config comes from environment variables via _config.js.
@@ -9,7 +9,7 @@ import { env } from './_config.js';
 import { logToolCall } from './_toolCallLogger.js';
 
 /**
- * Send messages to the configured fallback provider (Anthropic by default).
+ * Send messages to Quinn bridge fallback (Rule 1: Quinn-only routing).
  * @param {Array<{role: string, content: string}>} messages
  * @param {string} [systemPrompt]
  * @returns {Promise<{provider: string, model: string, content: string, fallbackTriggered: true}>}
@@ -19,44 +19,27 @@ export async function runFallback(messages, systemPrompt = '') {
     throw new Error('Fallback is disabled. Set FALLBACK_ENABLED=true to enable.');
   }
 
-  if (!env.fallback.apiKey) {
-    throw new Error('Fallback requires ANTHROPIC_API_KEY to be set.');
-  }
-
-  if (!env.fallback.apiUrl) {
-    throw new Error('Fallback requires FALLBACK_API_URL to be set.');
-  }
-
-  if (!env.fallback.model) {
-    throw new Error('Fallback requires FALLBACK_MODEL to be set.');
-  }
-
   try {
-    const body = {
-      model: env.fallback.model,
-      max_tokens: 1200,
-      messages: messages.slice(-10),
-    };
-    if (systemPrompt) body.system = systemPrompt;
-
-    const response = await fetch(env.fallback.apiUrl, {
+    const trimmedMessages = messages.slice(-10);
+    const quinnUrl = process.env.QUINN_BRIDGE_URL || 'http://127.0.0.1:8765';
+    const response = await fetch(`${quinnUrl}/v1/chat/completions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': env.fallback.apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: env.fallback.model || 'qwen2.5:7b',
+        messages: systemPrompt ? [{ role: 'system', content: systemPrompt }, ...trimmedMessages] : trimmedMessages,
+        max_tokens: 1200,
+      }),
       signal: AbortSignal.timeout(env.fallback.timeoutMs),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      throw new Error(`${env.fallback.provider} error ${response.status}: ${errText}`);
+      throw new Error(`Quinn bridge error ${response.status}: ${errText}`);
     }
 
     const data = await response.json();
-    const content = data?.content?.[0]?.text || '';
+    const content = data?.choices?.[0]?.message?.content || data?.content?.[0]?.text || '';
 
     logToolCall({
       source: 'quinnRouter',

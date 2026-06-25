@@ -2,11 +2,28 @@
 // PRODUCT SCOUT AGENT — Finds and scores product opportunities
 // ============================================================
 
-import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config.js';
 import { search, multiSearch, formatSearchResults } from './web-search.js';
 
-const client = new Anthropic({ apiKey: config.anthropic.apiKey });
+// Quinn bridge wrapper — mimics Anthropic SDK interface, routes through Quinn
+function createQuinnClient() {
+  return {
+    messages: {
+      async create(params) {
+        const body = { ...params };
+        const r = await fetch(`${config.quinn.bridgeUrl}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(120000),
+        });
+        if (!r.ok) throw new Error(`Quinn bridge error: ${r.status}`);
+        return r.json();
+      }
+    }
+  };
+}
+const client = createQuinnClient();
 
 // ── Tool definitions for Claude ──────────────────────────────
 const PRODUCT_TOOLS = [
@@ -168,8 +185,8 @@ Record all ${maxProducts} products before finishing.`;
     if (onProgress) onProgress(`Researching products... (found ${products.length} so far)`);
 
     const response = await client.messages.create({
-      model:      config.anthropic.model,
-      max_tokens: config.anthropic.maxTokens,
+      model:      config.quinn.model,
+      max_tokens: config.quinn.maxTokens,
       system:     systemPrompt,
       tools:      PRODUCT_TOOLS,
       messages,
