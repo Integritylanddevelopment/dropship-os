@@ -24,7 +24,7 @@ Write-Host ""
 Write-Host "Step 1: Validating configuration..." -ForegroundColor Yellow
 python badge/validate_config.py
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Config validation failed. Fix issues and try again." -ForegroundColor Red
+    Write-Host "[X] Config validation failed. Fix issues and try again." -ForegroundColor Red
     exit 1
 }
 
@@ -44,7 +44,7 @@ foreach ($port in $ports.Keys) {
         $proc = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess
         if ($proc) {
             Stop-Process -Id $proc -Force -Confirm:$false
-            Write-Host "✓ Killed port $port" -ForegroundColor Green
+            Write-Host "[OK] Killed port $port" -ForegroundColor Green
         }
     } catch {}
 }
@@ -77,7 +77,7 @@ foreach ($service in $services) {
     $proc = [System.Diagnostics.Process]::Start($startupInfo)
     $processes += $proc
     
-    Write-Host "✓ Started $script (PID $($proc.Id)) on port $port" -ForegroundColor Green
+    Write-Host "[OK] Started $script (PID $($proc.Id)) on port $port" -ForegroundColor Green
     Start-Sleep -Seconds 1
 }
 
@@ -93,7 +93,7 @@ python tests/test_integration.py
 
 Write-Host ""
 Write-Host "================================" -ForegroundColor Green
-Write-Host "✓ ShipStack AI is running" -ForegroundColor Green
+Write-Host "[OK] ShipStack AI is running" -ForegroundColor Green
 Write-Host "================================" -ForegroundColor Green
 
 Write-Host ""
@@ -112,7 +112,7 @@ while ($true) {
     Start-Sleep -Seconds 1
     $running = $processes | Where-Object { -not $_.HasExited }
     if ($running.Count -eq 0) {
-        Write-Host "⚠️  All services have stopped" -ForegroundColor Yellow
+        Write-Host "[!] All services have stopped" -ForegroundColor Yellow
         break
     }
 }
