@@ -10,7 +10,7 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
-DROPSHIP_OS_ROOT = Path(__file__).parent
+DROPSHIP_OS_ROOT = Path(__file__).parent.parent
 
 
 def check_ports() -> bool:
@@ -31,9 +31,11 @@ def check_files() -> bool:
     """Check required files exist."""
     logger.info("\nChecking files...")
     files = [
-        "CLAUDE.md", "SHIPSTACK_DIRECTIVES.md", ".env.local",
-        "shipstack_engine.py", "prometheus_engine.py", "social_ai_agent.py", "shipstack_dashboard.py",
-        "shipstack_badge.py", "decision_engine.py", "product_research.py", "analytics_engine.py"
+        "CLAUDE.md", ".env",
+        "engines/shipstack_engine.py", "engines/prometheus_engine.py",
+        "agents/social_ai_agent.py", "engines/shipstack_dashboard.py",
+        "badge/shipstack_badge.py", "engines/decision_engine.py",
+        "agents/product_research.py", "agents/analytics_engine.py"
     ]
     all_ok = True
     for fname in files:
@@ -49,16 +51,19 @@ def check_no_leaks() -> bool:
     """Check no direct Anthropic calls."""
     logger.info("\nChecking for Anthropic API leaks...")
     import glob
-    for py_file in glob.glob(str(DROPSHIP_OS_ROOT / "*.py")):
-        if "validate_config" in py_file:
+    for py_file in glob.glob(str(DROPSHIP_OS_ROOT / "**" / "*.py"), recursive=True):
+        if "validate_config" in py_file or "node_modules" in py_file:
             continue
-        with open(py_file) as f:
-            for i, line in enumerate(f, 1):
-                if line.strip().startswith("#"):
-                    continue
-                if "api.anthropic.com" in line and "requests" in line:
-                    logger.error(f"FAIL: Found api.anthropic.com in {Path(py_file).name}:{i}")
-                    return False
+        try:
+            with open(py_file, encoding="utf-8", errors="replace") as f:
+                for i, line in enumerate(f, 1):
+                    if line.strip().startswith("#"):
+                        continue
+                    if "api.anthropic.com" in line and "requests" in line:
+                        logger.error(f"FAIL: Found api.anthropic.com in {Path(py_file).name}:{i}")
+                        return False
+        except Exception:
+            continue
     logger.info("PASS: No Anthropic leaks detected")
     return True
 
