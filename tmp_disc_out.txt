@@ -1,0 +1,98 @@
+Google Trends: 10 signals
+Reddit r/shutupandtakemymoney: 25 signals
+Reddit r/INEEEEDIT: 25 signals
+Reddit r/BuyItForLife: 25 signals
+Reddit kw 'pet accessories': 10 signals
+Reddit kw 'kitchen gadget': 10 signals
+Reddit kw 'fitness tool': 10 signals
+Reddit kw 'posture corrector': 10 signals
+Reddit kw 'led lights': 10 signals
+
+Total: 135 signals in 23.0s
+Clusters: 19 (>=2 signals each)
+
+============================================================
+TOP PRODUCT OPPORTUNITIES (scored)
+============================================================
+
+1. TRAPPED TOYMAN
+   Overall Score: 7/100
+   Signals: 5
+   Demand: 0 | Intent: 0 | Content: 10
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+2. CHEMICAL ENGINEERING
+   Overall Score: 6/100
+   Signals: 5
+   Demand: 0 | Intent: 0 | Content: 5
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+3. POSTURE
+   Overall Score: 6/100
+   Signals: 4
+   Demand: 0 | Intent: 0 | Content: 2
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+4. STEAMY CAT
+   Overall Score: 6/100
+   Signals: 5
+   Demand: 0 | Intent: 0 | Content: 0
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+5. TICKLE TOES
+   Overall Score: 6/100
+   Signals: 3
+   Demand: 0 | Intent: 0 | Content: 0
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+6. PLAYING CARDS
+   Overall Score: 6/100
+   Signals: 2
+   Demand: 0 | Intent: 0 | Content: 0
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+7. EASYJOBAI
+   Overall Score: 6/100
+   Signals: 2
+   Demand: 0 | Intent: 0 | Content: 0
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+8. TOILET PAPER
+   Overall Score: 6/100
+   Signals: 2
+   Demand: 0 | Intent: 0 | Content: 0
+   Saturation: 60 | Shipping: 50
+   Recommendation: SKIP
+   Warnings: margin:no_supplier_data_for_margin_check
+
+9. FLORAL CARE
+   Overall Score: 3/100
+   Signals: 2
+   Demand: 0 | Intent: 0 | Content: 5
+   Saturation: 60 | Shipping: 50
+   Recommendation: REJECT
+   Warnings: margin:no_supplier_data_for_margin_check
+
+10. CUT DEEP
+   Overall Score: 2/100
+   Signals: 3
+   Demand: 0 | Intent: 0 | Content: 0
+   Saturation: 60 | Shipping: 50
+   Recommendation: REJECT
+   Warnings: margin:no_supplier_data_for_margin_check
+
+Full results saved to discovery_results.json
