@@ -1,5 +1,0 @@
-{
-  "google_trends": 10,
-  "amazon_movers": 0,
-  "reddit": 5
-}

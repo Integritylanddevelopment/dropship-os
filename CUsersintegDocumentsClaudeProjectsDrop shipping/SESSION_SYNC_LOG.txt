@@ -1,6 +1,0 @@
-[2026-05-18T15:44:10.037271] === Cowork Session Sync Started ===
-[2026-05-18T15:44:10.115329] Qdrant unavailable: HTTPConnectionPool(host='127.0.0.1', port=6333): Max retries exceeded with url: /health (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=6333): Failed to establish a new connection: [Errno 111] Connection refused"))
-[2026-05-18T15:44:10.125371] WARNING: Qdrant not available. Skipping ingestion. Tracker updated with session list only.
-[2026-05-18T15:44:10.137799] Tracker saved. Status: qdrant_offline
-[2026-05-18T15:44:10.146891] === Cowork Session Sync Complete ===
-
