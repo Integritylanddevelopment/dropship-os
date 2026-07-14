@@ -15,6 +15,7 @@
     { "source": "/roi",                "destination": "/roi.html" },
     { "source": "/content",            "destination": "/content.html" },
     { "source": "/privacy",            "destination": "/privacy.html" },
+    { "source": "/terms",              "destination": "/terms.html" },
     { "source": "/pet-hair-remover",   "destination": "/pet-hair-remover.html" },
     { "source": "/posture-corrector",  "destination": "/posture-corrector.html" },
     { "source": "/facial-roller",      "destination": "/facial-roller.html" },
