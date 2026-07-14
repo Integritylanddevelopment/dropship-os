@@ -116,6 +116,18 @@ def run(subreddits=None, keywords=None, amazon_cats=None, max_clusters=30,
     signals = collect_all_signals(subreddits, keywords, amazon_cats, verbose=verbose)
     if verbose: print(f"[pipeline] {len(signals)} total signals collected", flush=True)
 
+    # Dedup by signal ID (same post can appear from subreddit + keyword searches)
+    seen = set()
+    unique = []
+    for s in signals:
+        sid = s.get("id") or id(s)
+        if sid not in seen:
+            seen.add(sid)
+            unique.append(s)
+    if verbose and len(unique) < len(signals):
+        print(f"[pipeline] deduped {len(signals)} -> {len(unique)} signals", flush=True)
+    signals = unique
+
     clusters = clusterer.cluster(signals, min_similarity=0.35)
     clusters = [c for c in clusters if len(c) >= min_cluster_size]
     clusters.sort(key=len, reverse=True)

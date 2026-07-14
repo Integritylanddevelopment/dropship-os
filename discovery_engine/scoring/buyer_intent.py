@@ -19,8 +19,21 @@ def score_signal(signal: dict) -> float:
     return min(1.0, raw / 10.0)
 
 def aggregate_for_product(signals: list[dict]) -> float:
-    """Average normalized buyer-intent across signals for one product cluster."""
+    """Buyer-intent score for a product cluster.
+
+    Uses a weighted approach: the BEST intent signals matter most, and having
+    ANY intent-bearing signals in the cluster is itself a positive signal.
+    Pure averaging dilutes score to near-zero when most signals lack intent.
+    """
     if not signals:
         return 0.0
     scores = [score_signal(s) for s in signals]
-    return sum(scores) / len(scores)
+    nonzero = [s for s in scores if s > 0]
+    if not nonzero:
+        return 0.0
+    # Penetration: what fraction of signals show intent (capped at 0.5)
+    penetration = min(0.5, len(nonzero) / len(scores))
+    # Strength: average of intent-bearing signals
+    strength = sum(nonzero) / len(nonzero)
+    # Combined: strong intent in even a few signals is meaningful
+    return min(1.0, 0.6 * strength + 0.4 * (penetration * 2))

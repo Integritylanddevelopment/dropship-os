@@ -1,0 +1,11 @@
+Test 1 URL: https://api.pullpush.io/reddit/search/submission/?subreddit=shutupandtakemymoney&sort=created_utc&order=desc&size=5&after=1781464281
+Test 1 FAIL: <urlopen error _ssl.c:993: The handshake operation timed out>
+
+Test 2 URL: https://api.pullpush.io/reddit/search/submission/?q=pet+gadget&sort=created_utc&order=desc&size=5&after=1781464281
+Test 2 results: 0
+
+Test 3 (original): https://api.pullpush.io/reddit/search/submission/?subreddit=shutupandtakemymoney&sort=score&size=5
+Test 3 results: 5
+  [422d ago] score=1 Playing cards with my friend's faces on them
+  [422d ago] score=1 Custom playing cards
+  [427d ago] score=0 Turn your face into a bobblehead that's so realistic it's al

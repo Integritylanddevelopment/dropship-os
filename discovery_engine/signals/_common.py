@@ -84,11 +84,28 @@ def fetch_json(url: str, headers: Optional[dict] = None, timeout: int = 20) -> d
         return {}
 
 BUYER_INTENT_PHRASES = [
+    # Direct purchase intent
     "where can i buy", "where to buy", "link please", "drop the link", "need this",
     "amazon link", "tiktok made me buy", "tiktok shop link", "does this ship",
     "is this available", "where did you get", "what brand", "how much",
     "ordering this", "buying this", "added to cart", "i need this in my life",
     "shut up and take my money", "comment for link", "link in bio",
+    # Recommendation-seeking (strong purchase signal on Reddit)
+    "worth it", "worth the money", "worth buying", "worth the price",
+    "recommend", "which one should i", "best one",
+    "just bought", "just ordered", "just got mine", "finally bought",
+    "anyone tried", "anyone have", "anyone use",
+    "thinking about buying", "thinking of getting", "should i buy",
+    "should i get", "want to buy", "looking to buy",
+    "looking for a", "looking for recommendations",
+    # Price/deal hunting
+    "on sale", "coupon code", "discount code", "promo code",
+    "cheaper alternative", "budget friendly", "affordable",
+    # Post-purchase validation (confirms demand exists)
+    "game changer", "life changer", "changed my life",
+    "best purchase", "best thing i bought", "so glad i bought",
+    "highly recommend", "must have", "can't live without",
+    "obsessed with", "swear by",
 ]
 
 def extract_buyer_intent(text: str) -> list:

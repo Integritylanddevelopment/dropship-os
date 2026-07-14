@@ -1,0 +1,258 @@
+[
+  {
+    "product_keyword": "kitchen",
+    "category": "",
+    "scores": {
+      "demand_velocity": 0.019,
+      "buyer_intent": 0.46,
+      "supplier_availability": 0.3,
+      "content_potential": 0.0,
+      "low_saturation": 0.6,
+      "shipping_simplicity": 0.5,
+      "margin": 0.667,
+      "overall": 0.243
+    },
+    "margin": {
+      "landed_cost": 10.5,
+      "retail_price": 31.5,
+      "platform_fee": 1.21,
+      "ad_cpa_assumed": 12.0,
+      "gross_margin": 21.0,
+      "gross_margin_pct": 0.667,
+      "net_margin": 7.79,
+      "net_margin_pct": 0.247,
+      "break_even_cpa": 19.79,
+      "passes_margin_floor": true,
+      "margin_score": 0.6666666666666665,
+      "estimated": true
+    },
+    "content_hooks": [],
+    "buyer_intent_phrases": [
+      "looking for a"
+    ],
+    "n_signals": 2,
+    "n_suppliers": 0,
+    "top_social_sources": [
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/acrylicpainting/comments/1kpykas/kitchen_gadget_art/",
+        "title": "Kitchen gadget art"
+      },
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/DirtyPenPersonals/comments/1kprcnu/m4f_lets_have_fun_at_work/",
+        "title": "[M4F] let’s have fun at work"
+      }
+    ],
+    "top_suppliers": [],
+    "rejection_reasons": [],
+    "soft_warnings": [],
+    "recommendation": "skip"
+  },
+  {
+    "product_keyword": "trapped toyman",
+    "category": "",
+    "scores": {
+      "demand_velocity": 0.011,
+      "buyer_intent": 0.0,
+      "supplier_availability": 0.3,
+      "content_potential": 0.1,
+      "low_saturation": 0.6,
+      "shipping_simplicity": 0.5,
+      "margin": 0.667,
+      "overall": 0.163
+    },
+    "margin": {
+      "landed_cost": 7.5,
+      "retail_price": 22.5,
+      "platform_fee": 0.95,
+      "ad_cpa_assumed": 12.0,
+      "gross_margin": 15.0,
+      "gross_margin_pct": 0.667,
+      "net_margin": 2.05,
+      "net_margin_pct": 0.091,
+      "break_even_cpa": 14.05,
+      "passes_margin_floor": true,
+      "margin_score": 0.6666666666666665,
+      "estimated": true
+    },
+    "content_hooks": [
+      "problem-solving"
+    ],
+    "buyer_intent_phrases": [],
+    "n_signals": 5,
+    "n_suppliers": 0,
+    "top_social_sources": [
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/snuffrp2/comments/1kq3ve9/f4m_dollification_rp_batgirl_trapped_in_toymans/",
+        "title": "[F4M] Dollification RP Batgirl Trapped in Toyman's Dollhouse"
+      },
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/MindControlRP/comments/1kq362f/f4m_dollification_rp_wonder_woman_trapped_in/",
+        "title": "[F4M] Dollification RP: Wonder Woman Trapped in Toyman's Dollhouse"
+      },
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/Roleplayheaven/comments/1kq2ijp/f4m_dollification_rp_batgirl_trapped_in_toymans/",
+        "title": "[F4M] Dollification RP Batgirl Trapped in Toyman's Dollhouse"
+      }
+    ],
+    "top_suppliers": [],
+    "rejection_reasons": [],
+    "soft_warnings": [],
+    "recommendation": "skip"
+  },
+  {
+    "product_keyword": "playing cards",
+    "category": "",
+    "scores": {
+      "demand_velocity": 0.019,
+      "buyer_intent": 0.0,
+      "supplier_availability": 0.3,
+      "content_potential": 0.0,
+      "low_saturation": 0.6,
+      "shipping_simplicity": 0.5,
+      "margin": 0.667,
+      "overall": 0.151
+    },
+    "margin": {
+      "landed_cost": 11.5,
+      "retail_price": 34.5,
+      "platform_fee": 1.3,
+      "ad_cpa_assumed": 12.0,
+      "gross_margin": 23.0,
+      "gross_margin_pct": 0.667,
+      "net_margin": 9.7,
+      "net_margin_pct": 0.281,
+      "break_even_cpa": 21.7,
+      "passes_margin_floor": true,
+      "margin_score": 0.6666666666666665,
+      "estimated": true
+    },
+    "content_hooks": [],
+    "buyer_intent_phrases": [],
+    "n_signals": 2,
+    "n_suppliers": 0,
+    "top_social_sources": [
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kpk0up/playing_cards_with_my_friends_faces_on_them/",
+        "title": "Playing cards with my friend's faces on them"
+      },
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kpjwc7/custom_playing_cards/",
+        "title": "Custom playing cards"
+      }
+    ],
+    "top_suppliers": [],
+    "rejection_reasons": [],
+    "soft_warnings": [],
+    "recommendation": "skip"
+  },
+  {
+    "product_keyword": "easyjobai",
+    "category": "",
+    "scores": {
+      "demand_velocity": 0.01,
+      "buyer_intent": 0.0,
+      "supplier_availability": 0.3,
+      "content_potential": 0.0,
+      "low_saturation": 0.6,
+      "shipping_simplicity": 0.5,
+      "margin": 0.667,
+      "overall": 0.148
+    },
+    "margin": {
+      "landed_cost": 11.5,
+      "retail_price": 34.5,
+      "platform_fee": 1.3,
+      "ad_cpa_assumed": 12.0,
+      "gross_margin": 23.0,
+      "gross_margin_pct": 0.667,
+      "net_margin": 9.7,
+      "net_margin_pct": 0.281,
+      "break_even_cpa": 21.7,
+      "passes_margin_floor": true,
+      "margin_score": 0.6666666666666665,
+      "estimated": true
+    },
+    "content_hooks": [],
+    "buyer_intent_phrases": [],
+    "n_signals": 2,
+    "n_suppliers": 0,
+    "top_social_sources": [
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/shutupandtakemymoney/comments/1klftiu/easyjobai/",
+        "title": "easyjobai"
+      },
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/shutupandtakemymoney/comments/1klfvtc/easyjobai/",
+        "title": "easyjobai"
+      }
+    ],
+    "top_suppliers": [],
+    "rejection_reasons": [],
+    "soft_warnings": [],
+    "recommendation": "skip"
+  },
+  {
+    "product_keyword": "cut deep",
+    "category": "",
+    "scores": {
+      "demand_velocity": 0.019,
+      "buyer_intent": 0.0,
+      "supplier_availability": 0.3,
+      "content_potential": 0.0,
+      "low_saturation": 0.6,
+      "shipping_simplicity": 0.5,
+      "margin": 0.667,
+      "overall": 0.06
+    },
+    "margin": {
+      "landed_cost": 11.5,
+      "retail_price": 34.5,
+      "platform_fee": 1.3,
+      "ad_cpa_assumed": 12.0,
+      "gross_margin": 23.0,
+      "gross_margin_pct": 0.667,
+      "net_margin": 9.7,
+      "net_margin_pct": 0.281,
+      "break_even_cpa": 21.7,
+      "passes_margin_floor": true,
+      "margin_score": 0.6666666666666665,
+      "estimated": true
+    },
+    "content_hooks": [],
+    "buyer_intent_phrases": [],
+    "n_signals": 3,
+    "n_suppliers": 0,
+    "top_social_sources": [
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kh0nis/just_dropped_this_samurai_tee_cut_deep_walk_quiet/",
+        "title": "Just dropped this Samurai tee: Cut Deep. Walk Quiet. ⚔️ Would you wear this?"
+      },
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kh0lk9/just_dropped_this_samurai_tee_cut_deep_walk_quiet/",
+        "title": "Just dropped this Samurai tee: Cut Deep. Walk Quiet. ⚔️ Would you wear this?"
+      },
+      {
+        "platform": "reddit",
+        "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kh0jja/cut_deep_walk_quiet_samurai_warrior_design/",
+        "title": "Cut Deep. Walk Quiet. – Samurai Warrior Design Graphic T-Shirt"
+      }
+    ],
+    "top_suppliers": [],
+    "rejection_reasons": [
+      "explainability:no_visual_hook_and_long_titles"
+    ],
+    "soft_warnings": [],
+    "recommendation": "reject"
+  }
+]

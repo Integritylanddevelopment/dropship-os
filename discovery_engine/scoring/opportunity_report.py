@@ -20,6 +20,36 @@ Soft warnings get logged in `soft_warnings` without killing the candidate.
 """
 from . import buyer_intent, trend_velocity, content_score, margin_calc, risk_filters
 
+# Category-based supplier cost estimates (USD) for when no live supplier data
+FALLBACK_COSTS = {
+    "light": 4, "lights": 4, "led": 4, "lamp": 6, "strip": 3,
+    "kitchen": 5, "gadget": 5, "tool": 6, "utensil": 3,
+    "pet": 5, "dog": 5, "cat": 5, "collar": 3, "leash": 3, "toy": 2,
+    "fitness": 7, "gym": 8, "yoga": 5, "band": 3, "resistance": 4,
+    "posture": 6, "corrector": 6, "brace": 5, "support": 5,
+    "phone": 3, "case": 2, "charger": 4, "holder": 3, "mount": 4, "stand": 5,
+    "beauty": 5, "skin": 4, "serum": 5, "cream": 4, "mask": 3,
+    "hair": 4, "brush": 3, "organizer": 5, "storage": 5,
+    "speaker": 8, "headphone": 7, "earbuds": 6, "wireless": 6,
+    "watch": 8, "clock": 5, "plant": 4, "planter": 4, "garden": 5,
+    "massage": 8, "gun": 10, "roller": 4, "cleaner": 6, "vacuum": 12,
+    "bottle": 3, "flask": 4, "cup": 3, "mug": 3, "bag": 5, "backpack": 8,
+    "wallet": 4, "pillow": 5, "blanket": 6, "rug": 8, "mat": 4,
+    "camera": 10, "tripod": 6, "pen": 2, "notebook": 3,
+    "fan": 5, "heater": 8, "humidifier": 7,
+}
+FALLBACK_DEFAULT_COST = 6.0  # generic dropship item estimate
+
+def _estimate_supplier_cost(keyword: str) -> float:
+    """Estimate supplier cost from product keyword when no live supplier data."""
+    if not keyword:
+        return FALLBACK_DEFAULT_COST
+    kw = keyword.lower()
+    for term, cost in FALLBACK_COSTS.items():
+        if term in kw:
+            return float(cost)
+    return FALLBACK_DEFAULT_COST
+
 WEIGHTS = {
     "demand_velocity": 0.30,
     "buyer_intent": 0.20,
@@ -30,7 +60,8 @@ WEIGHTS = {
 }
 
 def _supplier_score(suppliers):
-    if not suppliers: return 0.0
+    if not suppliers:
+        return 0.3  # partial credit — product exists but no confirmed supplier yet
     best = min((s.get("unit_cost", 999) for s in suppliers if s.get("unit_cost", 0) > 0), default=999)
     score = 0.5
     if best < 10: score += 0.3
@@ -67,8 +98,16 @@ def build(product_keyword, signals, suppliers, force_retail=None):
             retail_price=force_retail,
         )
     else:
-        margin = {"margin_score": 0, "landed_cost": 0, "retail_price": 0,
-                  "gross_margin": 0, "gross_margin_pct": 0, "passes_margin_floor": False}
+        # Fallback: estimate supplier cost from product category so scoring
+        # still produces meaningful results even without live supplier data.
+        est_cost = _estimate_supplier_cost(product_keyword)
+        margin = margin_calc.compute(
+            supplier_cost=est_cost,
+            shipping_cost=4.00,
+            retail_price=force_retail,
+        )
+        # Flag as estimated so downstream knows
+        margin["estimated"] = True
 
     # HARD AVOID FILTERS
     rejected, rejection_reasons, soft_warnings = risk_filters.evaluate(signals, suppliers, margin)

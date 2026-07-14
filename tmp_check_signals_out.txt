@@ -1,0 +1,26 @@
+Reports: 20
+
+--- tried bunch (4 sig, vel=0.0, bi=0.46, margin_est=True, gm=67%) ---
+  reddit : Tried a Bunch of Diffusers, But This One is Actually Worth It
+  reddit : Tried a Bunch of Diffusers, But This One is Actually Worth It
+  reddit : Tried A Bunch of Diffusers, But This One is Actually Worth It
+
+--- dog bark (3 sig, vel=0.0, bi=0.327, margin_est=True, gm=67%) ---
+  reddit : Does the IRTSVF Anti Barking Device Really Work for Dog Training Revie
+  reddit : Why Choose the Devogue DR01 Dog Bark Deterrent Device Review for Train
+  reddit : Why Should Lifreesia Dog Bark Deterrent Be Your Top Pick Review?
+
+--- mirror (4 sig, vel=0.0, bi=0.26, margin_est=True, gm=67%) ---
+  reddit : Unwanted Guests!
+  reddit : Mirror, mirror, ...
+  reddit : Unwanted Guests!
+
+--- steamy cat (6 sig, vel=0.0, bi=0.0, margin_est=True, gm=67%) ---
+  reddit : Steamy Cat Brush
+  reddit : Steamy Cat Brush
+  reddit : Steamy Cat Brush
+
+--- toilet paper (3 sig, vel=0.0, bi=0.0, margin_est=True, gm=67%) ---
+  reddit : We're out of toilet paper!
+  reddit : We're out of toilet paper!
+  reddit : Elon Musk Toilet Paper

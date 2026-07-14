@@ -1,0 +1,21 @@
+[+] Google Trends: 10
+[+] r/shutupandtakemymoney: 15
+[+] r/INEEEEDIT: 15
+[+] kw 'kitchen gadget': 10
+[+] kw 'pet accessory': 10
+[+] kw 'led lights': 10
+
+70 raw -> 65 unique in 57s
+
+Signal ages: min=421d, max=486d, median=422d
+5 clusters
+
+#   Keyword                 Score   Vel   Int   Cnt   Mrg Rec       N
+---------------------------------------------------------------------
+1   kitchen                 0.243 0.019 0.460 0.000 0.667 skip      2
+2   trapped toyman          0.163 0.011 0.000 0.100 0.667 skip      5
+3   playing cards           0.151 0.019 0.000 0.000 0.667 skip      2
+4   easyjobai               0.148 0.010 0.000 0.000 0.667 skip      2
+5   cut deep                0.060 0.019 0.000 0.000 0.667 reject    3
+
+Saved. Total: 57s
