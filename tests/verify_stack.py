@@ -1,65 +1,61 @@
-import os
-try:
-    from dotenv import load_dotenv
-    load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
-except ImportError:
-    pass
+"""verify_stack.py - ShipStack stack verification (Docker-on-ALIEN edition, 2026-07-12).
 
-import requests, json, sys
+Checks every ShipStack container endpoint on ALIEN, the Quinn bridge, and the
+GRUNT Qdrant collections. Exits 0 only when all required checks pass.
+"""
+import sys
+import urllib.request
+import json
 
-print("=== ShipStack AI Stack Verify ===")
+ALIEN = "100.66.135.31"
+GRUNT = "100.124.162.86"
 
-_QUINN_HOST   = os.getenv("QUINN_HOST", "127.0.0.1")
-_QUINN_PORT   = os.getenv("QUINN_BRIDGE_PORT", "8765")
-_NGROK_HOST   = os.getenv("NGROK_HOST", "127.0.0.1")
-_NGROK_PORT   = os.getenv("NGROK_PORT", "4040")
-_QDRANT_HOST  = os.getenv("QDRANT_HOST", "127.0.0.1")
-_QDRANT_PORT  = os.getenv("QDRANT_PORT", "6333")
+REQUIRED = [
+    ("ShipStack Engine",    f"http://{ALIEN}:8889/health"),
+    ("Prometheus Engine",   f"http://{ALIEN}:8766/health"),
+    ("Social AI Agent",     f"http://{ALIEN}:8867/health"),
+    ("ShipStack Dashboard", f"http://{ALIEN}:8890/"),
+    ("Pipeline Dashboard",  f"http://{ALIEN}:8891/"),
+    ("Quinn Bridge",        f"http://{ALIEN}:8765/health"),
+]
 
-# 1. Local Quinn
-try:
-    r = requests.get(f"http://{_QUINN_HOST}:{_QUINN_PORT}/stats", timeout=5)
-    d = r.json()
-    print(f"[OK] Quinn bridge: port {_QUINN_PORT} responding, {d.get('total_vectors', 0)} total vectors")
-except Exception as e:
-    print(f"[FAIL] Quinn bridge: {e}")
+OPTIONAL = [
+    ("Context Injector (PRIME)", "http://127.0.0.1:4001/health"),
+]
 
-# 2. ngrok tunnel
-try:
-    r2 = requests.get(f"http://{_NGROK_HOST}:{_NGROK_PORT}/api/tunnels", timeout=5)
-    tunnels = r2.json().get("tunnels", [])
-    url = next((t["public_url"] for t in tunnels if t.get("proto") == "https"), None)
-    print(f"[OK] ngrok tunnel: {url}" if url else "[FAIL] ngrok: no https tunnel")
-except Exception as e:
-    print(f"[FAIL] ngrok: {e}")
+QDRANT_COLLECTIONS = ["dropship_intel", "strategy_books", "general_knowledge"]
 
-# 3. Vercel metrics
-try:
-    r3 = requests.get("https://dropship-os-hazel.vercel.app/api/metrics", timeout=15)
-    d3 = r3.json()
-    print(f"[OK] Vercel metrics: stripe={d3.get('stripe')}, qdrant={d3.get('qdrant')}")
-except Exception as e:
-    print(f"[FAIL] Vercel metrics: {e}")
+def fetch(url, timeout=6):
+    req = urllib.request.Request(url, headers={"User-Agent": "verify"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.status, r.read()
 
-# 4. Qdrant counts
-try:
-    for col in ["general_knowledge", "dropship_intel", "strategy_books"]:
-        r4 = requests.get(f"http://{_QDRANT_HOST}:{_QDRANT_PORT}/collections/{col}", timeout=5)
-        pts = r4.json()["result"]["points_count"]
-        status = "[OK]" if pts > 0 else "[WARN]"
-        print(f"{status} Qdrant {col}: {pts} vectors")
-except Exception as e:
-    print(f"[FAIL] Qdrant: {e}")
+def main():
+    print("=== ShipStack Stack Verify (Docker on ALIEN) ===")
+    failures = 0
+    for name, url in REQUIRED:
+        try:
+            status, _ = fetch(url)
+            print(f"[OK] {name}: {status} {url}")
+        except Exception as e:
+            print(f"[FAIL] {name}: {e} {url}")
+            failures += 1
+    for name, url in OPTIONAL:
+        try:
+            status, _ = fetch(url)
+            print(f"[OK] {name}: {status}")
+        except Exception as e:
+            print(f"[WARN] {name}: {e}")
+    for col in QDRANT_COLLECTIONS:
+        try:
+            status, body = fetch(f"http://{GRUNT}:6333/collections/{col}")
+            pts = json.loads(body)["result"].get("points_count", 0)
+            tag = "[OK]" if pts and pts > 0 else "[WARN]"
+            print(f"{tag} Qdrant {col}: {pts} vectors")
+        except Exception as e:
+            print(f"[WARN] Qdrant {col}: {e}")
+    print("RESULT: " + ("PASS" if failures == 0 else f"FAIL ({failures} required checks failed)"))
+    return 0 if failures == 0 else 1
 
-# 5. Task scheduler
-import subprocess
-result = subprocess.run(
-    ["schtasks", "/query", "/tn", "Dropship_OS_DecisionEngine"],
-    capture_output=True, text=True
-)
-if result.returncode == 0:
-    print("[OK] Task scheduler: Dropship_OS_DecisionEngine registered")
-else:
-    print("[FAIL] Task scheduler: not found")
-
-print("=== Done ===")
+if __name__ == "__main__":
+    sys.exit(main())

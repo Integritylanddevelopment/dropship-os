@@ -162,3 +162,10 @@ ShipStack is a dropshipping discovery and automation platform with a dual-stack 
 - **Video:** ffmpeg, edge_tts, Pexels/Pixabay APIs, Runway ML, ElevenLabs
 - **Deployment:** Vercel (frontend/API), PowerShell launchers (local services)
 - **Package managers:** npm (Node deps), pip (Python deps via requirements.txt)
+
+## CREATIVE SOLUTION LOG - 2026-07-12 (Dockerization session)
+- ALIEN worker (quinn_worker_exec) returned fabricated file-write receipts; nothing executed. Interim rule: worker_exec = text drafting only; ALL execution via quinn_run_powershell + PSRemote to ALIEN with disk verification afterward.
+- Docker Desktop credential helper (docker-credential-desktop) fails in non-interactive PSRemote sessions ('logon session does not exist'). Workaround: build FROM locally cached python:3.12-slim with DOCKER_BUILDKIT=0; never rely on registry pulls from remote sessions.
+- Set-Content -Encoding UTF8 writes a BOM that breaks Dockerfiles; write files with [System.IO.File]::WriteAllText + UTF8Encoding(false).
+- Context Injector had been down since 2026-06-24: BOM in config.json crashed injector.py json.load at boot. Fixed with encoding='utf-8-sig'.
+- Flask/socketserver services must bind 0.0.0.0 inside containers (mapped ports refuse external connections on 127.0.0.1 binds).

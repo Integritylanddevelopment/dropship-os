@@ -244,4 +244,4 @@ if __name__ == "__main__":
     print(f"Prometheus Engine starting on http://127.0.0.1:{PORT}")
     print(f"  ffmpeg: {_ffmpeg_bin() or 'NOT FOUND'}")
     print(f"  output: {OUTPUT_ROOT}")
-    app.run(host="127.0.0.1", port=PORT, threaded=True, use_reloader=False)
+    app.run(host="0.0.0.0", port=PORT, threaded=True, use_reloader=False)

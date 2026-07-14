@@ -12,7 +12,7 @@ DECISIONS = STATE / "decisions.json"
 MEDIA_KITS = STATE / "media_kits.json"
 COLLATERAL_JOBS_FILE = STATE / "collateral_jobs.json"
 PORT = 8891
-PROMETHEUS_URL = "http://127.0.0.1:8766"
+PROMETHEUS_URL = "http://prometheus-engine:8766"  # container DNS 2026-07-12
 HTML_PATH = pathlib.Path(__file__).parent / "_pipe_dash.html"
 
 # media_gen + social_push + content_calendar + collateral_scraper live next to this file
@@ -584,6 +584,6 @@ class H(http.server.BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    with socketserver.TCPServer(("127.0.0.1", PORT), H) as httpd:
+    with socketserver.TCPServer(("0.0.0.0", PORT), H) as httpd:
         print(f"ShipStack Pipeline Dashboard on http://127.0.0.1:{PORT}", flush=True)
         httpd.serve_forever()

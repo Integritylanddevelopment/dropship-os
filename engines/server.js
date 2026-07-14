@@ -37,7 +37,7 @@ const routes = {
 
 Object.entries(routes).forEach(([route, file]) => {
   app.get(route, (req, res) => {
-    res.sendFile(path.join(__dirname, file));
+    res.sendFile(path.join(__dirname, '..', 'frontend', file));
   });
 });
 
@@ -109,7 +109,7 @@ async function loadHandlers() {
 
 // SPA fallback
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
 // Startup

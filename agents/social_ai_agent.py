@@ -597,4 +597,4 @@ if __name__ == '__main__':
     print(f"[social_ai_agent] Configured platforms: {configured or 'none'}")
     print(f"[social_ai_agent] Quinn bridge: {QUINN_CHAT_URL}")
 
-    app.run(host='127.0.0.1', port=8867, debug=False, use_reloader=False)
+    app.run(host='0.0.0.0', port=8867, debug=False, use_reloader=False)
