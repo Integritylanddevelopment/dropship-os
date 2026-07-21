@@ -32,10 +32,14 @@ DEFAULT_KEYWORDS = ["pet accessories", "kitchen gadget", "fitness", "home decor"
 DEFAULT_AMAZON_CATS = ["pet-supplies", "home-garden", "kitchen", "beauty", "health-personal-care"]
 
 
-def collect_all_signals(subreddits=None, keywords=None, amazon_cats=None, verbose=True) -> list:
+def collect_all_signals(subreddits=None, keywords=None, amazon_cats=None, verbose=True, fast=False) -> list:
+    """fast=True -> Reddit + Google Trends only (skips youtube/etsy/pinterest/amazon).
+    Cuts a full scan from ~8 min to ~90 sec for interactive UI runs."""
     subreddits = subreddits if subreddits is not None else DEFAULT_SUBREDDITS
     keywords = keywords if keywords is not None else DEFAULT_KEYWORDS
     amazon_cats = amazon_cats if amazon_cats is not None else DEFAULT_AMAZON_CATS
+    if fast:
+        amazon_cats = []
     out = []
     # randomize batch order so we don't always hit hosts in the same sequence
     subreddits = list(subreddits); random.shuffle(subreddits)
@@ -56,20 +60,21 @@ def collect_all_signals(subreddits=None, keywords=None, amazon_cats=None, verbos
             out.extend(sigs); _log(f"reddit kw '{kw}': {len(sigs)}")
         except Exception as e: _log(f"reddit kw '{kw}' FAIL: {e}")
 
-        try:
-            sigs = youtube_signals.collect_keyword(kw, limit=15)
-            out.extend(sigs); _log(f"youtube '{kw}': {len(sigs)}")
-        except Exception as e: _log(f"youtube '{kw}' FAIL: {e}")
+        if not fast:
+            try:
+                sigs = youtube_signals.collect_keyword(kw, limit=15)
+                out.extend(sigs); _log(f"youtube '{kw}': {len(sigs)}")
+            except Exception as e: _log(f"youtube '{kw}' FAIL: {e}")
 
-        try:
-            sigs = etsy_trending.collect_keyword(kw, limit=15)
-            out.extend(sigs); _log(f"etsy '{kw}': {len(sigs)}")
-        except Exception as e: _log(f"etsy '{kw}' FAIL: {e}")
+            try:
+                sigs = etsy_trending.collect_keyword(kw, limit=15)
+                out.extend(sigs); _log(f"etsy '{kw}': {len(sigs)}")
+            except Exception as e: _log(f"etsy '{kw}' FAIL: {e}")
 
-        try:
-            sigs = pinterest_signals.collect_keyword(kw, limit=15)
-            out.extend(sigs); _log(f"pinterest '{kw}': {len(sigs)}")
-        except Exception as e: _log(f"pinterest '{kw}' FAIL: {e}")
+            try:
+                sigs = pinterest_signals.collect_keyword(kw, limit=15)
+                out.extend(sigs); _log(f"pinterest '{kw}': {len(sigs)}")
+            except Exception as e: _log(f"pinterest '{kw}' FAIL: {e}")
 
     for cat in amazon_cats:
         try:
@@ -77,10 +82,11 @@ def collect_all_signals(subreddits=None, keywords=None, amazon_cats=None, verbos
             out.extend(sigs); _log(f"amazon-movers {cat}: {len(sigs)}")
         except Exception as e: _log(f"amazon-movers {cat} FAIL: {e}")
 
-    try:
-        sigs = etsy_trending.collect_trending(limit=20)
-        out.extend(sigs); _log(f"etsy /trending: {len(sigs)}")
-    except Exception as e: _log(f"etsy /trending FAIL: {e}")
+    if not fast:
+        try:
+            sigs = etsy_trending.collect_trending(limit=20)
+            out.extend(sigs); _log(f"etsy /trending: {len(sigs)}")
+        except Exception as e: _log(f"etsy /trending FAIL: {e}")
 
     try:
         sigs = google_trends.collect_daily(geo="US")
@@ -112,9 +118,9 @@ def find_suppliers(keyword: str, verbose=True) -> list:
 
 def run(subreddits=None, keywords=None, amazon_cats=None, max_clusters=30,
         min_cluster_size=2, verbose=True, out_path=None, with_suppliers=True,
-        progress_cb=None) -> dict:
+        progress_cb=None, fast=False) -> dict:
     t0 = time.time()
-    signals = collect_all_signals(subreddits, keywords, amazon_cats, verbose=verbose)
+    signals = collect_all_signals(subreddits, keywords, amazon_cats, verbose=verbose, fast=fast)
     if verbose: print(f"[pipeline] {len(signals)} total signals collected", flush=True)
 
     # Dedup by signal ID (same post can appear from subreddit + keyword searches)

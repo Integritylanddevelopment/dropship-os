@@ -59,7 +59,60 @@ mirror magnifying
 scale thermometer
 umbrella raincoat
 fan heater humidifier
+wellness sauna therapy sleep tracker compression patch
+insole knee wrist ankle elbow shoulder
+diffuser aromatherapy essential oil
+yard sprinkler hose mower trimmer rake shovel
+grill firepit patio deck birdhouse
+tent tarp lantern flashlight headlamp binoculars
+camping hammock cooler thermos canteen
+decoy camo blind stand rangefinder
+fishing lure rod reel tackle
+bike helmet gloves goggles
+stroller carrier crib bassinet
+blender juicer airfryer skillet
+humidifier purifier dehumidifier
+doormat curtain blinds
+keychain lanyard carabiner
 """.split())
+
+# Words that are NEVER valid product keywords on their own
+KEYWORD_JUNK = set("""
+wrong tried bunch dropshipping shopify amazon ebay etsy tiktok reddit
+apple google pay cash app store online shipping free sale deal
+review reviews rating unboxing haul favorite favorites
+question advice suggestion recommendation experience story
+update news today yesterday week month year daily
+guys folks everyone people person friend family
+work works working worked school job money price cost
+issue problem broken fixed error fail
+happy sad angry funny weird crazy cool nice
+america american usa china chinese
+temu coupon coupons promo wish alibaba
+nerd nerdy geek fell girl guy woman man
+f4a f4m m4a a4a activities tips learn
+selling buying trading pick picks
+rtx gpu nvidia amd intel ps5 xbox
+""".split())
+
+
+def _is_valid_keyword(kw: str, titles: list[str]) -> bool:
+    """A usable product keyword is a bigram, a known product term, or a
+    substantial token that appears across multiple signal titles."""
+    if not kw:
+        return False
+    parts = kw.split()
+    if any(p in KEYWORD_JUNK for p in parts):
+        return False
+    if len(parts) >= 2:
+        return True  # bigrams are usually real product phrases
+    tok = parts[0]
+    if tok in PRODUCT_TERMS:
+        return True
+    if len(tok) < 5:
+        return False
+    hits = sum(1 for t in titles if tok in t.lower())
+    return hits >= 2
 
 
 def _tokenize(s: str) -> set[str]:

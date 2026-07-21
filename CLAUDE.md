@@ -163,6 +163,23 @@ ShipStack is a dropshipping discovery and automation platform with a dual-stack 
 - **Deployment:** Vercel (frontend/API), PowerShell launchers (local services)
 - **Package managers:** npm (Node deps), pip (Python deps via requirements.txt)
 
+## Mission Control (added 2026-07-21)
+
+One-button UI at **http://127.0.0.1:8889/** (served by shipstack_engine.py). Desktop shortcut: "ShipStack Mission Control.lnk" → LAUNCH_MISSION_CONTROL.pyw (kills stale ports, starts engine+social+prometheus locally, opens browser). Backend: `engines/mission_pipeline.py` background thread; routes `/api/pipeline/start`, `/api/pipeline/status`, `/api/services`, `/cards/<file>`. Stages: services → discover → pick → content → host → post. UI runs use `fast=True` discovery (Reddit+Trends only, ~90-110s). Card images pushed to public GitHub repo via `integrations/github_image_host.py` → raw.githubusercontent.com URLs for Pinterest.
+
+**Blockers needing Alex's accounts (code cannot fix):**
+- Pinterest app is TRIAL tier → API error code 29 blocks production pins. Request Standard access at developers.pinterest.com/apps.
+- Reddit blocks unauthenticated JSON (403) and Pullpush data is frozen ~2023 → need Reddit OAuth app for live trend signals.
+- TikTok OAuth incomplete; Meta/Instagram credentials empty.
+
+## CREATIVE SOLUTION LOG - 2026-07-21 (Mission Control session)
+- Pinterest fake-success bug: API errors return {"code":29,"message":...} with HTTP 200 path through poster; social agent checked only for "error" key. Rule: a real pin ALWAYS has "id" — no id = failure. Fixed in agents/social_ai_agent.py + engines/mission_pipeline.py.
+- Pullpush.io (Pushshift mirror) data frozen ~2023 (421+ day old posts). trend_velocity falls back to engagement-based scoring (avg score/comments, capped 0.4) when no signal is <14d old.
+- Pinterest needs PUBLIC image URLs: upload cards via GitHub Contents API (PUT /repos/{u}/{r}/contents/...) to the public dropship-os repo; raw.githubusercontent.com URL is instantly fetchable.
+- Junk cluster keywords ("Wrong", "Tried Bunch"): _is_valid_keyword() in clusterer.py requires bigram OR known PRODUCT_TERM OR ≥5-char token appearing in ≥2 titles; KEYWORD_JUNK blocklist kills platform words.
+- Query-scoped discovery: when the UI gets a niche query, skip generic subreddits entirely and search only query variants — stops "Tickle Toes" polluting "pet accessories" runs.
+- Quinn PS calls that take >~8s often return MCP timeout even though the command RAN. Pattern: fire Start-Process (it launches despite the timeout), then verify with a short follow-up call instead of retrying the launch.
+
 ## CREATIVE SOLUTION LOG - 2026-07-12 (Dockerization session)
 - ALIEN worker (quinn_worker_exec) returned fabricated file-write receipts; nothing executed. Interim rule: worker_exec = text drafting only; ALL execution via quinn_run_powershell + PSRemote to ALIEN with disk verification afterward.
 - Docker Desktop credential helper (docker-credential-desktop) fails in non-interactive PSRemote sessions ('logon session does not exist'). Workaround: build FROM locally cached python:3.12-slim with DOCKER_BUILDKIT=0; never rely on registry pulls from remote sessions.

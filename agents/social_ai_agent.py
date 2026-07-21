@@ -221,10 +221,20 @@ def post_pinterest():
         if "error" in result:
             return jsonify(result), 400
 
+        # Pinterest API errors come back as {"code": N, "message": "..."} with NO id.
+        # A real created pin always has an "id". Anything else is a failure.
+        if not result.get("id"):
+            return jsonify({
+                "error": result.get("message", f"Pin not created: {result}"),
+                "code": result.get("code"),
+                "platform": "pinterest",
+            }), 400
+
         return jsonify({
             "status": "posted",
             "platform": "pinterest",
             "result": result,
+            "pin_url": f"https://www.pinterest.com/pin/{result['id']}/",
             "timestamp": datetime.now(timezone.utc).isoformat(),
         })
     except Exception as e:

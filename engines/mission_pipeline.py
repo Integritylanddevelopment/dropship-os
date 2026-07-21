@@ -156,9 +156,14 @@ def _do_run(query, platforms, limit, dry_run):
     from discovery_engine import pipeline as dpipe
 
     kwargs = {"verbose": False, "with_suppliers": False, "max_clusters": 20,
+              "fast": True,
               "progress_cb": lambda m: _stage("discover", "running", m)}
     if query:
-        kwargs["keywords"] = [query] if isinstance(query, str) else query
+        q = query if isinstance(query, str) else " ".join(query)
+        # Query runs: search ONLY the requested niche (skip generic subreddits)
+        # so every signal relates to what Alex asked for.
+        kwargs["keywords"] = [q, f"best {q}", f"{q} gadget"]
+        kwargs["subreddits"] = []
 
     result = dpipe.run(**kwargs)
     reports = result.get("reports", [])
@@ -169,9 +174,21 @@ def _do_run(query, platforms, limit, dry_run):
 
     # STAGE 3: pick winners
     _stage("pick", "running")
-    viable = [r for r in reports if r.get("recommendation") not in ("reject",)]
+    from discovery_engine.scoring.clusterer import _is_valid_keyword
+    viable = []
+    for r in reports:
+        if r.get("recommendation") == "reject":
+            continue
+        titles = [s.get("title") or "" for s in r.get("top_social_sources", [])]
+        if not _is_valid_keyword(r.get("product_keyword", ""), titles):
+            _log(f"dropped junk keyword: '{r.get('product_keyword')}'")
+            continue
+        viable.append(r)
     viable.sort(key=lambda r: r["scores"]["overall"], reverse=True)
     winners = viable[:limit]
+
+    if not winners:
+        raise RuntimeError("No viable product keywords survived filtering — try a more specific niche")
 
     products = []
     for w in winners:
@@ -279,16 +296,18 @@ def _do_run(query, platforms, limit, dry_run):
                                 "link": LANDING_URL,
                             }, timeout=45)
                             body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
-                            if r.ok and body.get("status") == "posted":
+                            pin_id = (body.get("result") or {}).get("id", "")
+                            if r.ok and body.get("status") == "posted" and pin_id:
                                 entry["status"] = "posted"
-                                pin = body.get("result", {})
-                                pin_id = pin.get("id") or pin.get("data", {}).get("id", "")
-                                if pin_id:
-                                    entry["url"] = f"https://www.pinterest.com/pin/{pin_id}/"
+                                entry["url"] = body.get("pin_url") or f"https://www.pinterest.com/pin/{pin_id}/"
                                 entry["detail"] = "live on Pinterest"
                             else:
                                 entry["status"] = "failed"
-                                entry["detail"] = str(body.get("error", r.text[:150]))
+                                msg = str(body.get("error", r.text[:150]))
+                                if "Trial access" in msg:
+                                    msg = ("Pinterest app is in TRIAL mode - Pinterest blocks real pins until "
+                                           "you request Standard access at developers.pinterest.com/apps")
+                                entry["detail"] = msg
                     elif platform == "youtube":
                         entry["status"] = "skipped"
                         entry["detail"] = "needs video — run Prometheus video job first"

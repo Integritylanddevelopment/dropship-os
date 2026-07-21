@@ -1,0 +1,169 @@
+{
+  "generated_at": "2026-07-21T22:20:58.886327+00:00",
+  "count": 5,
+  "products": [
+    {
+      "product_id": "guide",
+      "title": "Guide",
+      "keyword": "guide",
+      "score": 0.249,
+      "margin_pct": 0.667,
+      "retail_price": 34.5,
+      "recommendation": "skip",
+      "hooks": [
+        "visual-demo"
+      ],
+      "intent": [
+        "recommend"
+      ],
+      "n_signals": 2,
+      "sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/carinfonews/comments/1kf8s1u/best_car_lighter_adapter_guide_2025_power_up/",
+          "title": "Best Car Lighter Adapter Guide 2025: Power Up Devices"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BeautifulDayStore3/comments/1kpz83t/best_small_power_inverter_2025_top_reviews_guide/",
+          "title": "Best Small Power Inverter 2025: Top Reviews & Guide"
+        }
+      ],
+      "card_path": null,
+      "card_url": null
+    },
+    {
+      "product_id": "roof_rack",
+      "title": "Roof Rack",
+      "keyword": "roof rack",
+      "score": 0.246,
+      "margin_pct": 0.667,
+      "retail_price": 34.5,
+      "recommendation": "skip",
+      "hooks": [
+        "giftable",
+        "problem-solving",
+        "visual-demo"
+      ],
+      "intent": [
+        "recommend"
+      ],
+      "n_signals": 3,
+      "sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BeautifulDayStore3/comments/1kq46at/best_rav4_roof_rack_2025_top_picks_expert_buying/",
+          "title": "Best RAV4 Roof Rack 2025: Top Picks & Expert Buying Guide"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BeautifulDayStore3/comments/1kq1t13/best_jeep_jku_roof_rack_2025_reviews_guide/",
+          "title": "Best Jeep JKU Roof Rack [2025]: Reviews & Guide"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BeautifulDayStore3/comments/1kpwv8e/best_trailer_hitch_ball_receiver_2025_expert/",
+          "title": "Best Trailer Hitch Ball Receiver [2025]: Expert Buying Guide"
+        }
+      ],
+      "card_path": null,
+      "card_url": null
+    },
+    {
+      "product_id": "bulandshahr",
+      "title": "Bulandshahr",
+      "keyword": "bulandshahr",
+      "score": 0.239,
+      "margin_pct": 0.667,
+      "retail_price": 34.5,
+      "recommendation": "skip",
+      "hooks": [],
+      "intent": [
+        "looking for a"
+      ],
+      "n_signals": 2,
+      "sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/Bulandshahr/comments/1kqazyj/smalltown_surprise_great_detailing_service_in/",
+          "title": "Small-town surprise: Great detailing service in Bulandshahr"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/Bulandshahr/comments/1kqazfl/best_place_in_bulandshahr_for_car_detailing/",
+          "title": "Best place in Bulandshahr for car detailing?"
+        }
+      ],
+      "card_path": null,
+      "card_url": null
+    },
+    {
+      "product_id": "considering_flagship",
+      "title": "Considering Flagship",
+      "keyword": "considering flagship",
+      "score": 0.185,
+      "margin_pct": 0.667,
+      "retail_price": 34.5,
+      "recommendation": "skip",
+      "hooks": [
+        "problem-solving",
+        "visual-demo"
+      ],
+      "intent": [],
+      "n_signals": 6,
+      "sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/Smartphones/comments/1kpn8zz/considering_new_flagship_android_mobile_phones/",
+          "title": "Considering new flagship Android mobile phones"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/Smartphones/comments/1kpr4he/considering_new_flagship_android_mobile_phones/",
+          "title": "Considering new flagship Android mobile phones"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/phones/comments/1kpr93w/considering_new_flagship_android_mobile_phones/",
+          "title": "Considering new flagship Android mobile phones"
+        }
+      ],
+      "card_path": null,
+      "card_url": null
+    },
+    {
+      "product_id": "license_plate",
+      "title": "License Plate",
+      "keyword": "license plate",
+      "score": 0.178,
+      "margin_pct": 0.667,
+      "retail_price": 34.5,
+      "recommendation": "skip",
+      "hooks": [
+        "problem-solving",
+        "visual-demo"
+      ],
+      "intent": [],
+      "n_signals": 3,
+      "sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/TravelTwo/comments/1kqb2z2/best_carbon_fiber_license_plate_frame_2025/",
+          "title": "Best Carbon Fiber License Plate Frame 2025: Reviews & Guide"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BeautifulDayStore3/comments/1kq43la/best_red_license_plate_frame_2025_shop_now/",
+          "title": "Best Red License Plate Frame 2025: Shop Now!"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/BeautifulDayStore3/comments/1kpnka0/best_snoopy_license_plate_frame_2025_show_your/",
+          "title": "Best Snoopy License Plate Frame [2025]: Show Your Style!"
+        }
+      ],
+      "card_path": null,
+      "card_url": null
+    }
+  ]
+}
