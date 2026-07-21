@@ -111,7 +111,8 @@ def find_suppliers(keyword: str, verbose=True) -> list:
 
 
 def run(subreddits=None, keywords=None, amazon_cats=None, max_clusters=30,
-        min_cluster_size=2, verbose=True, out_path=None) -> dict:
+        min_cluster_size=2, verbose=True, out_path=None, with_suppliers=True,
+        progress_cb=None) -> dict:
     t0 = time.time()
     signals = collect_all_signals(subreddits, keywords, amazon_cats, verbose=verbose)
     if verbose: print(f"[pipeline] {len(signals)} total signals collected", flush=True)
@@ -135,10 +136,13 @@ def run(subreddits=None, keywords=None, amazon_cats=None, max_clusters=30,
     if verbose: print(f"[pipeline] {len(clusters)} clusters >= {min_cluster_size} signals", flush=True)
 
     reports = []
-    for c in clusters:
+    for ci, c in enumerate(clusters):
         kw = clusterer.cluster_keyword(c)
         if not kw: continue
-        suppliers = find_suppliers(kw, verbose=verbose)
+        if progress_cb:
+            try: progress_cb(f"scoring '{kw}' ({ci+1}/{len(clusters)})")
+            except Exception: pass
+        suppliers = find_suppliers(kw, verbose=verbose) if with_suppliers else []
         rpt = opportunity_report.build(kw, c, suppliers)
         reports.append(rpt)
 

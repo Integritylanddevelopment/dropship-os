@@ -37,7 +37,7 @@ logging.basicConfig(
 logger = logging.getLogger("shipstack_engine")
 
 # ── Flask ────────────────────────────────────────────────────────────────
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file, send_from_directory
 
 app = Flask(__name__)
 
@@ -126,6 +126,84 @@ def _require(subsystem, name: str):
             "detail": f"The {name} subsystem failed to import. Check server logs.",
         }), 503
     return None
+
+
+# ── Mission Control (one-button pipeline UI) ─────────────────────────────
+
+mission_pipeline = None
+try:
+    from engines import mission_pipeline
+    logger.info("Mission pipeline loaded")
+except Exception as e:
+    logger.warning(f"Mission pipeline unavailable: {e}")
+
+FRONTEND_DIR = SHIPSTACK_ROOT / "frontend"
+CARDS_DIR = SHIPSTACK_ROOT / "pinterest_cards"
+
+
+@app.route("/", methods=["GET"])
+def mission_control_ui():
+    """Serve the Mission Control interface."""
+    ui = FRONTEND_DIR / "mission_control.html"
+    if ui.exists():
+        return send_file(str(ui))
+    return jsonify({"error": "mission_control.html not found", "hint": str(ui)}), 404
+
+
+@app.route("/cards/<path:filename>", methods=["GET"])
+def serve_card(filename):
+    """Serve generated card images for UI preview."""
+    return send_from_directory(str(CARDS_DIR), filename)
+
+
+@app.route("/api/pipeline/start", methods=["POST"])
+def api_pipeline_start():
+    err = _require(mission_pipeline, "Mission pipeline")
+    if err:
+        return err
+    body = request.get_json(silent=True) or {}
+    result = mission_pipeline.start_run(
+        query=body.get("query") or None,
+        platforms=body.get("platforms") or ["pinterest"],
+        limit=int(body.get("limit", 5)),
+        dry_run=bool(body.get("dry_run", False)),
+    )
+    return jsonify(result), (200 if result.get("ok") else 409)
+
+
+@app.route("/api/pipeline/status", methods=["GET"])
+def api_pipeline_status():
+    err = _require(mission_pipeline, "Mission pipeline")
+    if err:
+        return err
+    return jsonify(mission_pipeline.get_status())
+
+
+@app.route("/api/services", methods=["GET"])
+def api_services():
+    """Health check across all ShipStack services for the UI status bar."""
+    import requests as _rq
+    services = {
+        "engine": {"url": f"http://127.0.0.1:{PORT}", "up": True},
+        "social": {"url": "http://127.0.0.1:8867", "up": False},
+        "prometheus": {"url": "http://127.0.0.1:8766", "up": False},
+        "quinn": {"url": "http://127.0.0.1:8765", "up": False},
+    }
+    for name in ("social", "prometheus", "quinn"):
+        try:
+            r = _rq.get(f"{services[name]['url']}/health", timeout=3)
+            services[name]["up"] = r.ok
+        except Exception:
+            services[name]["up"] = False
+    # platform posting readiness
+    platforms = {
+        "pinterest": bool(os.getenv("PINTEREST_ACCESS_TOKEN")),
+        "youtube": all([os.getenv("YOUTUBE_CLIENT_ID"), os.getenv("YOUTUBE_CLIENT_SECRET"), os.getenv("YOUTUBE_REFRESH_TOKEN")]),
+        "tiktok": bool(os.getenv("TIKTOK_ACCESS_TOKEN")),
+        "instagram": bool(os.getenv("META_ACCESS_TOKEN")),
+    }
+    hosting = all([os.getenv("GITHUB_TOKEN"), os.getenv("GITHUB_USERNAME"), os.getenv("GITHUB_PAGES_REPO")])
+    return jsonify({"services": services, "platforms": platforms, "image_hosting": hosting})
 
 
 # ── Routes ───────────────────────────────────────────────────────────────

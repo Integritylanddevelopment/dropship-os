@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipStack Mission Control</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --panel: #121826;
+    --panel2: #1a2234;
+    --border: #232d42;
+    --text: #e6ecf7;
+    --muted: #8b97ad;
+    --accent: #38bdf8;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --violet: #a78bfa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* Header */
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 46px; height: 46px; border-radius: 12px;
+    background: linear-gradient(135deg, #38bdf8, #a78bfa);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800; color: #0b0f17;
+  }
+  .brand h1 { font-size: 22px; letter-spacing: 0.5px; }
+  .brand small { color: var(--muted); display: block; font-size: 12px; font-weight: 400; }
+  .statusbar { display: flex; gap: 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; background: #555; }
+  .dot.up { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot.down { background: var(--red); }
+
+  /* Launch panel */
+  .launch {
+    background: linear-gradient(180deg, var(--panel), var(--panel2));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px;
+    margin-bottom: 22px;
+  }
+  .launch-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .big-btn {
+    background: linear-gradient(135deg, #06b6d4, #38bdf8);
+    color: #04121c;
+    border: none;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 20px 46px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+    box-shadow: 0 6px 24px rgba(56, 189, 248, .35);
+  }
+  .big-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(56,189,248,.5); }
+  .big-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .field input[type=text] {
+    background: #0d1420; border: 1px solid var(--border); color: var(--text);
+    padding: 12px 14px; border-radius: 10px; font-size: 15px; width: 260px;
+  }
+  .field input:focus { outline: none; border-color: var(--accent); }
+  .plats { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    display: flex; align-items: center; gap: 7px;
+    background: #0d1420; border: 1px solid var(--border);
+    padding: 9px 14px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    user-select: none; transition: border-color .12s;
+  }
+  .chip input { accent-color: var(--accent); }
+  .chip.on { border-color: var(--accent); color: var(--accent); }
+  .chip.disabled { opacity: .4; cursor: not-allowed; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+  /* Stages */
+  .stages {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 22px;
+  }
+  @media (max-width: 900px) { .stages { grid-template-columns: repeat(3, 1fr); } }
+  .stage {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px; text-align: center; position: relative; min-height: 96px;
+  }
+  .stage .icon { font-size: 22px; margin-bottom: 6px; }
+  .stage .name { font-size: 12px; font-weight: 600; }
+  .stage .detail { font-size: 10.5px; color: var(--muted); margin-top: 5px; line-height: 1.35; word-break: break-word; }
+  .stage.pending { opacity: .5; }
+  .stage.running { border-color: var(--accent); box-shadow: 0 0 14px rgba(56,189,248,.18); }
+  .stage.done { border-color: rgba(52,211,153,.5); }
+  .stage.error { border-color: var(--red); }
+  .spinner {
+    width: 20px; height: 20px; border: 3px solid rgba(56,189,248,.25);
+    border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 6px;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Panels */
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    padding: 22px; margin-bottom: 22px;
+  }
+  .panel h2 { font-size: 15px; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+
+  /* Products */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .card img { width: 100%; height: 190px; object-fit: cover; background: #0d1420; }
+  .card .noimg { width: 100%; height: 120px; display:flex; align-items:center; justify-content:center; color: var(--muted); font-size: 13px; background: #0d1420; }
+  .card .body { padding: 14px 16px 16px; }
+  .card h3 { font-size: 16px; margin-bottom: 8px; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; }
+  .b-score { background: rgba(56,189,248,.15); color: var(--accent); }
+  .b-margin { background: rgba(52,211,153,.15); color: var(--green); }
+  .b-rec-pursue { background: rgba(52,211,153,.2); color: var(--green); }
+  .b-rec-test { background: rgba(251,191,36,.15); color: var(--amber); }
+  .b-rec-watch { background: rgba(167,139,250,.15); color: var(--violet); }
+  .b-rec-skip { background: rgba(139,151,173,.15); color: var(--muted); }
+  .tags { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+  /* Posts table */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px; border-bottom: 1px solid rgba(35,45,66,.6); }
+  .st-posted { color: var(--green); font-weight: 700; }
+  .st-failed { color: var(--red); font-weight: 700; }
+  .st-skipped { color: var(--muted); }
+  td a { color: var(--accent); }
+
+  /* Log */
+  .log {
+    background: #070b12; border: 1px solid var(--border); border-radius: 12px;
+    font-family: "Cascadia Code", Consolas, monospace; font-size: 12px;
+    padding: 14px; max-height: 220px; overflow-y: auto; color: #9fb4d4;
+    white-space: pre-wrap; line-height: 1.6;
+  }
+  .summary-line {
+    background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.35);
+    color: var(--green); border-radius: 12px; padding: 14px 18px;
+    font-size: 15px; font-weight: 600; margin-bottom: 22px; display: none;
+  }
+  .error-line {
+    background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.4);
+    color: var(--red); border-radius: 12px; padding: 14px 18px;
+    font-size: 14px; margin-bottom: 22px; display: none;
+  }
+  .empty { color: var(--muted); font-size: 13.5px; padding: 8px 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>
+        <h1>ShipStack <span style="color:var(--accent)">Mission Control</span></h1>
+        <small>Discover &rarr; Score &rarr; Create &rarr; Publish — one button</small>
+      </div>
+    </div>
+    <div class="statusbar" id="statusbar">
+      <span><span class="dot" id="svc-engine"></span>Engine</span>
+      <span><span class="dot" id="svc-social"></span>Social</span>
+      <span><span class="dot" id="svc-prometheus"></span>Video</span>
+      <span><span class="dot" id="svc-quinn"></span>Quinn AI</span>
+    </div>
+  </header>
+
+  <div class="launch">
+    <div class="launch-row">
+      <button class="big-btn" id="runBtn" onclick="startRun()">&#9654;&nbsp; RUN PIPELINE</button>
+      <div class="field">
+        <label>Niche / product focus (optional)</label>
+        <input type="text" id="query" placeholder="e.g. pet gadgets — blank = scan trending">
+      </div>
+      <div class="field">
+        <label>Post to</label>
+        <div class="plats" id="plats">
+          <label class="chip on" data-p="pinterest"><input type="checkbox" checked value="pinterest">Pinterest</label>
+          <label class="chip" data-p="youtube"><input type="checkbox" value="youtube">YouTube</label>
+          <label class="chip disabled" data-p="tiktok" title="TikTok OAuth not completed"><input type="checkbox" disabled value="tiktok">TikTok</label>
+          <label class="chip disabled" data-p="instagram" title="Meta credentials not configured"><input type="checkbox" disabled value="instagram">Instagram</label>
+        </div>
+      </div>
+    </div>
+    <div class="hint" id="hint">Push the button. ShipStack scans live trend sources, scores products, builds branded cards, publishes them, and posts — automatically.</div>
+  </div>
+
+  <div class="summary-line" id="summary"></div>
+  <div class="error-line" id="errorline"></div>
+
+  <div class="stages" id="stages"></div>
+
+  <div class="panel" id="productsPanel" style="display:none">
+    <h2>Product Picks</h2>
+    <div class="grid" id="products"></div>
+  </div>
+
+  <div class="panel" id="postsPanel" style="display:none">
+    <h2>Publishing Results</h2>
+    <table>
+      <thead><tr><th>Platform</th><th>Product</th><th>Status</th><th>Detail</th><th>Link</th></tr></thead>
+      <tbody id="posts"></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Activity Log</h2>
+    <div class="log" id="log">Waiting for first run...</div>
+  </div>
+
+</div>
+
+<script>
+const STAGE_ICONS = { services: "&#128268;", discover: "&#128269;", pick: "&#127942;", content: "&#127912;", host: "&#127760;", post: "&#128640;" };
+let polling = null;
+
+function el(id) { return document.getElementById(id); }
+
+// Platform chips toggle styling
+document.querySelectorAll('.chip:not(.disabled) input').forEach(cb => {
+  cb.addEventListener('change', () => cb.closest('.chip').classList.toggle('on', cb.checked));
+});
+
+async function fetchJSON(url, opts) {
+  const r = await fetch(url, opts);
+  return r.json();
+}
+
+async function refreshServices() {
+  try {
+    const data = await fetchJSON('/api/services');
+    for (const [name, svc] of Object.entries(data.services)) {
+      const d = el('svc-' + name);
+      if (d) d.className = 'dot ' + (svc.up ? 'up' : 'down');
+    }
+  } catch (e) {
+    ['engine','social','prometheus','quinn'].forEach(n => { const d = el('svc-'+n); if (d) d.className='dot down'; });
+  }
+}
+
+function renderStages(stages) {
+  const order = ["services","discover","pick","content","host","post"];
+  el('stages').innerHTML = order.map(n => {
+    const s = stages[n] || {status:'pending', label:n, detail:''};
+    let icon;
+    if (s.status === 'running') icon = '<div class="spinner"></div>';
+    else if (s.status === 'done') icon = '<div class="icon" style="color:var(--green)">&#10004;</div>';
+    else if (s.status === 'error') icon = '<div class="icon" style="color:var(--red)">&#10008;</div>';
+    else icon = `<div class="icon">${STAGE_ICONS[n]||''}</div>`;
+    return `<div class="stage ${s.status}">${icon}<div class="name">${s.label}</div><div class="detail">${s.detail||''}</div></div>`;
+  }).join('');
+}
+
+function recClass(rec) {
+  return { pursue:'b-rec-pursue', test:'b-rec-test', watch:'b-rec-watch' }[rec] || 'b-rec-skip';
+}
+
+function renderProducts(products) {
+  if (!products || !products.length) { el('productsPanel').style.display='none'; return; }
+  el('productsPanel').style.display='block';
+  el('products').innerHTML = products.map(p => {
+    const img = p.card_path
+      ? `<img src="/cards/${p.card_path.split(/[\\\\/]/).pop()}?t=${Date.now()}" alt="">`
+      : `<div class="noimg">card pending...</div>`;
+    const price = p.retail_price ? `$${p.retail_price.toFixed(2)}` : '';
+    return `<div class="card">${img}<div class="body">
+      <h3>${p.title}</h3>
+      <div class="meta">
+        <span class="badge b-score">score ${(p.score*100).toFixed(0)}</span>
+        <span class="badge b-margin">${(p.margin_pct*100).toFixed(0)}% margin ${price ? '&middot; '+price : ''}</span>
+        <span class="badge ${recClass(p.recommendation)}">${p.recommendation||'—'}</span>
+      </div>
+      <div class="tags">
+        ${p.hooks && p.hooks.length ? '&#127919; ' + p.hooks.join(', ') + '<br>' : ''}
+        ${p.intent && p.intent.length ? '&#128172; "' + p.intent.slice(0,3).join('", "') + '"<br>' : ''}
+        &#128202; ${p.n_signals} signals
+      </div>
+    </div></div>`;
+  }).join('');
+}
+
+function renderPosts(posts) {
+  if (!posts || !posts.length) { el('postsPanel').style.display='none'; return; }
+  el('postsPanel').style.display='block';
+  el('posts').innerHTML = posts.map(x => `
+    <tr>
+      <td style="text-transform:capitalize">${x.platform}</td>
+      <td>${x.product}</td>
+      <td class="st-${x.status}">${x.status.toUpperCase()}</td>
+      <td style="color:var(--muted)">${x.detail||''}</td>
+      <td>${x.url ? `<a href="${x.url}" target="_blank">view &#8599;</a>` : ''}</td>
+    </tr>`).join('');
+}
+
+async function poll() {
+  try {
+    const s = await fetchJSON('/api/pipeline/status');
+    renderStages(s.stages || {});
+    renderProducts(s.products || []);
+    renderPosts(s.posts || []);
+    el('log').textContent = (s.log && s.log.length) ? s.log.join('\n') : 'Waiting for first run...';
+    el('log').scrollTop = el('log').scrollHeight;
+
+    if (s.error) { el('errorline').style.display='block'; el('errorline').textContent = '&#9888; ' + s.error; el('errorline').innerHTML = '&#9888;&nbsp; ' + s.error; }
+    else el('errorline').style.display='none';
+
+    if (s.summary && !s.running) {
+      el('summary').style.display='block';
+      el('summary').innerHTML = '&#9989;&nbsp; Run complete — ' + s.summary;
+    }
+
+    const btn = el('runBtn');
+    if (s.running) {
+      btn.disabled = true;
+      btn.innerHTML = '&#9203;&nbsp; RUNNING&hellip;';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '&#9654;&nbsp; RUN PIPELINE';
+      if (polling && s.finished_at) { /* keep polling slow after finish */ }
+    }
+  } catch (e) { /* engine restarting; keep trying */ }
+}
+
+async function startRun() {
+  el('summary').style.display = 'none';
+  el('errorline').style.display = 'none';
+  const platforms = [...document.querySelectorAll('.plats input:checked')].map(c => c.value);
+  const query = el('query').value.trim();
+  const body = { platforms, limit: 5 };
+  if (query) body.query = query;
+  try {
+    const r = await fetchJSON('/api/pipeline/start', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+    });
+    if (!r.ok && r.error) { el('errorline').style.display='block'; el('errorline').textContent = r.error; }
+  } catch (e) {
+    el('errorline').style.display='block';
+    el('errorline').textContent = 'Cannot reach ShipStack Engine. Run the launcher first.';
+  }
+}
+
+// boot
+renderStages({});
+refreshServices();
+poll();
+setInterval(poll, 1800);
+setInterval(refreshServices, 15000);
+</script>
+</body>
+</html>
