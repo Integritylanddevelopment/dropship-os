@@ -188,6 +188,9 @@ Content stage now produces BUYER-facing ads, not internal scorecards. Flow per w
 
 ## Business Identity (added 2026-07-22)
 
+- **Main website domain:** integrityproductsusa.com — THE home of the public site. Attached to Vercel project prj_uFSUtfgA5yC8puLDMzAZig8Ik30a (+ www).
+- **Vercel: PRO side ONLY.** Everything deploys on the Pro team (team_qd9zTuDQ41euDNXJwHVVPocq). Nothing lives on hobby accounts — retire/ignore any *-hobby.vercel.app deployments.
+- **Deploy workflow:** push to GitHub → Vercel auto-deploys. Site repo: integrity-products-site (GitHub, Integritylanddevelopment).
 - **Public business name:** Integrity Products USA (Stripe checkout + statement descriptor INTEGRITY PRODUCTS)
 - **Public business phone:** 945-312-6709 — use this on ALL websites, listings, policies, and public content. NEVER publish the 808 number anywhere public.
 - **Support email (planned):** support@ the new domain (GoDaddy purchase in progress)

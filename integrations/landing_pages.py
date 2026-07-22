@@ -240,6 +240,14 @@ def render_landing_html(product_name: str, photo_url: str, retail_price: float,
       <p><b>Is checkout safe?</b><br>Payment runs through Stripe — the same processor used by millions of stores. We never see your card number.</p>
     </div>
     <a class="buy" style="margin-top:22px" href="{buy_url}">GET YOURS — ${retail_price:,.2f}</a>
+    <div style="border-top:1px solid #edf0f3; margin-top:30px; padding-top:18px; text-align:center;
+                font-size:12.5px; color:#9aa2ae; line-height:1.9">
+      <b style="color:#6e7682">Integrity Products USA</b><br>
+      Support: <a style="color:#06897c" href="mailto:support@integrityproductsusa.com">support@integrityproductsusa.com</a> · 945-312-6709<br>
+      <a style="color:#9aa2ae" href="/dropship-os/legal/privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+      <a style="color:#9aa2ae" href="/dropship-os/legal/terms.html">Terms of Service</a><br>
+      © 2026 Integrity Products USA. All rights reserved.
+    </div>
   </div>
 </div></body></html>"""
 

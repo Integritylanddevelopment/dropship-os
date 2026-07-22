@@ -27,110 +27,141 @@
     "photo_url": "https://cf.cjdropshipping.com/e42c84b4-a9d4-4410-bc22-b973319fe444.jpg",
     "landing_url": "https://integritylanddevelopment.github.io/dropship-os/landing/tickle_toes.html",
     "payment_link": "https://buy.stripe.com/4gMcN6doDfwf0fK7Lz3F60r",
-    "top_grade": "A (88)",
+    "top_grade": "B (74)",
     "ad_variants": [
       {
         "file": "tickle_toes_v1.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v1.png",
-        "headline": "Never deal with doing it the hard way again",
-        "subline": "24 Pieces Of Short Square-shaped Gold-plated handles it — set it up once, done. 30-day returns · $19.99 (was $30)",
-        "archetype": "hormozi_dream",
+        "headline": "Stop searching, find your match",
+        "subline": "Short square-shaped gold-plated pieces at last. 30-day returns · $19.99 (was $30)",
+        "archetype": "hormozi_stop",
         "advisor": "Hormozi",
-        "grade": 88,
-        "letter": "A"
+        "grade": 74,
+        "letter": "B",
+        "photo": "https://cf.cjdropshipping.com/quick/product/e33441ad-aa78-47f6-ba66-5b34307f0222.jpg",
+        "badge": "NEW WAY",
+        "cta": "SEE HOW"
       },
       {
         "file": "tickle_toes_v2.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v2.png",
-        "headline": "Stop doing it the hard way. Do this instead.",
-        "subline": "24 Pieces Of Short Square-shaped Gold-plated — the fix people wish they'd found sooner. 30-day returns · $19.99 (was $30)",
-        "archetype": "hormozi_stop",
-        "advisor": "Hormozi",
-        "grade": 88,
-        "letter": "A"
+        "headline": "Why are you still looking?",
+        "subline": "Hidden gems: 24 short square-shaped gold-plated. 30-day returns · $19.99 (was $30)",
+        "archetype": "kamil_viral",
+        "advisor": "Kamil",
+        "grade": 62,
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/39cd5a3f-cf10-43ef-b471-939f31ec0c48.jpg",
+        "badge": "UNDER THE RADAR",
+        "cta": "SHOP BEFORE IT'S GONE"
       },
       {
         "file": "tickle_toes_v3.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v3.png",
-        "headline": "POV: you finally fixed doing it the hard way",
-        "subline": "24 Pieces Of Short Square-shaped Gold-plated — going viral for a reason. 30-day returns · $19.99 (was $30)",
-        "archetype": "kamil_pov",
-        "advisor": "Kamil",
-        "grade": 82,
-        "letter": "A"
+        "headline": "Would you try it if...",
+        "subline": "You could have 24 perfect pieces for $19.99?. 30-day returns",
+        "archetype": "garyvee_question",
+        "advisor": "GaryVee",
+        "grade": 62,
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/839bc410-c097-42e6-a527-63a5d49531fa.jpg",
+        "badge": "YOU DECIDE",
+        "cta": "TAKE A LOOK"
       },
       {
         "file": "tickle_toes_v4.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v4.png",
-        "headline": "The tickle toes upgrade nobody told you about",
-        "subline": "Specific, simple, and it just works. 30-day returns · $19.99 (was $30)",
-        "archetype": "hormozi_secret",
+        "headline": "Customers say, \"Game changer",
+        "subline": "Own 24 short squares; get yours now for $19.99. 30-day returns",
+        "archetype": "proof_direct",
         "advisor": "Hormozi",
         "grade": 62,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/10b80244-1a2a-4d06-b7b1-7064a519fae9.jpg",
+        "badge": "BUYER APPROVED",
+        "cta": "SHOP NOW"
       },
       {
         "file": "tickle_toes_v5.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v5.png",
-        "headline": "We compared the top tickle toes finds. This one won.",
-        "subline": "Real product, real results — see for yourself. 30-day returns · $19.99 (was $30)",
+        "headline": "We tried, we tested — this won",
+        "subline": "Best value in short gold-plated shapes. 30-day returns · $19.99 (was $30)",
         "archetype": "kamil_tested",
         "advisor": "Kamil",
-        "grade": 62,
-        "letter": "C"
+        "grade": 60,
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/37a39eda-167a-46ec-a325-776ddf8e0725.jpg",
+        "badge": "TOP PICK",
+        "cta": "SEE THE WINNER"
       },
       {
         "file": "tickle_toes_v6.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v6.png",
-        "headline": "Would you use this?",
-        "subline": "24 Pieces Of Short Square-shaped Gold-plated — tap and decide in 10 seconds. 30-day returns · $19.99 (was $30)",
-        "archetype": "garyvee_question",
-        "advisor": "GaryVee",
-        "grade": 62,
-        "letter": "C"
+        "headline": "Get 30% off now",
+        "subline": "24 gold-plated squares for $19.99 only. 30-day returns",
+        "archetype": "hormozi_offer",
+        "advisor": "Hormozi",
+        "grade": 55,
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/d55a2d69-4fdc-465e-9863-f748c8b39446.jpg",
+        "badge": "SAVE 33%",
+        "cta": "CLAIM THIS PRICE"
       },
       {
         "file": "tickle_toes_v7.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v7.png",
-        "headline": "$30 value. $19.99 today.",
-        "subline": "30-day returns. If it's not for you, send it back.",
-        "archetype": "hormozi_offer",
+        "headline": "Unseen beauty, seen here",
+        "subline": "Perfect for necklaces; 24 pieces included. 30-day returns · $19.99 (was $30)",
+        "archetype": "hormozi_secret",
         "advisor": "Hormozi",
-        "grade": 60,
-        "letter": "C"
+        "grade": 55,
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/888d9ca0-f485-4fee-97c0-c4b014482e5c.jpg",
+        "badge": "INSIDER FIND",
+        "cta": "SHOP NOW"
       },
       {
         "file": "tickle_toes_v8.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v8.png",
-        "headline": "Why is nobody talking about this?",
-        "subline": "24 Pieces Of Short Square-shaped Gold-plated, quietly selling out at $19.99. 30-day returns",
-        "archetype": "kamil_viral",
+        "headline": "Wearing it made my jewelry game stronger",
+        "subline": "New look with 24 short square-shaped pieces. 30-day returns · $19.99 (was $30)",
+        "archetype": "kamil_pov",
         "advisor": "Kamil",
         "grade": 55,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/e45eecb4-5825-40c5-9cbc-aad325ab9759.jpg",
+        "badge": "AS SEEN ON SOCIAL",
+        "cta": "GET YOURS"
       },
       {
         "file": "tickle_toes_v9.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v9.png",
-        "headline": "2 people talking about this right now",
-        "subline": "24 Pieces Of Short Square-shaped Gold-plated · $19.99 with tracked delivery. 30-day returns",
-        "archetype": "proof_direct",
-        "advisor": "Hormozi",
-        "grade": 55,
-        "letter": "C"
-      },
-      {
-        "file": "tickle_toes_v10.png",
-        "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v10.png",
         "headline": "Unpopular opinion: skip the big-brand version",
         "subline": "This does the same job for $19.99. 30-day returns",
         "archetype": "garyvee_hot",
         "advisor": "GaryVee",
         "grade": 53,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/quick/product/ff806e96-d48a-4128-8026-d86c5c90d47f.jpg",
+        "badge": "HOT TAKE",
+        "cta": "JUDGE FOR YOURSELF"
+      },
+      {
+        "file": "tickle_toes_v10.png",
+        "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v10.png",
+        "headline": "Sparkle without spending more",
+        "subline": "24 pieces for less, radiant look guaranteed",
+        "archetype": "hormozi_dream",
+        "advisor": "Hormozi",
+        "grade": 45,
+        "letter": "D",
+        "photo": "https://cf.cjdropshipping.com/quick/product/92bb7eee-a55d-48ca-a78a-43d4875aeca2.jpg",
+        "badge": "TRENDING NOW",
+        "cta": "SHOP NOW"
       }
     ],
-    "updated_at": "2026-07-22T03:49:19.286341+00:00"
+    "updated_at": "2026-07-22T17:45:49.077443+00:00",
+    "cj_pid": "2607220830261639400"
   },
   "wrong": {
     "product_id": "wrong",
@@ -335,17 +366,23 @@
         "archetype": "hormozi_dream",
         "advisor": "Hormozi",
         "grade": 88,
-        "letter": "A"
+        "letter": "A",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/87b9aa55-1fde-4545-a9e0-b0475999e762.jpg",
+        "badge": "TRENDING NOW",
+        "cta": "SHOP NOW"
       },
       {
         "file": "gift_cards_v2.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/gift_cards_v2.png",
-        "headline": "Stop doing it the hard way. Do this instead.",
-        "subline": "Compass Spin Necklaces For Women — the fix people wish they'd found sooner. 30-day returns · $23.99 (was $36)",
+        "headline": "End the Search for Directions",
+        "subline": "Compass Spin Necklaces For Women — finally find your way in style. 30-day returns · $23.99 (was $36)",
         "archetype": "hormozi_stop",
         "advisor": "Hormozi",
-        "grade": 88,
-        "letter": "A"
+        "grade": 68,
+        "letter": "B",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/87b9aa55-1fde-4545-a9e0-b0475999e762.jpg",
+        "badge": "NEW WAY",
+        "cta": "SEE HOW"
       },
       {
         "file": "gift_cards_v3.png",
@@ -355,27 +392,36 @@
         "archetype": "kamil_pov",
         "advisor": "Kamil",
         "grade": 82,
-        "letter": "A"
+        "letter": "A",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/9c23a93d-1ce1-47bc-94a6-764624214299.jpg",
+        "badge": "AS SEEN ON SOCIAL",
+        "cta": "GET YOURS"
       },
       {
         "file": "gift_cards_v4.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/gift_cards_v4.png",
-        "headline": "Upgrade nobody told you about",
-        "subline": "Specific, simple, works. 30-day returns · $23.99 (was $36)",
+        "headline": "The compass upgrade nobody told you about",
+        "subline": "Specific, simple, and it just works. 30-day returns · $23.99 (was $36)",
         "archetype": "hormozi_secret",
         "advisor": "Hormozi",
         "grade": 62,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/87b9aa55-1fde-4545-a9e0-b0475999e762.jpg",
+        "badge": "INSIDER FIND",
+        "cta": "SHOP NOW"
       },
       {
         "file": "gift_cards_v5.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/gift_cards_v5.png",
-        "headline": "We compared the top gift cards finds. This one won.",
+        "headline": "We compared the top compass finds. This one won.",
         "subline": "Real product, real results — see for yourself. 30-day returns · $23.99 (was $36)",
         "archetype": "kamil_tested",
         "advisor": "Kamil",
         "grade": 62,
-        "letter": "C"
+        "letter": "C",
+        "photo": "[\"https://oss-cf.cjdropshipping.com/product/2026/07/21/08/87b9aa55-1fde-4545-a9e0-b0475999e762.jpg\"]",
+        "badge": "TOP PICK",
+        "cta": "SEE THE WINNER"
       },
       {
         "file": "gift_cards_v6.png",
@@ -385,7 +431,10 @@
         "archetype": "garyvee_question",
         "advisor": "GaryVee",
         "grade": 62,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/9c23a93d-1ce1-47bc-94a6-764624214299.jpg",
+        "badge": "YOU DECIDE",
+        "cta": "TAKE A LOOK"
       },
       {
         "file": "gift_cards_v7.png",
@@ -395,27 +444,36 @@
         "archetype": "hormozi_offer",
         "advisor": "Hormozi",
         "grade": 60,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/87b9aa55-1fde-4545-a9e0-b0475999e762.jpg",
+        "badge": "SAVE 33%",
+        "cta": "CLAIM THIS PRICE"
       },
       {
         "file": "gift_cards_v8.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/gift_cards_v8.png",
+        "headline": "Why the quiet hero?",
+        "subline": "Hidden in plain sight, yet ignored. 30-day returns · $23.99 (was $36)",
+        "archetype": "kamil_viral",
+        "advisor": "Kamil",
+        "grade": 55,
+        "letter": "C",
+        "photo": "[\"https://oss-cf.cjdropshipping.com/product/2026/07/21/08/87b9aa55-1fde-4545-a9e0-b0475999e762.jpg\"]",
+        "badge": "UNDER THE RADAR",
+        "cta": "SHOP BEFORE IT'S GONE"
+      },
+      {
+        "file": "gift_cards_v9.png",
+        "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/gift_cards_v9.png",
         "headline": "2 people talking about this right now",
         "subline": "Compass Spin Necklaces For Women · $23.99 with tracked delivery. 30-day returns",
         "archetype": "proof_direct",
         "advisor": "Hormozi",
         "grade": 55,
-        "letter": "C"
-      },
-      {
-        "file": "gift_cards_v9.png",
-        "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/gift_cards_v9.png",
-        "headline": "Why is nobody talking about this?",
-        "subline": "Compass Spin Necklaces For Women, quietly selling out at $23.99. 30-day returns",
-        "archetype": "kamil_viral",
-        "advisor": "Kamil",
-        "grade": 53,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/9c23a93d-1ce1-47bc-94a6-764624214299.jpg",
+        "badge": "BUYER APPROVED",
+        "cta": "SHOP NOW"
       },
       {
         "file": "gift_cards_v10.png",
@@ -425,10 +483,14 @@
         "archetype": "garyvee_hot",
         "advisor": "GaryVee",
         "grade": 53,
-        "letter": "C"
+        "letter": "C",
+        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/21/08/87b9aa55-1fde-4545-a9e0-b0475999e762.jpg",
+        "badge": "HOT TAKE",
+        "cta": "JUDGE FOR YOURSELF"
       }
     ],
-    "updated_at": "2026-07-22T03:49:19.286341+00:00"
+    "updated_at": "2026-07-22T17:47:50.291601+00:00",
+    "cj_pid": "2607210855081638000"
   },
   "steamy_cat": {
     "product_id": "steamy_cat",
@@ -1092,13 +1154,13 @@
       {
         "file": "bird_house_v3.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v3.png",
-        "headline": "Stop Suffering in the Cold",
-        "subline": "Experience Year-Round Growing with Our Mini Greenhouse · $142.99. 30-day returns",
+        "headline": "Say Goodbye to Frosty Starts",
+        "subline": "Plant Year-Round in Warm Comfort · $142.99. 30-day returns",
         "archetype": "hormozi_stop",
         "advisor": "Hormozi",
-        "grade": 68,
-        "letter": "B",
-        "photo": "https://cf.cjdropshipping.com/3084b531-1790-45fd-9ac3-b0f384b56347.png",
+        "grade": 61,
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/175e4c93-6dd2-4349-a2b7-2e17bfd7ed12.png",
         "badge": "NEW WAY",
         "cta": "SEE HOW"
       },
@@ -1180,7 +1242,7 @@
         "photo": "https://cf.cjdropshipping.com/320ffd14-cd0f-47b5-995f-bfa6702987a1.png"
       }
     ],
-    "updated_at": "2026-07-22T16:45:05.645459+00:00",
+    "updated_at": "2026-07-22T17:44:09.086376+00:00",
     "cj_pid": "2079741523178455042"
   },
   "activities_tips": {
