@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "brand": {
+    "business_name": "Integrity Products USA",
+    "support_email": "support@integrityproductsusa.com",
+    "phone": "945-312-6709"
+  },
+  "feed_url": "http://127.0.0.1:8889/api/library/approved",
+  "last_sync_at": "2026-07-22T19:30:36.873387+00:00",
+  "last_sync_error": "",
+  "accounts": [
+    {
+      "id": "pinterest_main",
+      "platform": "pinterest",
+      "handle": "integrityproductsusa_pinterest",
+      "display_name": "Pinterest main",
+      "status": "warming",
+      "warmup_day": 1,
+      "daily_limit": 0,
+      "cooldown_minutes": 45,
+      "link_ready": true,
+      "board_id": "1128644425305597523",
+      "notes": "Auto-created from configured credentials.",
+      "system_managed": true,
+      "created_at": "2026-07-22T19:30:36.856393+00:00",
+      "updated_at": "2026-07-22T19:30:36.856393+00:00",
+      "last_post_at": "",
+      "activity": {}
+    },
+    {
+      "id": "youtube_main",
+      "platform": "youtube",
+      "handle": "integrityproductsusa_youtube",
+      "display_name": "Youtube main",
+      "status": "warming",
+      "warmup_day": 1,
+      "daily_limit": 0,
+      "cooldown_minutes": 180,
+      "link_ready": true,
+      "board_id": "",
+      "notes": "Auto-created from configured credentials.",
+      "system_managed": true,
+      "created_at": "2026-07-22T19:30:36.856393+00:00",
+      "updated_at": "2026-07-22T19:30:36.856393+00:00",
+      "last_post_at": "",
+      "activity": {}
+    }
+  ],
+  "queue": [
+    {
+      "id": "bird_house_88129b1b2336",
+      "product_id": "bird_house",
+      "title": "Mini Walk-in Greenhouse With PVC Cover",
+      "retail_price": 142.99,
+      "landing_url": "https://integritylanddevelopment.github.io/dropship-os/landing/bird_house.html",
+      "image_url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v1.png",
+      "file": "bird_house_v1.png",
+      "headline": "POV: you finally fixed plants dying every winter",
+      "subline": "Mini Walk-in Greenhouse With PVC Cover — going viral for a reason. 30-day returns · $142.99 (was $215)",
+      "grade": 82,
+      "letter": "A",
+      "approved_at": "2026-07-22T18:18:53.997005+00:00",
+      "video_path": "",
+      "video_url": "",
+      "notes": "",
+      "feed_active": true,
+      "created_at": "2026-07-22T19:30:36.873387+00:00",
+      "updated_at": "2026-07-22T19:30:36.873387+00:00",
+      "platform_posts": {
+        "pinterest": {
+          "state": "not_posted",
+          "account_id": "",
+          "attempted_at": "",
+          "posted_at": "",
+          "detail": "",
+          "external_url": ""
+        },
+        "youtube": {
+          "state": "not_posted",
+          "account_id": "",
+          "attempted_at": "",
+          "posted_at": "",
+          "detail": "",
+          "external_url": ""
+        },
+        "tiktok": {
+          "state": "not_posted",
+          "account_id": "",
+          "attempted_at": "",
+          "posted_at": "",
+          "detail": "",
+          "external_url": ""
+        },
+        "meta": {
+          "state": "not_posted",
+          "account_id": "",
+          "attempted_at": "",
+          "posted_at": "",
+          "detail": "",
+          "external_url": ""
+        }
+      },
+      "history": [],
+      "status": "ready",
+      "preferred_platforms": [
+        "pinterest",
+        "meta"
+      ]
+    }
+  ]
+}

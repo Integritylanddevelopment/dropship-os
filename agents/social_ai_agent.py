@@ -34,6 +34,7 @@ PinterestPoster = None
 YouTubePoster = None
 TikTokPoster = None
 MetaPoster = None
+PostingManager = None
 
 try:
     sys.path.insert(0, str(BASE_DIR))
@@ -56,6 +57,11 @@ try:
 except Exception as e:
     print(f"[social_ai_agent] WARN: Could not import MetaPoster from integrations: {e}")
 
+try:
+    from social_ai_agent.posting_manager import PostingManager
+except Exception as e:
+    print(f"[social_ai_agent] WARN: Could not import PostingManager: {e}")
+
 # social_ai_agent/pinterest_poster.py -- generate_product_card
 generate_product_card = None
 try:
@@ -73,6 +79,7 @@ CARDS_DIR = BASE_DIR / "pinterest_cards"
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
 START_TIME = time.time()
+POSTING_MANAGER = PostingManager() if PostingManager is not None else None
 
 
 # ── CORS middleware ───────────────────────────────────────────────────────────
@@ -137,6 +144,195 @@ def _quinn_generate(prompt: str, max_tokens: int = 512) -> str:
         return f"[LLM unavailable: {e}]"
 
 
+def _post_to_pinterest_payload(data: dict) -> tuple[dict, int]:
+    if not os.getenv("PINTEREST_ACCESS_TOKEN"):
+        return {"error": "Pinterest not configured", "missing": "PINTEREST_ACCESS_TOKEN"}, 503
+
+    if PinterestPoster is None:
+        return {"error": "PinterestPoster module not available"}, 503
+
+    title = data.get("title", "")
+    description = data.get("description", "")
+    image_url = data.get("image_url", "")
+    image_path = data.get("image_path", "")
+    board_id = data.get("board_id",
+                        os.getenv("PINTEREST_DEFAULT_BOARD_ID",
+                                  os.getenv("PINTEREST_BOARD_ID", "")))
+    link = data.get("link", "")
+
+    if not board_id:
+        return {"error": "No board_id provided and PINTEREST_DEFAULT_BOARD_ID not set"}, 400
+    if not title:
+        return {"error": "title is required"}, 400
+
+    try:
+        poster = PinterestPoster()
+        pin_image_url = image_url
+        if not pin_image_url and image_path:
+            return {
+                "error": "Pinterest API requires a publicly accessible image_url, not a local path. "
+                         "Upload the image first or provide image_url.",
+                "image_path_provided": image_path,
+            }, 400
+
+        result = poster.create_pin(
+            board_id=board_id,
+            title=title,
+            description=description,
+            link=link,
+            image_url=pin_image_url,
+        )
+
+        if "error" in result:
+            return result, 400
+        if not result.get("id"):
+            return {
+                "error": result.get("message", f"Pin not created: {result}"),
+                "code": result.get("code"),
+                "platform": "pinterest",
+            }, 400
+
+        return {
+            "status": "posted",
+            "platform": "pinterest",
+            "result": result,
+            "pin_url": f"https://www.pinterest.com/pin/{result['id']}/",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }, 200
+    except Exception as e:
+        traceback.print_exc()
+        return {"error": str(e), "platform": "pinterest"}, 500
+
+
+def _post_to_youtube_payload(data: dict) -> tuple[dict, int]:
+    if not all([os.getenv("YOUTUBE_CLIENT_ID"), os.getenv("YOUTUBE_CLIENT_SECRET"),
+                os.getenv("YOUTUBE_REFRESH_TOKEN")]):
+        return {"error": "YouTube not configured",
+                "missing": "YOUTUBE_CLIENT_ID / YOUTUBE_CLIENT_SECRET / YOUTUBE_REFRESH_TOKEN"}, 503
+
+    if YouTubePoster is None:
+        return {"error": "YouTubePoster module not available"}, 503
+
+    video_path = data.get("video_path", "")
+    title = data.get("title", "")
+    description = data.get("description", "")
+    tags = data.get("tags", [])
+
+    if not video_path:
+        return {"error": "video_path is required"}, 400
+    if not title:
+        return {"error": "title is required"}, 400
+
+    try:
+        poster = YouTubePoster()
+        result = poster.upload_short(
+            video_path=video_path,
+            title=title,
+            description=description,
+            tags=tags,
+        )
+
+        if "error" in result:
+            return result, 400
+
+        return {
+            "status": "posted",
+            "platform": "youtube",
+            "result": result,
+            "url": f"https://youtube.com/shorts/{result['id']}" if result.get("id") else "",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }, 200
+    except Exception as e:
+        traceback.print_exc()
+        return {"error": str(e), "platform": "youtube"}, 500
+
+
+def _post_to_tiktok_payload(data: dict) -> tuple[dict, int]:
+    if not os.getenv("TIKTOK_ACCESS_TOKEN"):
+        return {"error": "TikTok not configured", "missing": "TIKTOK_ACCESS_TOKEN"}, 503
+
+    if TikTokPoster is None:
+        return {"error": "TikTokPoster module not available"}, 503
+
+    video_path = data.get("video_path", "")
+    title = data.get("title", "")
+    description = data.get("description", "")
+    caption = data.get("caption", title or description)
+
+    if not video_path:
+        return {"error": "video_path is required"}, 400
+
+    try:
+        poster = TikTokPoster()
+        result = poster.post_video(
+            video_path=video_path,
+            caption=caption,
+        )
+
+        if "error" in result:
+            return result, 400
+
+        return {
+            "status": "posted",
+            "platform": "tiktok",
+            "result": result,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }, 200
+    except Exception as e:
+        traceback.print_exc()
+        return {"error": str(e), "platform": "tiktok"}, 500
+
+
+def _post_to_meta_payload(data: dict) -> tuple[dict, int]:
+    if not all([os.getenv("META_ACCESS_TOKEN"), os.getenv("META_IG_ACCOUNT_ID")]):
+        return {"error": "Meta not configured", "missing": "META_ACCESS_TOKEN / META_IG_ACCOUNT_ID"}, 503
+
+    if MetaPoster is None:
+        return {"error": "MetaPoster module not available"}, 503
+
+    image_url = data.get("image_url", "")
+    video_url = data.get("video_url", "")
+    caption = data.get("caption", "")
+
+    if not image_url and not video_url:
+        return {"error": "image_url or video_url is required"}, 400
+
+    try:
+        poster = MetaPoster()
+        if video_url:
+            result = poster.post_reel(video_url=video_url, caption=caption)
+        else:
+            result = poster.post_image(image_url=image_url, caption=caption)
+
+        if "error" in result:
+            return result, 400
+        if not result.get("id"):
+            return {"error": result.get("message", f"Post not created: {result}"), "platform": "meta"}, 400
+
+        return {
+            "status": "posted",
+            "platform": "meta",
+            "result": result,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }, 200
+    except Exception as e:
+        traceback.print_exc()
+        return {"error": str(e), "platform": "meta"}, 500
+
+
+def _dispatch_post(platform: str, data: dict) -> tuple[dict, int]:
+    platform = (platform or "").lower()
+    if platform == "pinterest":
+        return _post_to_pinterest_payload(data)
+    if platform == "youtube":
+        return _post_to_youtube_payload(data)
+    if platform == "tiktok":
+        return _post_to_tiktok_payload(data)
+    if platform in {"meta", "instagram"}:
+        return _post_to_meta_payload(data)
+    return {"error": f"Unsupported platform: {platform}"}, 400
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # ROUTES
 # ══════════════════════════════════════════════════════════════════════════════
@@ -158,6 +354,7 @@ def health():
             "TikTokPoster": TikTokPoster is not None,
             "MetaPoster": MetaPoster is not None,
             "generate_product_card": generate_product_card is not None,
+            "PostingManager": POSTING_MANAGER is not None,
         },
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
@@ -173,73 +370,8 @@ def platforms():
 def post_pinterest():
     if request.method == 'OPTIONS':
         return jsonify({}), 200
-
-    if not os.getenv("PINTEREST_ACCESS_TOKEN"):
-        return jsonify({"error": "Pinterest not configured", "missing": "PINTEREST_ACCESS_TOKEN"}), 503
-
-    if PinterestPoster is None:
-        return jsonify({"error": "PinterestPoster module not available"}), 503
-
-    data = request.get_json(silent=True) or {}
-    title = data.get("title", "")
-    description = data.get("description", "")
-    image_url = data.get("image_url", "")
-    image_path = data.get("image_path", "")
-    board_id = data.get("board_id",
-                        os.getenv("PINTEREST_DEFAULT_BOARD_ID",
-                                  os.getenv("PINTEREST_BOARD_ID", "")))
-    link = data.get("link", "")
-
-    if not board_id:
-        return jsonify({"error": "No board_id provided and PINTEREST_DEFAULT_BOARD_ID not set"}), 400
-
-    if not title:
-        return jsonify({"error": "title is required"}), 400
-
-    try:
-        poster = PinterestPoster()
-
-        # If image_path provided but no image_url, the caller should host it
-        # PinterestPoster.create_pin expects image_url
-        pin_image_url = image_url
-        if not pin_image_url and image_path:
-            # Store note that local file was referenced -- API requires a URL
-            return jsonify({
-                "error": "Pinterest API requires a publicly accessible image_url, not a local path. "
-                         "Upload the image first or provide image_url.",
-                "image_path_provided": image_path,
-            }), 400
-
-        result = poster.create_pin(
-            board_id=board_id,
-            title=title,
-            description=description,
-            link=link,
-            image_url=pin_image_url,
-        )
-
-        if "error" in result:
-            return jsonify(result), 400
-
-        # Pinterest API errors come back as {"code": N, "message": "..."} with NO id.
-        # A real created pin always has an "id". Anything else is a failure.
-        if not result.get("id"):
-            return jsonify({
-                "error": result.get("message", f"Pin not created: {result}"),
-                "code": result.get("code"),
-                "platform": "pinterest",
-            }), 400
-
-        return jsonify({
-            "status": "posted",
-            "platform": "pinterest",
-            "result": result,
-            "pin_url": f"https://www.pinterest.com/pin/{result['id']}/",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": str(e), "platform": "pinterest"}), 500
+    body, status = _post_to_pinterest_payload(request.get_json(silent=True) or {})
+    return jsonify(body), status
 
 
 # ── YouTube ───────────────────────────────────────────────────────────────────
@@ -247,47 +379,8 @@ def post_pinterest():
 def post_youtube():
     if request.method == 'OPTIONS':
         return jsonify({}), 200
-
-    if not all([os.getenv("YOUTUBE_CLIENT_ID"), os.getenv("YOUTUBE_CLIENT_SECRET"),
-                os.getenv("YOUTUBE_REFRESH_TOKEN")]):
-        return jsonify({"error": "YouTube not configured",
-                        "missing": "YOUTUBE_CLIENT_ID / YOUTUBE_CLIENT_SECRET / YOUTUBE_REFRESH_TOKEN"}), 503
-
-    if YouTubePoster is None:
-        return jsonify({"error": "YouTubePoster module not available"}), 503
-
-    data = request.get_json(silent=True) or {}
-    video_path = data.get("video_path", "")
-    title = data.get("title", "")
-    description = data.get("description", "")
-    tags = data.get("tags", [])
-
-    if not video_path:
-        return jsonify({"error": "video_path is required"}), 400
-    if not title:
-        return jsonify({"error": "title is required"}), 400
-
-    try:
-        poster = YouTubePoster()
-        result = poster.upload_short(
-            video_path=video_path,
-            title=title,
-            description=description,
-            tags=tags,
-        )
-
-        if "error" in result:
-            return jsonify(result), 400
-
-        return jsonify({
-            "status": "posted",
-            "platform": "youtube",
-            "result": result,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": str(e), "platform": "youtube"}), 500
+    body, status = _post_to_youtube_payload(request.get_json(silent=True) or {})
+    return jsonify(body), status
 
 
 # ── TikTok ────────────────────────────────────────────────────────────────────
@@ -295,41 +388,16 @@ def post_youtube():
 def post_tiktok():
     if request.method == 'OPTIONS':
         return jsonify({}), 200
+    body, status = _post_to_tiktok_payload(request.get_json(silent=True) or {})
+    return jsonify(body), status
 
-    if not os.getenv("TIKTOK_ACCESS_TOKEN"):
-        return jsonify({"error": "TikTok not configured", "missing": "TIKTOK_ACCESS_TOKEN"}), 503
 
-    if TikTokPoster is None:
-        return jsonify({"error": "TikTokPoster module not available"}), 503
-
-    data = request.get_json(silent=True) or {}
-    video_path = data.get("video_path", "")
-    title = data.get("title", "")
-    description = data.get("description", "")
-    caption = data.get("caption", title or description)
-
-    if not video_path:
-        return jsonify({"error": "video_path is required"}), 400
-
-    try:
-        poster = TikTokPoster()
-        result = poster.post_video(
-            video_path=video_path,
-            caption=caption,
-        )
-
-        if "error" in result:
-            return jsonify(result), 400
-
-        return jsonify({
-            "status": "posted",
-            "platform": "tiktok",
-            "result": result,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": str(e), "platform": "tiktok"}), 500
+@app.route('/post/meta', methods=['POST', 'OPTIONS'])
+def post_meta():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    body, status = _post_to_meta_payload(request.get_json(silent=True) or {})
+    return jsonify(body), status
 
 
 # ── Auto-post to all configured platforms ─────────────────────────────────────
@@ -475,6 +543,91 @@ def get_queue():
         return jsonify({"error": f"Failed to read queue: {e}"}), 500
 
 
+@app.route('/manager/status', methods=['GET'])
+def manager_status():
+    if POSTING_MANAGER is None:
+        return jsonify({"error": "PostingManager not available"}), 503
+    return jsonify(POSTING_MANAGER.status(platform_status=_platform_status()))
+
+
+@app.route('/manager/sync', methods=['POST', 'OPTIONS'])
+def manager_sync():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    if POSTING_MANAGER is None:
+        return jsonify({"error": "PostingManager not available"}), 503
+    try:
+        result = POSTING_MANAGER.sync_approved_feed(platform_status=_platform_status())
+        return jsonify(result)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/manager/accounts', methods=['GET', 'POST', 'OPTIONS'])
+def manager_accounts():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    if POSTING_MANAGER is None:
+        return jsonify({"error": "PostingManager not available"}), 503
+    try:
+        if request.method == 'GET':
+            return jsonify({"accounts": POSTING_MANAGER.list_accounts(platform_status=_platform_status())})
+        account = POSTING_MANAGER.upsert_account(
+            request.get_json(silent=True) or {},
+            platform_status=_platform_status(),
+        )
+        return jsonify({"status": "saved", "account": account})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route('/manager/queue', methods=['GET'])
+def manager_queue():
+    if POSTING_MANAGER is None:
+        return jsonify({"error": "PostingManager not available"}), 503
+    return jsonify({"queue": POSTING_MANAGER.list_queue()})
+
+
+@app.route('/manager/queue/item', methods=['POST', 'OPTIONS'])
+def manager_queue_item():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    if POSTING_MANAGER is None:
+        return jsonify({"error": "PostingManager not available"}), 503
+    try:
+        item = POSTING_MANAGER.update_queue_item(request.get_json(silent=True) or {})
+        return jsonify({"status": "saved", "item": item})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route('/manager/run', methods=['POST', 'OPTIONS'])
+def manager_run():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    if POSTING_MANAGER is None:
+        return jsonify({"error": "PostingManager not available"}), 503
+    data = request.get_json(silent=True) or {}
+    platforms = data.get("platforms")
+    if platforms is not None and not isinstance(platforms, list):
+        return jsonify({"error": "platforms must be a list"}), 400
+    try:
+        result = POSTING_MANAGER.run(
+            dispatch_fn=_dispatch_post,
+            platform_status=_platform_status(),
+            platforms=platforms,
+            limit=int(data.get("limit", 10) or 10),
+            dry_run=bool(data.get("dry_run", True)),
+        )
+        return jsonify(result)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
 # ── Generate product card ─────────────────────────────────────────────────────
 @app.route('/generate-card', methods=['POST', 'OPTIONS'])
 def gen_card():
@@ -562,20 +715,15 @@ def post_legacy():
         return jsonify({}), 200
     data = request.get_json(silent=True) or {}
     platform = data.get("platform", "").lower()
-
-    if platform == "pinterest":
-        return post_pinterest()
-    elif platform == "youtube":
-        return post_youtube()
-    elif platform == "tiktok":
-        return post_tiktok()
-    else:
-        return jsonify({
-            "status": "queued",
-            "platform": platform or "unknown",
-            "id": f"queued-{uuid.uuid4()}",
-            "message": f"Platform '{platform}' not yet supported for direct posting",
-        })
+    if platform in {"pinterest", "youtube", "tiktok", "meta", "instagram"}:
+        body, status = _dispatch_post(platform, data)
+        return jsonify(body), status
+    return jsonify({
+        "status": "queued",
+        "platform": platform or "unknown",
+        "id": f"queued-{uuid.uuid4()}",
+        "message": f"Platform '{platform}' not yet supported for direct posting",
+    })
 
 
 # ══════════════════════════════════════════════════════════════════════════════
