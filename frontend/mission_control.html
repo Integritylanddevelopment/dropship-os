@@ -293,6 +293,8 @@ function renderProducts(products) {
         ${p.hooks && p.hooks.length ? '&#127919; ' + p.hooks.join(', ') + '<br>' : ''}
         ${p.intent && p.intent.length ? '&#128172; "' + p.intent.slice(0,3).join('", "') + '"<br>' : ''}
         &#128202; ${p.n_signals} signals
+        ${p.landing_url ? '<br>&#128722; <a href="' + p.landing_url + '" target="_blank" style="color:var(--accent)">View store page &#8599;</a>' : ''}
+        ${p.payment_link ? ' &middot; <a href="' + p.payment_link + '" target="_blank" style="color:var(--green)">checkout link &#8599;</a>' : ''}
       </div>
     </div></div>`;
   }).join('');
