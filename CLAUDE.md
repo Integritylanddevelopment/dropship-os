@@ -186,11 +186,20 @@ Content stage now produces BUYER-facing ads, not internal scorecards. Flow per w
 - 5 rotating visual layouts × 5 palettes = ads look like different creatives (Kamil multi-angle testing).
 - Pipeline posts the top-3 graded ads per product per run (anti-spam), all → same landing page.
 
+## Team / Agent Division (added 2026-07-22)
+
+- **"OpenAI Mike"** = Alex's OpenAI/Codex agent. Mike owns the PUSH-OUT side: social media posting, platform OAuth (TikTok, Instagram/Meta), posting schedules/cadence, channel growth.
+- **Claude (EAGLE + ALIEN)** owns the FIND side: discovery → scoring → collateral engine → sales pages → orders/fulfillment → Mission Control.
+- **Handoff interface for Mike:** `data/product_library.json` + GET /api/library on :8889 (all products with 10 graded ad URLs each + landing_url). Mike consumes finished collateral and posts it; all ads for a product link to its one sales page.
+- Mike's old workspace snapshot lives at C:\Users\integ\Documents\Codex\2026-07-16\ — historical docs only, superseded by this repo.
+
 ## Business Identity (added 2026-07-22)
 
-- **Main website domain:** integrityproductsusa.com — THE home of the public site. Attached to Vercel project prj_uFSUtfgA5yC8puLDMzAZig8Ik30a (+ www).
-- **Vercel: PRO side ONLY.** Everything deploys on the Pro team (team_qd9zTuDQ41euDNXJwHVVPocq). Nothing lives on hobby accounts — retire/ignore any *-hobby.vercel.app deployments.
-- **Deploy workflow:** push to GitHub → Vercel auto-deploys. Site repo: integrity-products-site (GitHub, Integritylanddevelopment).
+- **Main website domain:** integrityproductsusa.com (OWNED, bought 2026-07-22 at GoDaddy). Nameservers → ns1/ns2.vercel-dns.com (changed 2026-07-22, propagating). Domain + www attached to **site project prj_9KReqSd8eUnhSWFJ2rxESqIlZ2xC** ("integrity-products-site").
+- **Vercel: PRO side ONLY** (team_qd9zTuDQ41euDNXJwHVVPocq, slug "togetherwe"). Nothing on hobby — retire/ignore *-hobby.vercel.app.
+- **Deploy workflow:** push to GitHub repo `Integritylanddevelopment/integrity-products-site` (main) → Vercel auto-deploys. Homepage seeded; first production deploy triggered via API.
+- **Support email:** support@integrityproductsusa.com. PENDING after NS propagation: add MX mx1/mx2.forwardemail.net + TXT "forward-email=support:integritylanddevelopment@gmail.com" via Vercel DNS API (zone activates when Vercel sees its NS). Then also save Business website https://integrityproductsusa.com in Stripe (Stripe refused while domain didn't resolve).
+- Stripe done 2026-07-22: statement descriptor INTEGRITY PRODUCTS (short: INTEGRITY); name/phone/email/address set by Alex.
 - **Public business name:** Integrity Products USA (Stripe checkout + statement descriptor INTEGRITY PRODUCTS)
 - **Public business phone:** 945-312-6709 — use this on ALL websites, listings, policies, and public content. NEVER publish the 808 number anywhere public.
 - **Support email (planned):** support@ the new domain (GoDaddy purchase in progress)

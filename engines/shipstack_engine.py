@@ -212,6 +212,38 @@ def api_regen_status():
     return jsonify(mission_pipeline.get_regen_status())
 
 
+@app.route("/api/product/approve", methods=["POST"])
+def api_product_approve():
+    """Approve an ad (moves it to the Approved page + Mike's feed) or pull it back."""
+    err = _require(mission_pipeline, "Mission pipeline")
+    if err:
+        return err
+    body = request.get_json(silent=True) or {}
+    pid = body.get("product_id", "")
+    variant = body.get("variant")
+    if not pid or variant is None:
+        return jsonify({"ok": False, "error": "product_id and variant required"}), 400
+    return jsonify(mission_pipeline.set_ad_approval(pid, int(variant),
+                                                    bool(body.get("approved", True))))
+
+
+@app.route("/api/library/approved", methods=["GET"])
+def api_library_approved():
+    """MIKE'S FEED: only approved, ready-to-post collateral."""
+    err = _require(mission_pipeline, "Mission pipeline")
+    if err:
+        return err
+    return jsonify({"products": mission_pipeline.load_approved()})
+
+
+@app.route("/approved", methods=["GET"])
+def approved_page():
+    ui = FRONTEND_DIR / "approved.html"
+    if ui.exists():
+        return send_file(str(ui))
+    return jsonify({"error": "approved.html not found"}), 404
+
+
 # ── Orders + auto-fulfillment ────────────────────────────────────────────
 
 order_fulfillment = None

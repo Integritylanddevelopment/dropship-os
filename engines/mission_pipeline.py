@@ -36,6 +36,8 @@ def _variant_public(v: dict) -> dict:
         "photo": v.get("photo", ""),
         "badge": v.get("badge", ""),
         "cta": v.get("cta", ""),
+        "approved": v.get("approved", False),
+        "approved_at": v.get("approved_at", ""),
     }
 
 
@@ -243,6 +245,54 @@ def _regen_detail(msg: str):
     with _LOCK:
         REGEN["detail"] = msg
     _log(msg)
+
+
+def set_ad_approval(product_id: str, variant_index: int, approved: bool = True) -> dict:
+    """Mark one ad approved (ready for Mike to post) or pull it back."""
+    try:
+        lib = json.loads(LIBRARY_PATH.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return {"ok": False, "error": "library not found"}
+    entry = lib.get(product_id)
+    if not entry:
+        return {"ok": False, "error": "product not found"}
+    ads = entry.get("ad_variants") or []
+    if not (0 <= variant_index < len(ads)):
+        return {"ok": False, "error": "ad not found"}
+    ads[variant_index]["approved"] = bool(approved)
+    ads[variant_index]["approved_at"] = (datetime.now(timezone.utc).isoformat()
+                                         if approved else "")
+    entry["updated_at"] = datetime.now(timezone.utc).isoformat()
+    lib[product_id] = entry
+    LIBRARY_PATH.write_text(json.dumps(lib, indent=2, ensure_ascii=False), encoding="utf-8")
+    return {"ok": True, "approved": bool(approved)}
+
+
+def load_approved() -> list:
+    """Mike's feed: products that have at least one APPROVED ad, with only
+    the approved ads included. Everything else stays invisible to him."""
+    out = []
+    for p in load_library():
+        approved = [v for v in (p.get("ad_variants") or []) if v.get("approved")]
+        if not approved:
+            continue
+        out.append({
+            "product_id": p.get("product_id"),
+            "title": p.get("title"),
+            "retail_price": p.get("retail_price"),
+            "landing_url": p.get("landing_url"),
+            "payment_link": p.get("payment_link"),
+            "approved_ads": [{
+                "image_url": v.get("url", ""),
+                "file": v.get("file", ""),
+                "headline": v.get("headline", ""),
+                "subline": v.get("subline", ""),
+                "grade": v.get("grade", 0),
+                "letter": v.get("letter", "?"),
+                "approved_at": v.get("approved_at", ""),
+            } for v in approved],
+        })
+    return out
 
 
 def start_regen(product_id: str, variant_index: int | None = None) -> dict:
@@ -758,13 +808,12 @@ def _do_run(query, platforms, limit, dry_run):
                         # run to avoid spam flags) — every one links to the SAME
                         # sales page for this product.
                         shop_link = p.get("landing_url") or LANDING_URL
-                        postable = [v for v in (p.get("ad_variants") or []) if v.get("url")][:3]
-                        if not postable and p.get("card_url"):
-                            postable = [{"url": p["card_url"], "headline": p["title"],
-                                         "subline": p.get("ad_copy", ""), "letter": "?"}]
+                        # Only APPROVED ads ever get posted — Alex reviews first
+                        postable = [v for v in (p.get("ad_variants") or [])
+                                    if v.get("url") and v.get("approved")][:3]
                         if not postable:
                             entry["status"] = "skipped"
-                            entry["detail"] = "no hosted ads"
+                            entry["detail"] = "waiting for your approval — approve ads in the Library"
                         else:
                             n_ok, last_msg, first_url = 0, "", ""
                             for v in postable:

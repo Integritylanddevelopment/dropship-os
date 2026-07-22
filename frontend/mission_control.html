@@ -315,7 +315,9 @@
   </div>
 
   <div class="panel" id="libraryPanel">
-    <h2>Product Library — everything gathered so far <span id="libCount" style="color:var(--accent)"></span></h2>
+    <h2>Product Library — everything gathered so far <span id="libCount" style="color:var(--accent)"></span>
+      <a href="/approved" target="_blank" class="btn-sm" style="float:right; text-decoration:none; color:var(--green); border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.1)">&#10003; Approved page — Mike's feed</a>
+    </h2>
     <div class="regen-banner" id="regenBanner"><div class="spinner"></div><span id="regenText">Working...</span></div>
     <div id="library"><div class="empty">Loading library...</div></div>
   </div>
@@ -513,11 +515,15 @@ async function loadLibrary() {
                           hormozi_secret:'Insider find', kamil_pov:'POV hook', kamil_tested:'Comparison win',
                           kamil_viral:'Under the radar', garyvee_hot:'Hot take', garyvee_question:'Question hook',
                           proof_direct:'Social proof' };
-      const ads = (p.ad_variants || []).map((v, vi) => `
+      const nApproved = (p.ad_variants||[]).filter(v => v.approved).length;
+      const ads = (p.ad_variants || []).map((v, vi) => v.approved ? '' : `
         <div class="ad-tile">
           ${v.file ? `<img loading="lazy" src="/cards/${v.file}?t=${ts}" alt="">` : ''}
           <div class="cap"><b><span class="g-${v.letter}">${v.letter} ${v.grade}</span> · ${TECHNIQUE[v.archetype]||'Ad'}</b>${v.headline||''}</div>
-          <button class="btn-retry regen-btn" onclick="regen('${p.product_id}', ${vi})">&#8635; Redo this ad</button>
+          <div style="display:flex">
+            <button class="btn-retry regen-btn" style="border-right:1px solid var(--border); color:var(--green)" onclick="approveAd('${p.product_id}', ${vi})">&#10003; Approve</button>
+            <button class="btn-retry regen-btn" onclick="regen('${p.product_id}', ${vi})">&#8635; Redo</button>
+          </div>
         </div>`).join('');
       const hasAds = (p.ad_variants||[]).length > 0;
       return `<div class="lib-item" id="lib${idx}">
@@ -525,7 +531,7 @@ async function loadLibrary() {
           ${thumb ? `<img src="${thumb.startsWith('/cards/') ? thumb + '?t=' + ts : thumb}" alt="">` : '<img alt="">'}
           <div class="lib-title">
             <h3>${p.title || p.product_id}</h3>
-            <div class="sub">${price} · ${(p.ad_variants||[]).length} ads · best ${p.top_grade||'—'} · from "${p.query||p.keyword||''}" · ${when}</div>
+            <div class="sub">${price} · ${(p.ad_variants||[]).length} ads${nApproved ? ` · <span style="color:var(--green)">${nApproved} approved &#10003;</span>` : ''} · best ${p.top_grade||'—'} · from "${p.query||p.keyword||''}" · ${when}</div>
           </div>
           <div class="lib-links" onclick="event.stopPropagation()">
             <button class="btn-sm regen-btn" onclick="regen('${p.product_id}', null)">${hasAds ? '&#8635; Redo all 10 ads' : '&#9889; Create 10 ads'}</button>
@@ -605,6 +611,17 @@ async function fulfillOrder(sid, force) {
 async function orderDone(sid) {
   try { await fetchJSON('/api/orders/done', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({session_id: sid})}); } catch (e) {}
   loadOrders();
+}
+
+async function approveAd(pid, vi) {
+  try {
+    const r = await fetchJSON('/api/product/approve', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ product_id: pid, variant: vi, approved: true }),
+    });
+    if (!r.ok) { alert(r.error || 'Could not approve'); return; }
+    loadLibrary();
+  } catch (e) { alert('Engine not reachable'); }
 }
 
 // ── Ad regeneration (per product / per ad) ──

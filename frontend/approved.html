@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Approved Ads — Ready to Post</title>
+<style>
+  :root { --bg:#0b0f17; --panel:#121826; --panel2:#1a2234; --border:#232d42; --text:#e6ecf7;
+          --muted:#8b97ad; --accent:#38bdf8; --green:#34d399; --amber:#fbbf24; --red:#f87171; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:"Segoe UI",system-ui,sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 20px 80px; }
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  h1 { font-size:22px; }
+  h1 span { color:var(--green); }
+  .back { color:var(--accent); text-decoration:none; font-size:13.5px; }
+  .note { color:var(--muted); font-size:13.5px; margin-bottom:22px; line-height:1.6; }
+  .note code { background:#0d1420; border:1px solid var(--border); padding:2px 8px; border-radius:6px;
+               color:var(--green); font-size:12.5px; }
+  .prod { background:var(--panel); border:1px solid var(--border); border-radius:16px;
+          padding:18px 20px; margin-bottom:18px; }
+  .prod-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .prod-head h2 { font-size:17px; }
+  .prod-head .meta { color:var(--muted); font-size:12.5px; }
+  .prod-head a { color:var(--accent); font-size:12.5px; text-decoration:none; margin-left:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+  .tile { background:var(--panel2); border:1px solid rgba(52,211,153,.35); border-radius:10px; overflow:hidden; }
+  .tile img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; }
+  .cap { padding:8px 10px; font-size:11px; color:var(--muted); line-height:1.4; }
+  .cap b { color:var(--text); display:block; font-size:11.5px; margin-bottom:2px; }
+  .g { color:var(--green); font-weight:800; }
+  .unapprove { width:100%; background:none; border:none; border-top:1px solid var(--border);
+               color:var(--muted); font-size:11px; padding:7px 0; cursor:pointer; font-weight:600; }
+  .unapprove:hover { color:var(--amber); background:rgba(251,191,36,.06); }
+  .empty { color:var(--muted); padding:40px 0; text-align:center; font-size:14.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>&#10003; <span>Approved Ads</span> — ready for Mike to post</h1>
+    <a class="back" href="/">&larr; back to Mission Control</a>
+  </header>
+  <p class="note">
+    Everything here has been personally approved. Mike's feed pulls exactly this list from
+    <code>GET http://127.0.0.1:8889/api/library/approved</code> — every ad carries its public image URL
+    and the one sales page it must link to. Anything not on this page is still in review and off-limits.
+  </p>
+  <div id="content"><div class="empty">Loading...</div></div>
+</div>
+
+<script>
+async function load() {
+  try {
+    const r = await fetch('/api/library/approved');
+    const data = await r.json();
+    const prods = data.products || [];
+    if (!prods.length) {
+      document.getElementById('content').innerHTML =
+        '<div class="empty">Nothing approved yet. Go to Mission Control, open a product, and hit &#10003; Approve on the ads you like.</div>';
+      return;
+    }
+    document.getElementById('content').innerHTML = prods.map(p => `
+      <div class="prod">
+        <div class="prod-head">
+          <h2>${p.title}</h2>
+          <div class="meta">$${Number(p.retail_price||0).toFixed(2)} · ${p.approved_ads.length} approved ad${p.approved_ads.length>1?'s':''}
+            ${p.landing_url ? `<a href="${p.landing_url}" target="_blank">Sales page &#8599;</a>` : ''}
+          </div>
+        </div>
+        <div class="grid">
+          ${p.approved_ads.map(a => `
+            <div class="tile">
+              ${a.file ? `<img loading="lazy" src="/cards/${a.file}" alt="">` : (a.image_url ? `<img loading="lazy" src="${a.image_url}" alt="">` : '')}
+              <div class="cap"><b><span class="g">${a.letter} ${a.grade}</span></b>${a.headline||''}</div>
+              <button class="unapprove" onclick="unapprove('${p.product_id}', '${a.file}')">&#8617; Pull back to review</button>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    document.getElementById('content').innerHTML = '<div class="empty">Engine not reachable — is Mission Control running?</div>';
+  }
+}
+
+async function unapprove(pid, file) {
+  // find index by file via the full library
+  try {
+    const lib = await fetch('/api/library').then(r => r.json());
+    const p = (lib.products || []).find(x => x.product_id === pid);
+    const idx = (p.ad_variants || []).findIndex(v => v.file === file);
+    if (idx < 0) return;
+    await fetch('/api/product/approve', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ product_id: pid, variant: idx, approved: false }) });
+    load();
+  } catch (e) {}
+}
+
+load();
+setInterval(load, 20000);
+</script>
+</body>
+</html>

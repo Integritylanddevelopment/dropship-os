@@ -1138,7 +1138,9 @@
         "advisor": "Kamil",
         "grade": 82,
         "letter": "A",
-        "photo": "https://cf.cjdropshipping.com/3084b531-1790-45fd-9ac3-b0f384b56347.png"
+        "photo": "https://cf.cjdropshipping.com/3084b531-1790-45fd-9ac3-b0f384b56347.png",
+        "approved": true,
+        "approved_at": "2026-07-22T18:18:53.997005+00:00"
       },
       {
         "file": "bird_house_v2.png",
@@ -1242,7 +1244,7 @@
         "photo": "https://cf.cjdropshipping.com/320ffd14-cd0f-47b5-995f-bfa6702987a1.png"
       }
     ],
-    "updated_at": "2026-07-22T17:44:09.086376+00:00",
+    "updated_at": "2026-07-22T18:18:53.997005+00:00",
     "cj_pid": "2079741523178455042"
   },
   "activities_tips": {
