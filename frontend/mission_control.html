@@ -143,6 +143,12 @@
   .st-posted { color: var(--green); font-weight: 700; }
   .st-failed { color: var(--red); font-weight: 700; }
   .st-skipped { color: var(--muted); }
+  .o-new { color: var(--accent); font-weight: 700; }
+  .o-ordered { color: var(--violet); font-weight: 700; }
+  .o-shipped { color: var(--green); font-weight: 700; }
+  .o-done { color: var(--muted); }
+  .o-needs_review { color: var(--amber); font-weight: 700; }
+  .o-failed { color: var(--red); font-weight: 700; }
   td a { color: var(--accent); }
 
   /* Library */
@@ -298,6 +304,14 @@
       <thead><tr><th>Platform</th><th>Product</th><th>Status</th><th>Detail</th><th>Link</th></tr></thead>
       <tbody id="posts"></tbody>
     </table>
+  </div>
+
+  <div class="panel" id="ordersPanel">
+    <h2>Orders — money in, shipping out
+      <span id="orderStats" style="color:var(--green)"></span>
+      <button class="btn-sm" style="float:right" onclick="refreshOrders(true)">&#8635; Check for new orders</button>
+    </h2>
+    <div id="ordersBody"><div class="empty">No orders yet — when someone buys from a sales page, it shows up here and ships automatically.</div></div>
   </div>
 
   <div class="panel" id="libraryPanel">
@@ -526,6 +540,69 @@ async function loadLibrary() {
   }
 }
 
+// ── Orders ──
+const STATUS_LABEL = { new: 'NEW', ordered: 'ORDERED AT CJ', shipped: 'SHIPPED',
+                       done: 'DONE', needs_review: 'NEEDS YOUR OK', failed: 'FAILED' };
+
+async function loadOrders() {
+  try {
+    const data = await fetchJSON('/api/orders');
+    const orders = data.orders || [];
+    el('orderStats').textContent = orders.length
+      ? ` $${(data.revenue||0).toFixed(2)} from ${orders.length} order${orders.length>1?'s':''} · auto-ship ${data.auto?'ON':'OFF'}`
+      : '';
+    if (!orders.length) return;
+    el('ordersBody').innerHTML = `<table>
+      <thead><tr><th>When</th><th>Product</th><th>Buyer</th><th>Ship to</th><th>Paid</th><th>Status</th><th></th></tr></thead>
+      <tbody>` + orders.map(o => {
+        const when = o.created ? new Date(o.created).toLocaleString('en-US', {timeZone:'America/Chicago', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : '';
+        const a = o.address || {};
+        const f = o.fulfillment || {};
+        let extra = '';
+        if (f.reason) extra = `<div style="font-size:11px;color:var(--amber)">${f.reason}</div>`;
+        if (f.cj_order_id) extra = `<div style="font-size:11px;color:var(--muted)">CJ #${f.cj_order_id}${f.tracking ? ' · tracking ' + f.tracking : ''}</div>`;
+        let actions = '';
+        if (o.status === 'new' || o.status === 'needs_review')
+          actions = `<button class="btn-sm" onclick="fulfillOrder('${o.session_id}', ${o.status==='needs_review'})">Ship it</button>`;
+        else if (o.status === 'shipped')
+          actions = `<button class="btn-sm" onclick="orderDone('${o.session_id}')">Mark done</button>`;
+        return `<tr>
+          <td style="white-space:nowrap">${when}</td>
+          <td>${o.product_title}</td>
+          <td>${o.buyer_name||''}<div style="font-size:11px;color:var(--muted)">${o.buyer_email||''}</div></td>
+          <td style="font-size:12px">${a.city||''}${a.state?', '+a.state:''} ${a.zip||''}</td>
+          <td style="font-weight:700">$${(o.amount||0).toFixed(2)}</td>
+          <td><span class="o-${o.status}">${STATUS_LABEL[o.status]||o.status}</span>${extra}</td>
+          <td>${actions}</td>
+        </tr>`;
+      }).join('') + '</tbody></table>';
+  } catch (e) {}
+}
+
+async function refreshOrders(manual) {
+  if (manual) el('orderStats').textContent = ' checking Stripe...';
+  try {
+    await fetchJSON('/api/orders/refresh', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+  } catch (e) {}
+  loadOrders();
+}
+
+async function fulfillOrder(sid, force) {
+  try {
+    const r = await fetchJSON('/api/orders/fulfill', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({session_id: sid, force: !!force}),
+    });
+    if (!r.ok && (r.error || r.review)) alert(r.error || r.review);
+  } catch (e) { alert('Engine not reachable'); }
+  loadOrders();
+}
+
+async function orderDone(sid) {
+  try { await fetchJSON('/api/orders/done', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({session_id: sid})}); } catch (e) {}
+  loadOrders();
+}
+
 // ── Ad regeneration (per product / per ad) ──
 let regenPolling = null;
 
@@ -572,9 +649,11 @@ poll = async function() {
 renderStages({});
 refreshServices();
 loadLibrary();
+loadOrders();
 poll();
 setInterval(poll, 1800);
 setInterval(refreshServices, 15000);
+setInterval(loadOrders, 30000);
 </script>
 </body>
 </html>
