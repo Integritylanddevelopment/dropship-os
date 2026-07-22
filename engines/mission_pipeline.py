@@ -34,6 +34,8 @@ def _variant_public(v: dict) -> dict:
         "grade": v.get("grade", 0),
         "letter": v.get("letter", "?"),
         "photo": v.get("photo", ""),
+        "badge": v.get("badge", ""),
+        "cta": v.get("cta", ""),
     }
 
 
@@ -340,12 +342,36 @@ def _do_regen(product_id: str, variant_index: int | None):
                                  "headline": copy["headline"], "subline": copy.get("subline", ""),
                                  "archetype": copy["archetype"], "advisor": copy["advisor"],
                                  "grade": copy.get("grade", 0), "letter": copy.get("letter", "?"),
-                                 "photo": purl})
+                                 "photo": purl, "badge": copy.get("badge", ""),
+                                 "cta": copy.get("cta", "")})
         entry["ad_variants"] = new_variants
         if new_variants:
             entry["top_grade"] = f"{new_variants[0]['letter']} ({new_variants[0]['grade']})"
         if pool and not entry.get("photo_url"):
             entry["photo_url"] = pool[0]
+
+        # Refresh the sales page too — better copy every time ads are redone
+        if entry.get("payment_link"):
+            try:
+                from asset_machine.collateral_engine import ai_landing_copy
+                from integrations import landing_pages as lp
+                _regen_detail(f"Rewriting the sales page for {title}...")
+                page = ai_landing_copy(entry)
+                html = lp.render_landing_html(
+                    product_name=title,
+                    photo_url=entry.get("photo_url", ""),
+                    retail_price=entry.get("retail_price", 0),
+                    compare_at=entry.get("compare_at", 0),
+                    benefit=page["headline"],
+                    bullets=page["bullets"],
+                    buy_url=entry["payment_link"],
+                    headline=page["headline"],
+                    paragraph=page["paragraph"],
+                    quote=(entry.get("intent") or [""])[0],
+                )
+                entry["landing_url"] = lp.publish_landing_page(product_id[:30], html)
+            except Exception as e:
+                _log(f"sales page refresh failed: {e}")
         _regen_detail(f"{title}: {len(new_variants)} new ads live")
     else:
         # ── Single-ad retry: context injection — the reject + all other ads ──
@@ -356,10 +382,24 @@ def _do_regen(product_id: str, variant_index: int | None):
         others = [a.get("headline", "") for j, a in enumerate(ads) if j != variant_index]
         _regen_detail(f"ALIEN is rewriting ad {variant_index+1} for {title} (told: don't repeat the other {len(others)})")
         head, sub = ai_retry_copy(entry, old.get("archetype", "proof_direct"), old, others)
-        copy = dict(old)
+        # Rebuild a COMPLETE copy dict — saved ads may lack badge/cta fields
+        base = next((v for v in build_copy_variants(entry)
+                     if v["archetype"] == old.get("archetype")), None)
+        copy = dict(base) if base else {
+            "archetype": old.get("archetype", "proof_direct"),
+            "advisor": old.get("advisor", ""), "badge": "TRENDING NOW",
+            "cta": "SHOP NOW", "headline": old.get("headline", ""),
+            "subline": old.get("subline", ""),
+        }
+        if old.get("badge"):
+            copy["badge"] = old["badge"]
+        if old.get("cta"):
+            copy["cta"] = old["cta"]
         if head:
             copy["headline"], copy["subline"] = head, sub
         else:
+            copy["headline"] = old.get("headline") or copy["headline"]
+            copy["subline"] = old.get("subline") or copy["subline"]
             _log("AI didn't answer — reshuffling design + photo instead")
         g = grade_copy(copy, entry)
         if g["total"] < 70:
@@ -390,7 +430,8 @@ def _do_regen(product_id: str, variant_index: int | None):
                               "headline": copy["headline"], "subline": copy.get("subline", ""),
                               "archetype": copy["archetype"], "advisor": copy.get("advisor", ""),
                               "grade": copy["grade"], "letter": copy["letter"],
-                              "photo": purl}
+                              "photo": purl, "badge": copy.get("badge", ""),
+                              "cta": copy.get("cta", "")}
         entry["ad_variants"] = ads
         _regen_detail(f"Ad {variant_index+1} for {title} redone — grade {copy['letter']} ({copy['grade']})")
 
@@ -673,22 +714,21 @@ def _do_run(query, platforms, limit, dry_run):
                 except Exception as e:
                     _log(f"stripe link error for {p['title']}: {e}")
 
-                # 5c. landing page on GitHub Pages
+                # 5c. landing page on GitHub Pages (full sales copy)
                 try:
-                    bullets = [benefit,
-                               "Tracked delivery on every order",
-                               "Secure Stripe checkout",
-                               "30-day return window"]
-                    if p.get("intent"):
-                        bullets.insert(1, f'Buyers online: "{p["intent"][0]}"')
+                    from asset_machine.collateral_engine import ai_landing_copy
+                    page = ai_landing_copy(p)
                     html = lp.render_landing_html(
                         product_name=p["title"],
                         photo_url=p.get("photo_url", ""),
                         retail_price=p["retail_price"],
                         compare_at=p["compare_at"],
                         benefit=benefit,
-                        bullets=bullets,
+                        bullets=page["bullets"],
                         buy_url=p.get("payment_link") or LANDING_URL or "#",
+                        headline=page["headline"],
+                        paragraph=page["paragraph"],
+                        quote=(p.get("intent") or [""])[0],
                     )
                     p["landing_url"] = lp.publish_landing_page(p["product_id"][:30], html)
                     pages_made += 1

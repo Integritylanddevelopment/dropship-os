@@ -509,10 +509,14 @@ async function loadLibrary() {
       const price = p.retail_price ? `$${Number(p.retail_price).toFixed(2)}` : '';
       const when = p.updated_at ? new Date(p.updated_at).toLocaleString('en-US', {timeZone:'America/Chicago', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : '';
       const ts = p.updated_at ? new Date(p.updated_at).getTime() : 0;
+      const TECHNIQUE = { hormozi_dream:'Dream outcome', hormozi_offer:'Price anchor', hormozi_stop:'Pattern break',
+                          hormozi_secret:'Insider find', kamil_pov:'POV hook', kamil_tested:'Comparison win',
+                          kamil_viral:'Under the radar', garyvee_hot:'Hot take', garyvee_question:'Question hook',
+                          proof_direct:'Social proof' };
       const ads = (p.ad_variants || []).map((v, vi) => `
         <div class="ad-tile">
           ${v.file ? `<img loading="lazy" src="/cards/${v.file}?t=${ts}" alt="">` : ''}
-          <div class="cap"><b><span class="g-${v.letter}">${v.letter} ${v.grade}</span> · ${v.advisor||''}</b>${v.headline||''}</div>
+          <div class="cap"><b><span class="g-${v.letter}">${v.letter} ${v.grade}</span> · ${TECHNIQUE[v.archetype]||'Ad'}</b>${v.headline||''}</div>
           <button class="btn-retry regen-btn" onclick="regen('${p.product_id}', ${vi})">&#8635; Redo this ad</button>
         </div>`).join('');
       const hasAds = (p.ad_variants||[]).length > 0;

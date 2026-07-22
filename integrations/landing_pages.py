@@ -156,15 +156,19 @@ def ensure_pages_enabled() -> str:
 
 def render_landing_html(product_name: str, photo_url: str, retail_price: float,
                         compare_at: float, benefit: str, bullets: list,
-                        buy_url: str) -> str:
+                        buy_url: str, headline: str = "", paragraph: str = "",
+                        quote: str = "") -> str:
     save_pct = int(round((1 - retail_price / compare_at) * 100)) if compare_at > retail_price > 0 else 0
-    bullets_html = "\n".join(
-        f'<li>{b}</li>' for b in bullets[:4]
-    )
+    bullets_html = "\n".join(f'<li>{b}</li>' for b in bullets[:6])
     photo_html = (f'<img class="hero" src="{photo_url}" alt="{product_name}">'
                   if photo_url else "")
     save_html = (f'<span class="cmp">${compare_at:,.2f}</span>'
                  f'<span class="save">SAVE {save_pct}%</span>' if save_pct else "")
+    headline_html = f'<p class="hook">{headline}</p>' if headline else ""
+    story_html = f'<p class="story">{paragraph}</p>' if paragraph else ""
+    quote_html = (f'<div class="quote">&ldquo;{quote}&rdquo;<span> — buyer comment found online</span></div>'
+                  if quote else "")
+    stack_total = compare_at if compare_at > retail_price else retail_price * 1.5
     return f"""<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -174,42 +178,68 @@ def render_landing_html(product_name: str, photo_url: str, retail_price: float,
   body {{ background:#f7f8fa; color:#181c23; }}
   .page {{ max-width:520px; margin:0 auto; background:#fff; min-height:100vh; }}
   .hero {{ width:100%; display:block; }}
-  .body {{ padding:22px 22px 40px; }}
+  .body {{ padding:22px 22px 46px; }}
   .badge {{ display:inline-block; background:#ff5252; color:#fff; font-size:12px; font-weight:700;
            letter-spacing:1px; padding:6px 14px; border-radius:999px; margin-bottom:12px; }}
-  h1 {{ font-size:28px; line-height:1.2; margin-bottom:8px; }}
-  .benefit {{ color:#6e7682; font-size:16px; margin-bottom:16px; }}
+  .hook {{ font-size:22px; font-weight:800; color:#06897c; margin-bottom:6px; line-height:1.25; }}
+  h1 {{ font-size:27px; line-height:1.2; margin-bottom:10px; }}
+  .benefit {{ color:#6e7682; font-size:16px; margin-bottom:14px; }}
+  .story {{ font-size:15.5px; color:#3a4150; line-height:1.65; margin-bottom:18px; }}
   .price-row {{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }}
   .price {{ font-size:38px; font-weight:800; }}
   .cmp {{ color:#9aa2ae; text-decoration:line-through; font-size:20px; }}
   .save {{ background:#ff5252; color:#fff; font-size:13px; font-weight:700; padding:5px 12px; border-radius:999px; }}
-  ul {{ list-style:none; margin-bottom:22px; }}
+  ul {{ list-style:none; margin-bottom:20px; }}
   li {{ padding:8px 0 8px 30px; position:relative; font-size:15.5px; color:#3a4150; }}
   li:before {{ content:'✓'; position:absolute; left:2px; color:#06b6a4; font-weight:800; }}
+  .quote {{ background:#f2faf9; border-left:4px solid #06b6a4; padding:14px 16px; border-radius:0 12px 12px 0;
+           font-size:15.5px; font-style:italic; color:#2a4a46; margin-bottom:20px; }}
+  .quote span {{ display:block; font-style:normal; font-size:12.5px; color:#7a948f; margin-top:6px; }}
+  .stack {{ border:1.5px solid #e4e9ee; border-radius:14px; padding:16px 18px; margin-bottom:22px; }}
+  .stack h3 {{ font-size:13px; text-transform:uppercase; letter-spacing:1px; color:#8a94a2; margin-bottom:10px; }}
+  .stack .row {{ display:flex; justify-content:space-between; font-size:14.5px; padding:6px 0; color:#3a4150; }}
+  .stack .row.total {{ border-top:1.5px solid #e4e9ee; margin-top:8px; padding-top:12px; font-weight:800; color:#181c23; font-size:16px; }}
+  .stack .was {{ color:#9aa2ae; text-decoration:line-through; margin-right:8px; }}
   .buy {{ display:block; background:#06b6a4; color:#fff; text-align:center; font-size:20px; font-weight:800;
          padding:18px; border-radius:14px; text-decoration:none; letter-spacing:.5px;
          box-shadow:0 6px 18px rgba(6,182,164,.35); }}
   .buy:active {{ transform:translateY(1px); }}
-  .trust {{ text-align:center; color:#9aa2ae; font-size:13px; margin-top:14px; }}
-  .ship {{ margin-top:26px; border-top:1px solid #edf0f3; padding-top:16px; color:#6e7682; font-size:13.5px; line-height:1.6; }}
+  .trust {{ text-align:center; color:#9aa2ae; font-size:13px; margin-top:12px; margin-bottom:26px; }}
+  .faq {{ border-top:1px solid #edf0f3; padding-top:18px; }}
+  .faq h3 {{ font-size:15px; margin-bottom:12px; }}
+  .faq p {{ font-size:13.5px; color:#6e7682; line-height:1.6; margin-bottom:12px; }}
+  .faq b {{ color:#3a4150; }}
 </style></head>
 <body><div class="page">
   {photo_html}
   <div class="body">
     <span class="badge">TRENDING NOW</span>
+    {headline_html}
     <h1>{product_name}</h1>
     <p class="benefit">{benefit}</p>
     <div class="price-row">
       <span class="price">${retail_price:,.2f}</span>
       {save_html}
     </div>
-    <ul>{bullets_html}</ul>
     <a class="buy" href="{buy_url}">BUY NOW — SECURE CHECKOUT</a>
     <p class="trust">Powered by Stripe · Card details never touch our servers</p>
-    <div class="ship">
-      <strong>Shipping:</strong> Orders process in 1-2 business days; typical delivery 7-15 days with tracking.<br>
-      <strong>Returns:</strong> 30-day return window on unused items.
+    {story_html}
+    <ul>{bullets_html}</ul>
+    {quote_html}
+    <div class="stack">
+      <h3>What you get today</h3>
+      <div class="row"><span>{product_name}</span><span><span class="was">${stack_total:,.2f}</span></span></div>
+      <div class="row"><span>Tracked shipping to your door</span><span>Included</span></div>
+      <div class="row"><span>30-day return protection</span><span>Included</span></div>
+      <div class="row total"><span>Your price</span><span>${retail_price:,.2f}</span></div>
     </div>
+    <div class="faq">
+      <h3>Common questions</h3>
+      <p><b>How fast does it ship?</b><br>Orders process in 1-2 business days. Typical delivery is 7-15 days, with a tracking number the whole way.</p>
+      <p><b>What if it's not for me?</b><br>You have a 30-day window to return unused items. No hoops.</p>
+      <p><b>Is checkout safe?</b><br>Payment runs through Stripe — the same processor used by millions of stores. We never see your card number.</p>
+    </div>
+    <a class="buy" style="margin-top:22px" href="{buy_url}">GET YOURS — ${retail_price:,.2f}</a>
   </div>
 </div></body></html>"""
 

@@ -186,6 +186,13 @@ Content stage now produces BUYER-facing ads, not internal scorecards. Flow per w
 - 5 rotating visual layouts × 5 palettes = ads look like different creatives (Kamil multi-angle testing).
 - Pipeline posts the top-3 graded ads per product per run (anti-spam), all → same landing page.
 
+## Business Identity (added 2026-07-22)
+
+- **Public business name:** Integrity Products USA (Stripe checkout + statement descriptor INTEGRITY PRODUCTS)
+- **Public business phone:** 945-312-6709 — use this on ALL websites, listings, policies, and public content. NEVER publish the 808 number anywhere public.
+- **Support email (planned):** support@ the new domain (GoDaddy purchase in progress)
+- Legal pages (privacy policy, terms of service, legal footer) hosted with the landing pages; Stripe public details must point at them.
+
 ## Orders + Auto-Fulfillment (added 2026-07-21, late night)
 
 `integrations/order_fulfillment.py` — the last mile. Engine background loop polls Stripe checkout sessions every 5 min; each PAID session becomes an order in `data/orders.json`, matched to the library product, then AUTO-ordered at CJ (buyer's address, CJPacket) via `shopping/order/createOrder`. Money-safety fuse → NEEDS REVIEW instead of auto-order when: multi-variant price spread >20%, CJ cost > FULFILL_MAX_COST ($30 default), no phone, or no confident CJ match. Orders panel in Mission Control: status chips (NEW/ORDERED/SHIPPED/NEEDS YOUR OK), one-click "Ship it", tracking numbers auto-pulled. New payment links collect buyer phone (CJ needs it); SHIPSTACK_FULFILL_PHONE in .env is the fallback for old links. `cj_pid` now saved per product for exact supplier matching. AUTO_FULFILL=0 in .env disables auto mode.

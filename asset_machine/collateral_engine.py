@@ -105,6 +105,29 @@ PAIN_BY_TERM = {
 GENERIC_PAIN = "doing it the hard way"
 
 
+_GURU_WORDS = {"hormozi", "kamil", "garyvee", "vaynerchuk", "sattar"}
+
+
+def _mentions_guru(text: str) -> bool:
+    t = (text or "").lower()
+    return any(g in t for g in _GURU_WORDS) or "gary vee" in t
+
+
+def _display_category(product: dict) -> str:
+    """The category word ads should use. If the discovery keyword's words don't
+    appear in the product's real name (whole words, not substrings), derive
+    the category from the name instead."""
+    kw = product.get("keyword", "") or "home"
+    name = (product.get("title") or "").lower()
+    name_words = set(name.replace("-", " ").split())
+    if name and not any(t in name_words for t in kw.lower().split() if len(t) >= 4):
+        main = [t for t in name.replace("-", " ").split()
+                if len(t) >= 5 and t not in _STOP_TOKENS]
+        if main:
+            return main[0]
+    return kw
+
+
 def _pain_for(keyword: str, title: str = "") -> str:
     """Scan the keyword AND the real product title for pain language."""
     for source in (keyword, title):
@@ -124,7 +147,8 @@ def build_copy_variants(product: dict) -> list[dict]:
     quote = (product.get("intent") or [""])[0]
     n_signals = product.get("n_signals", 0)
     pain = _pain_for(kw, name)
-    cat = kw or "home"
+    # Stops a greenhouse being called a "bird house" in ads
+    cat = _display_category(product)
 
     v = [
         # ── Hormozi: dream outcome (value equation) ──
@@ -235,7 +259,7 @@ def ai_copy_set(product: dict, archetypes: list[str]) -> dict:
     """Generate ORIGINAL, product-specific copy for the given archetypes.
     Returns {index: (headline, subline)} for lines the AI produced well."""
     name = product.get("title", "")
-    kw = product.get("keyword", "")
+    kw = _display_category(product)
     price = product.get("retail_price", 0)
     compare = product.get("compare_at", 0)
     quote = (product.get("intent") or [""])[0]
@@ -268,6 +292,9 @@ def ai_copy_set(product: dict, archetypes: list[str]) -> dict:
             idx = int(ln.split(".", 1)[0]) - 1
             rest = ln.split(".", 1)[1]
             head, sub = [x.strip().strip('"') for x in rest.split("|", 1)]
+            # Hard filter: guru names never reach a buyer, no matter what the model does
+            if _mentions_guru(head) or _mentions_guru(sub):
+                continue
             if 0 <= idx < len(archetypes) and len(head.split()) >= 4:
                 out[idx] = (head[:90], sub[:140])
         except Exception:
@@ -281,7 +308,7 @@ def ai_retry_copy(product: dict, archetype: str, rejected: dict,
     The AI gets: the guru principle, the rejected ad, and every OTHER ad we
     already have (so it doesn't repeat any of them). Returns (head, sub) or ('','')."""
     name = product.get("title", "")
-    kw = product.get("keyword", "")
+    kw = _display_category(product)
     price = product.get("retail_price", 0)
     compare = product.get("compare_at", 0)
     quote = (product.get("intent") or [""])[0]
@@ -306,6 +333,8 @@ def ai_retry_copy(product: dict, archetype: str, rejected: dict,
             ln = ln.replace("HEADLINE:", "").replace("SUB:", "")
             try:
                 head, sub = [x.strip().strip('"') for x in ln.split("|", 1)]
+                if _mentions_guru(head) or _mentions_guru(sub):
+                    continue
                 if len(head.split()) >= 4:
                     return head[:90], sub[:140]
             except Exception:
@@ -313,35 +342,162 @@ def ai_retry_copy(product: dict, archetype: str, rejected: dict,
     return "", ""
 
 
-def build_photo_pool(product: dict, limit: int = 12) -> list[str]:
-    """Gather DIFFERENT product images from supplier search — by product title
-    first (best match), then by category keyword. Unique, ordered."""
-    from discovery_engine.suppliers import cj_dropshipping
-    urls = []
-    seen = set()
-    queries = []
-    title = product.get("title", "")
-    if title:
-        queries.append(" ".join(title.split()[:4]))
-    kw = product.get("keyword", "")
-    if kw and kw.lower() not in (q.lower() for q in queries):
-        queries.append(kw)
-    for q in queries:
-        try:
-            for listing in cj_dropshipping.search(q, limit=10):
-                u = listing.get("image") or ""
-                if u and u not in seen:
-                    seen.add(u)
-                    urls.append(u)
-                if len(urls) >= limit:
-                    return urls
-        except Exception:
+_STOP_TOKENS = {"with", "for", "the", "and", "mini", "set", "new", "cover", "style",
+                "pcs", "pieces", "piece", "pack"}
+
+
+def _title_tokens(s: str) -> set:
+    return {t for t in (s or "").lower().replace("-", " ").split()
+            if len(t) >= 4 and t not in _STOP_TOKENS}
+
+
+def ai_landing_copy(product: dict) -> dict:
+    """Product-specific sales-page copy: headline, story paragraph, bullets.
+    AI-written (guru-influenced), formula fallback. Guru names filtered."""
+    name = product.get("title", "")
+    cat = _display_category(product)
+    price = product.get("retail_price", 0)
+    quote = (product.get("intent") or [""])[0]
+    pain = _pain_for(product.get("keyword", ""), name)
+
+    out = {
+        "headline": f"Say goodbye to {pain}",
+        "paragraph": (f"The {name} does one job and does it well. Set it up once and it "
+                      f"keeps working for you — no tools, no learning curve, no fuss. "
+                      f"That's why it's one of the most-talked-about {cat} finds right now."),
+        "bullets": [
+            f"Solves {pain} the first day you use it",
+            "Sturdy build — made to be used daily, not returned",
+            "Tracked delivery on every order",
+            "Secure Stripe checkout — card details never touch our servers",
+            "30-day return window on unused items",
+        ],
+    }
+    quote_line = f'Real buyer comment: "{quote}". ' if quote else ""
+    content = _ai_chat(
+        f"You write high-converting product pages in the style of the best direct-response "
+        f"marketers. THE PRODUCT: '{name}' ({cat}), ${price:,.2f}. {quote_line}"
+        f"Write: (1) HEADLINE - max 9 words, the dream outcome, specific to this product. "
+        f"(2) STORY - 2-3 sentences, paint life after buying, concrete not fluffy. "
+        f"(3) THREE bullets - each a specific benefit or objection-killer for THIS product. "
+        f"Never mention any marketer's name. No emojis.\n"
+        f"Format exactly:\nHEADLINE: ...\nSTORY: ...\nB1: ...\nB2: ...\nB3: ...",
+        max_tokens=320, temperature=0.85,
+    )
+    bullets_ai = []
+    for ln in content.splitlines():
+        ln = ln.strip()
+        if _mentions_guru(ln):
             continue
-    # Always include the currently known photo as a fallback member
-    cur = product.get("photo_url", "")
-    if cur and cur not in seen:
-        urls.append(cur)
-    return urls
+        if ln.upper().startswith("HEADLINE:") and len(ln.split(":", 1)[1].split()) >= 4:
+            out["headline"] = ln.split(":", 1)[1].strip().strip('"')[:90]
+        elif ln.upper().startswith("STORY:") and len(ln.split(":", 1)[1].split()) >= 10:
+            out["paragraph"] = ln.split(":", 1)[1].strip().strip('"')[:500]
+        elif ln[:3].upper() in ("B1:", "B2:", "B3:"):
+            b = ln.split(":", 1)[1].strip().strip('"')
+            if len(b.split()) >= 3:
+                bullets_ai.append(b[:120])
+    if bullets_ai:
+        out["bullets"] = bullets_ai + out["bullets"][2:]
+    return out
+
+
+def _cj_images_for_pid(pid: str) -> list[str]:
+    """ALL photos from one CJ listing: the full image set (angles, lifestyle
+    shots, close-ups) plus each color-variant's photo. Same product, many looks."""
+    from discovery_engine.suppliers import cj_dropshipping
+    out = []
+    try:
+        tok = cj_dropshipping._get_token()
+        if not tok:
+            return out
+        resp = cj_dropshipping._http_json(
+            f"{cj_dropshipping.BASE}/product/query?pid={pid}",
+            headers={"CJ-Access-Token": tok}, timeout=25)
+        data = resp.get("data") or {}
+        images = data.get("productImageSet") or data.get("productImages") or []
+        if isinstance(images, str):
+            try:
+                images = json.loads(images)
+            except Exception:
+                images = [images]
+        for u in images:
+            if isinstance(u, str) and u.startswith("http"):
+                out.append(u)
+        main = data.get("productImage", "")
+        if main:
+            out.append(main)
+        # Variant photos (colors/styles of the same product)
+        for v in (data.get("variants") or []):
+            vi = v.get("variantImage") or ""
+            if vi.startswith("http"):
+                out.append(vi)
+    except Exception:
+        pass
+    return out
+
+
+def build_photo_pool(product: dict, limit: int = 14) -> list[str]:
+    """Gather MANY images of THIS PRODUCT ONLY.
+
+    1. The product's own CJ listing: full image set + variant photos (5-10+).
+    2. CJ search: for every listing whose title genuinely matches (2+ shared
+       meaningful words), pull that listing's FULL image set too.
+    3. Last resort: the one photo we already know is right.
+    A wrong photo is worse than a repeated photo — never pad with mismatches."""
+    from discovery_engine.suppliers import cj_dropshipping
+    urls, seen = [], set()
+
+    def _add(u):
+        if u and u not in seen:
+            seen.add(u)
+            urls.append(u)
+
+    title = product.get("title", "")
+    my_tokens = _title_tokens(title) | _title_tokens(product.get("supplier_title", ""))
+
+    # 1. The product's OWN listing — every photo it has
+    pid = product.get("cj_pid", "")
+    if pid:
+        for u in _cj_images_for_pid(pid):
+            _add(u)
+
+    # 2. Search — MEANINGFUL words only (CJ search happily matches junk words
+    #    like "With", returning cutlery for a greenhouse). Verified matches
+    #    contribute their FULL image sets.
+    if len(urls) < limit and title:
+        meaningful = [t for t in title.replace("-", " ").split()
+                      if len(t) >= 4 and t.lower() not in _STOP_TOKENS]
+        queries = []
+        if meaningful:
+            queries.append(" ".join(meaningful[:3]))
+            longest = max(meaningful, key=len)
+            if longest.lower() != queries[0].lower():
+                queries.append(longest)
+        try:
+            matched = 0
+            for q in queries:
+                for listing in cj_dropshipping.search(q, limit=10):
+                    lt = _title_tokens(listing.get("title", ""))
+                    overlap = len(my_tokens & lt)
+                    if overlap >= 2 and listing.get("id"):
+                        # Remember the best match for future runs + fulfillment
+                        if not product.get("cj_pid"):
+                            product["cj_pid"] = listing["id"]
+                        for u in _cj_images_for_pid(listing["id"]):
+                            _add(u)
+                        _add(listing.get("image") or "")
+                        matched += 1
+                        if matched >= 3 or len(urls) >= limit:
+                            break
+                if matched >= 3 or len(urls) >= limit:
+                    break
+        except Exception:
+            pass
+
+    # 3. Known-good photo — better repeated than wrong
+    _add(product.get("photo_url", ""))
+    return urls[:limit]
 
 
 # ── The Grader: custom weighting from the Hormozi + Gary Vee playbooks ───
@@ -456,6 +612,17 @@ def improve_offer(copy: dict, product: dict, grade: dict) -> dict:
 
 # ── Rendering: 5 layouts ─────────────────────────────────────────────────
 
+def _text_on(rgb) -> tuple:
+    """Readable text color for a given background: dark on light, white on dark."""
+    lum = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]
+    return DARK if lum > 150 else WHITE
+
+
+def _subtext_on(rgb) -> tuple:
+    """Softer secondary text color that still reads on the background."""
+    return (60, 66, 76) if _text_on(rgb) == DARK else (225, 229, 236)
+
+
 def _price_block(draw, x, y, price, compare, accent, text_color):
     if price <= 0:
         return y
@@ -477,7 +644,7 @@ def _cta_button(draw, y, cta, primary, width_pad=60):
     _rounded(draw, (width_pad, y, W - width_pad, y + 100), 50, primary)
     f = _font(42)
     tw = draw.textlength(cta + "  →", font=f)
-    draw.text(((W - tw) / 2, y + 26), cta + "  →", font=f, fill=WHITE)
+    draw.text(((W - tw) / 2, y + 26), cta + "  →", font=f, fill=_text_on(primary))
     return y + 100
 
 
@@ -485,7 +652,7 @@ def _badge_pill(draw, x, y, label, accent):
     f = _font(28)
     pw = draw.textlength(label, font=f) + 40
     _rounded(draw, (x, y, x + pw, y + 52), 26, accent)
-    draw.text((x + 20, y + 10), label, font=f, fill=WHITE)
+    draw.text((x + 20, y + 10), label, font=f, fill=_text_on(accent))
 
 
 def render_variant(product: dict, copy: dict, layout: int, palette_i: int,
@@ -544,13 +711,15 @@ def render_variant(product: dict, copy: dict, layout: int, palette_i: int,
             # Color block top with headline, photo bottom
             bh = 600
             draw.rectangle((0, 0, W, bh), fill=primary)
+            block_text = _text_on(primary)
+            block_sub = _subtext_on(primary)
             y = 90
             _badge_pill(draw, 60, y - 54, copy["badge"], accent)
             y = 150
             for ln in _wrap(draw, copy["headline"], _font(66), W - 120)[:3]:
-                draw.text((60, y), ln, font=_font(66), fill=WHITE); y += 80
+                draw.text((60, y), ln, font=_font(66), fill=block_text); y += 80
             for ln in _wrap(draw, copy["subline"], _font(32, bold=False), W - 120)[:2]:
-                draw.text((60, y + 6), ln, font=_font(32, bold=False), fill=(235, 238, 245)); y += 44
+                draw.text((60, y + 6), ln, font=_font(32, bold=False), fill=block_sub); y += 44
             if photo: canvas.paste(_cover(photo, W, H - bh - 160), (0, bh))
             draw = ImageDraw.Draw(canvas)
             draw.rectangle((0, H - 160, W, H), fill=panel_bg)
@@ -559,7 +728,7 @@ def render_variant(product: dict, copy: dict, layout: int, palette_i: int,
                 draw.text((60, H - 138), f"${price:,.2f}", font=pf, fill=panel_text)
             _rounded(draw, (W - 470, H - 138, W - 60, H - 42), 48, accent)
             f2 = _font(36); tw = draw.textlength(copy["cta"], font=f2)
-            draw.text((W - 470 + (410 - tw) / 2, H - 110), copy["cta"], font=f2, fill=WHITE)
+            draw.text((W - 470 + (410 - tw) / 2, H - 110), copy["cta"], font=f2, fill=_text_on(accent))
 
         elif layout == 3:
             # Minimal: headline top, rounded photo center, price+CTA below
@@ -600,7 +769,7 @@ def render_variant(product: dict, copy: dict, layout: int, palette_i: int,
                 draw.text((60, y + 4), ln, font=_font(31, bold=False), fill=(170, 178, 190)); y += 44
             if price > 0:
                 draw.text((60, y + 14), f"${price:,.2f}", font=_font(66), fill=accent); y += 100
-            _cta_button(draw, max(y, H - 160), copy["cta"], accent)
+            _cta_button(draw, max(y, H - 160), copy["cta"], accent)  # button text auto-contrasts
 
         out = Path(out_path)
         out.parent.mkdir(parents=True, exist_ok=True)

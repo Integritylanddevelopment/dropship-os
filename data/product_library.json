@@ -1065,106 +1065,108 @@
     "photo_url": "https://cf.cjdropshipping.com/d7dbaeb1-d27d-4ef0-8426-b95488098497.png",
     "landing_url": "https://integritylanddevelopment.github.io/dropship-os/landing/bird_house.html",
     "payment_link": "https://buy.stripe.com/7sYfZiesH5VF9Qk9TH3F60k",
-    "top_grade": "A (88)",
+    "top_grade": "A (82)",
     "ad_variants": [
       {
         "file": "bird_house_v1.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v1.png",
-        "headline": "Never deal with plants dying every winter again",
-        "subline": "Mini Walk-in Greenhouse With PVC Cover handles it — set it up once, done. 30-day returns · $142.99 (was $215)",
-        "archetype": "hormozi_dream",
-        "advisor": "Hormozi",
-        "grade": 88,
+        "headline": "POV: you finally fixed plants dying every winter",
+        "subline": "Mini Walk-in Greenhouse With PVC Cover — going viral for a reason. 30-day returns · $142.99 (was $215)",
+        "archetype": "kamil_pov",
+        "advisor": "Kamil",
+        "grade": 82,
         "letter": "A",
-        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/22/03/68358052-35c6-449f-bc4d-ed64de4dea1f.jpg"
+        "photo": "https://cf.cjdropshipping.com/3084b531-1790-45fd-9ac3-b0f384b56347.png"
       },
       {
         "file": "bird_house_v2.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v2.png",
-        "headline": "Tested multiple options — This wins for size",
-        "subline": "Perfect room for all your feathered friends. 30-day returns · $142.99 (was $215)",
-        "archetype": "kamil_tested",
-        "advisor": "Kamil",
+        "headline": "Have One, Use It",
+        "subline": "Will you finally get your hands on a mini greenhouse?. 30-day returns · $142.99 (was $215)",
+        "archetype": "garyvee_question",
+        "advisor": "GaryVee",
         "grade": 68,
         "letter": "B",
-        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/22/02/50a68736-5e0c-406a-ac1c-b499acacdc67_fine.jpeg"
+        "photo": "https://cf.cjdropshipping.com/175e4c93-6dd2-4349-a2b7-2e17bfd7ed12.png"
       },
       {
         "file": "bird_house_v3.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v3.png",
-        "headline": "Picture this: Your birds thrive in any weather",
-        "subline": "Start today and watch them flourish. 30-day returns · $142.99 (was $215)",
-        "archetype": "garyvee_question",
-        "advisor": "GaryVee",
-        "grade": 66,
+        "headline": "Stop Suffering in the Cold",
+        "subline": "Experience Year-Round Growing with Our Mini Greenhouse · $142.99. 30-day returns",
+        "archetype": "hormozi_stop",
+        "advisor": "Hormozi",
+        "grade": 68,
         "letter": "B",
-        "photo": "https://cf.cjdropshipping.com/quick/product/92f3a0d1-47fd-4978-aa3c-84df23cf5f2d.jpg"
+        "photo": "https://cf.cjdropshipping.com/3084b531-1790-45fd-9ac3-b0f384b56347.png",
+        "badge": "NEW WAY",
+        "cta": "SEE HOW"
       },
       {
         "file": "bird_house_v4.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v4.png",
-        "headline": "Kamil’s new bird paradise setup solved my issue",
-        "subline": "Instant brighter, healthier winged companions. 30-day returns · $142.99 (was $215)",
-        "archetype": "kamil_pov",
-        "advisor": "Kamil",
+        "headline": "The greenhouse upgrade nobody told you about",
+        "subline": "Specific, simple, and it just works. 30-day returns · $142.99 (was $215)",
+        "archetype": "hormozi_secret",
+        "advisor": "Hormozi",
         "grade": 62,
         "letter": "C",
-        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/22/01/fba46e63-ad7d-493a-bc4b-c46e14144eeb_trans.jpeg"
+        "photo": "https://cf.cjdropshipping.com/5765c2ba-6aa3-4d08-b07e-571d90599e47.png"
       },
       {
         "file": "bird_house_v5.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v5.png",
+        "headline": "We compared the top greenhouse finds. This one won.",
+        "subline": "Real product, real results — see for yourself. 30-day returns · $142.99 (was $215)",
+        "archetype": "kamil_tested",
+        "advisor": "Kamil",
+        "grade": 62,
+        "letter": "C",
+        "photo": "https://cf.cjdropshipping.com/5775b52d-a06f-4e02-9689-79af683d6ddf.png"
+      },
+      {
+        "file": "bird_house_v6.png",
+        "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v6.png",
         "headline": "$215 value. $142.99 today.",
         "subline": "30-day returns. If it's not for you, send it back.",
         "archetype": "hormozi_offer",
         "advisor": "Hormozi",
         "grade": 60,
         "letter": "C",
-        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/22/03/0256fa52-715d-4b8a-af54-c83090e0b62c_trans.jpeg"
-      },
-      {
-        "file": "bird_house_v6.png",
-        "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v6.png",
-        "headline": "Upgrade from old cages to this greenhouse",
-        "subline": "More space, better light. 30-day returns · $142.99 (was $215)",
-        "archetype": "hormozi_stop",
-        "advisor": "Hormozi",
-        "grade": 55,
-        "letter": "C",
-        "photo": "https://oss-cf.cjdropshipping.com/product/2026/07/22/02/3334c3dd-e8c0-4734-a013-78e3bdd8d980_fine.jpeg"
+        "photo": "https://cf.cjdropshipping.com/c29270cf-eb2f-441b-bd75-5f4fa981016b.png"
       },
       {
         "file": "bird_house_v7.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v7.png",
-        "headline": "Discover the secret to lush avian growth",
-        "subline": "Increased sunlight, happier birds. 30-day returns · $142.99 (was $215)",
-        "archetype": "hormozi_secret",
+        "headline": "Grow Fresh Herbs Year-Round",
+        "subline": "Compact space for bountiful harvest. 30-day returns · $142.99 (was $215)",
+        "archetype": "hormozi_dream",
         "advisor": "Hormozi",
         "grade": 55,
         "letter": "C",
-        "photo": "https://cf.cjdropshipping.com/quick/product/7cc3618d-1795-4780-a253-f17e11dec223.jpg"
+        "photo": "https://cf.cjdropshipping.com/7208d613-c1ea-4c79-a013-2684e3d49e9f.png"
       },
       {
         "file": "bird_house_v8.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v8.png",
-        "headline": "Why are greenhouses not more common?",
-        "subline": "More space, better climate control. 30-day returns · $142.99 (was $215)",
+        "headline": "Why is nobody talking about this?",
+        "subline": "Mini Walk-in Greenhouse With PVC Cover, quietly selling out at $142.99. 30-day returns",
         "archetype": "kamil_viral",
         "advisor": "Kamil",
         "grade": 55,
         "letter": "C",
-        "photo": "https://cf.cjdropshipping.com/quick/product/50e8b22c-f701-437f-a754-1efa5dfd6685.jpg"
+        "photo": "https://cf.cjdropshipping.com/1237d138-15b3-4dcf-92d8-81fbac916f96.png"
       },
       {
         "file": "bird_house_v9.png",
         "url": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v9.png",
-        "headline": "Hormozi's greenhouse: Not just another bird house",
-        "subline": "It’s the future of avian care. 30-day returns · $142.99 (was $215)",
+        "headline": "Forget the Big Ones",
+        "subline": "This small greenhouse outperforms others easily. 30-day returns · $142.99 (was $215)",
         "archetype": "garyvee_hot",
         "advisor": "GaryVee",
         "grade": 55,
         "letter": "C",
-        "photo": "https://cf.cjdropshipping.com/ded3d473-6aac-4806-915b-7f6e43d11e81.png"
+        "photo": "https://cf.cjdropshipping.com/ea128713-84eb-4334-8b00-7e7c9cd7f5fd.png"
       },
       {
         "file": "bird_house_v10.png",
@@ -1175,10 +1177,11 @@
         "advisor": "Hormozi",
         "grade": 55,
         "letter": "C",
-        "photo": "https://cf.cjdropshipping.com/8bf1b385-c36b-4027-b104-0e8d707b4220.png"
+        "photo": "https://cf.cjdropshipping.com/320ffd14-cd0f-47b5-995f-bfa6702987a1.png"
       }
     ],
-    "updated_at": "2026-07-22T03:52:46.756449+00:00"
+    "updated_at": "2026-07-22T16:45:05.645459+00:00",
+    "cj_pid": "2079741523178455042"
   },
   "activities_tips": {
     "product_id": "activities_tips",
