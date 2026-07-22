@@ -145,6 +145,84 @@
   .st-skipped { color: var(--muted); }
   td a { color: var(--accent); }
 
+  /* Library */
+  .lib-item {
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 14px;
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .lib-head {
+    display: flex; align-items: center; gap: 16px; padding: 14px 18px; cursor: pointer;
+    transition: background .12s;
+  }
+  .lib-head:hover { background: rgba(56,189,248,.05); }
+  .lib-head img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; background: #0d1420; }
+  .lib-title { flex: 1; }
+  .lib-title h3 { font-size: 15.5px; margin-bottom: 4px; }
+  .lib-title .sub { font-size: 12px; color: var(--muted); }
+  .lib-links { display: flex; gap: 14px; font-size: 12.5px; align-items: center; }
+  .lib-links a { color: var(--accent); text-decoration: none; }
+  .lib-links a:hover { text-decoration: underline; }
+  .caret { color: var(--muted); font-size: 18px; transition: transform .15s; }
+  .lib-item.open .caret { transform: rotate(90deg); }
+  .lib-body { display: none; padding: 6px 18px 18px; border-top: 1px solid var(--border); }
+  .lib-item.open .lib-body { display: block; }
+  .ad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 12px; }
+  .ad-tile { background: #0d1420; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .ad-tile img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+  .ad-tile .cap { padding: 8px 10px; font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .ad-tile .cap b { color: var(--text); display: block; margin-bottom: 2px; font-size: 11.5px; }
+  .g-A { color: var(--green); font-weight: 800; }
+  .g-B { color: var(--accent); font-weight: 800; }
+  .g-C { color: var(--amber); font-weight: 800; }
+  .g-D { color: var(--red); font-weight: 800; }
+  .btn-sm {
+    background: rgba(56,189,248,.12); color: var(--accent); border: 1px solid rgba(56,189,248,.4);
+    font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    transition: background .12s; white-space: nowrap;
+  }
+  .btn-sm:hover:not(:disabled) { background: rgba(56,189,248,.25); }
+  .btn-sm:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-retry {
+    width: 100%; background: none; border: none; border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 11px; padding: 7px 0; cursor: pointer; font-weight: 600;
+  }
+  .btn-retry:hover:not(:disabled) { color: var(--accent); background: rgba(56,189,248,.06); }
+  .btn-retry:disabled { opacity: .4; cursor: not-allowed; }
+  .regen-banner {
+    display: none; background: rgba(56,189,248,.08); border: 1px solid rgba(56,189,248,.35);
+    color: var(--accent); border-radius: 12px; padding: 12px 18px; font-size: 13.5px;
+    margin-bottom: 14px; align-items: center; gap: 12px;
+  }
+  .regen-banner.show { display: flex; }
+  .regen-banner .spinner { margin: 0; }
+
+  /* Page popup (modal) */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(4, 8, 15, .72); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-frame {
+    background: #fff; border-radius: 22px; overflow: hidden;
+    width: min(460px, 92vw); height: min(820px, 88vh);
+    box-shadow: 0 24px 80px rgba(0,0,0,.6); position: relative;
+    display: flex; flex-direction: column;
+  }
+  .modal-bar {
+    background: var(--panel); color: var(--text); padding: 10px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; border-bottom: 1px solid var(--border);
+  }
+  .modal-bar .actions { display: flex; gap: 14px; align-items: center; }
+  .modal-bar a { color: var(--accent); text-decoration: none; font-size: 12.5px; }
+  .modal-close {
+    background: none; border: none; color: var(--muted); font-size: 22px;
+    cursor: pointer; line-height: 1; padding: 2px 6px;
+  }
+  .modal-close:hover { color: var(--red); }
+  .modal-frame iframe { flex: 1; border: none; width: 100%; background: #fff; }
+
   /* Log */
   .log {
     background: #070b12; border: 1px solid var(--border); border-radius: 12px;
@@ -222,6 +300,12 @@
     </table>
   </div>
 
+  <div class="panel" id="libraryPanel">
+    <h2>Product Library — everything gathered so far <span id="libCount" style="color:var(--accent)"></span></h2>
+    <div class="regen-banner" id="regenBanner"><div class="spinner"></div><span id="regenText">Working...</span></div>
+    <div id="library"><div class="empty">Loading library...</div></div>
+  </div>
+
   <div class="panel">
     <h2>Activity Log</h2>
     <div class="log" id="log">Waiting for first run...</div>
@@ -229,8 +313,38 @@
 
 </div>
 
+<div class="modal-overlay" id="pageModal" onclick="if(event.target===this)closePage()">
+  <div class="modal-frame">
+    <div class="modal-bar">
+      <span id="modalTitle">Sales page</span>
+      <div class="actions">
+        <a id="modalOpenTab" href="#" target="_blank">open in tab &#8599;</a>
+        <button class="modal-close" onclick="closePage()">&times;</button>
+      </div>
+    </div>
+    <iframe id="modalFrame" src="about:blank"></iframe>
+  </div>
+</div>
+
 <script>
 const STAGE_ICONS = { services: "&#128268;", discover: "&#128269;", pick: "&#127942;", content: "&#127912;", host: "&#127760;", post: "&#128640;" };
+
+// ── Popup viewers ──
+function openPage(url, title) {
+  document.getElementById('modalFrame').src = url;
+  document.getElementById('modalTitle').textContent = title || 'Sales page';
+  document.getElementById('modalOpenTab').href = url;
+  document.getElementById('pageModal').classList.add('show');
+}
+function closePage() {
+  document.getElementById('pageModal').classList.remove('show');
+  document.getElementById('modalFrame').src = 'about:blank';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePage(); });
+// Stripe checkout refuses to be embedded — use a floating popup window instead
+function openCheckout(url) {
+  window.open(url, 'shipstack_checkout', 'width=480,height=780,left=200,top=60');
+}
 let polling = null;
 
 function el(id) { return document.getElementById(id); }
@@ -288,13 +402,14 @@ function renderProducts(products) {
         <span class="badge b-score">score ${(p.score*100).toFixed(0)}</span>
         <span class="badge b-margin">${(p.margin_pct*100).toFixed(0)}% margin ${price ? '&middot; '+price : ''}</span>
         <span class="badge ${recClass(p.recommendation)}">${p.recommendation||'—'}</span>
+        ${p.ad_variants && p.ad_variants.length ? '<span class="badge b-score">' + p.ad_variants.length + ' ads &middot; best ' + (p.top_grade||'') + '</span>' : ''}
       </div>
       <div class="tags">
         ${p.hooks && p.hooks.length ? '&#127919; ' + p.hooks.join(', ') + '<br>' : ''}
         ${p.intent && p.intent.length ? '&#128172; "' + p.intent.slice(0,3).join('", "') + '"<br>' : ''}
         &#128202; ${p.n_signals} signals
-        ${p.landing_url ? '<br>&#128722; <a href="' + p.landing_url + '" target="_blank" style="color:var(--accent)">View store page &#8599;</a>' : ''}
-        ${p.payment_link ? ' &middot; <a href="' + p.payment_link + '" target="_blank" style="color:var(--green)">checkout link &#8599;</a>' : ''}
+        ${p.landing_url ? '<br>&#128722; <a href="javascript:void(0)" onclick="openPage(\'' + p.landing_url + '\',\'' + (p.title||'').replace(/'/g,"\\'") + '\')" style="color:var(--accent)">View store page</a>' : ''}
+        ${p.payment_link ? ' &middot; <a href="javascript:void(0)" onclick="openCheckout(\'' + p.payment_link + '\')" style="color:var(--green)">checkout</a>' : ''}
       </div>
     </div></div>`;
   }).join('');
@@ -362,9 +477,101 @@ async function startRun() {
   }
 }
 
+// ── Product Library ──
+let wasRunning = false;
+
+async function loadLibrary() {
+  try {
+    const data = await fetchJSON('/api/library');
+    const items = data.products || [];
+    el('libCount').textContent = items.length ? `(${items.length} products)` : '';
+    if (!items.length) {
+      el('library').innerHTML = '<div class="empty">Nothing gathered yet — push RUN PIPELINE to start.</div>';
+      return;
+    }
+    el('library').innerHTML = items.map((p, idx) => {
+      const firstAd = (p.ad_variants || [])[0];
+      const thumb = firstAd && firstAd.file ? `/cards/${firstAd.file}` : (p.photo_url || '');
+      const price = p.retail_price ? `$${Number(p.retail_price).toFixed(2)}` : '';
+      const when = p.updated_at ? new Date(p.updated_at).toLocaleString('en-US', {timeZone:'America/Chicago', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : '';
+      const ts = p.updated_at ? new Date(p.updated_at).getTime() : 0;
+      const ads = (p.ad_variants || []).map((v, vi) => `
+        <div class="ad-tile">
+          ${v.file ? `<img loading="lazy" src="/cards/${v.file}?t=${ts}" alt="">` : ''}
+          <div class="cap"><b><span class="g-${v.letter}">${v.letter} ${v.grade}</span> · ${v.advisor||''}</b>${v.headline||''}</div>
+          <button class="btn-retry regen-btn" onclick="regen('${p.product_id}', ${vi})">&#8635; Redo this ad</button>
+        </div>`).join('');
+      const hasAds = (p.ad_variants||[]).length > 0;
+      return `<div class="lib-item" id="lib${idx}">
+        <div class="lib-head" onclick="document.getElementById('lib${idx}').classList.toggle('open')">
+          ${thumb ? `<img src="${thumb.startsWith('/cards/') ? thumb + '?t=' + ts : thumb}" alt="">` : '<img alt="">'}
+          <div class="lib-title">
+            <h3>${p.title || p.product_id}</h3>
+            <div class="sub">${price} · ${(p.ad_variants||[]).length} ads · best ${p.top_grade||'—'} · from "${p.query||p.keyword||''}" · ${when}</div>
+          </div>
+          <div class="lib-links" onclick="event.stopPropagation()">
+            <button class="btn-sm regen-btn" onclick="regen('${p.product_id}', null)">${hasAds ? '&#8635; Redo all 10 ads' : '&#9889; Create 10 ads'}</button>
+            ${p.landing_url ? `<a href="javascript:void(0)" onclick="openPage('${p.landing_url}','${(p.title||'').replace(/'/g,"\\'")}')">Sales page</a>` : ''}
+            ${p.payment_link ? `<a href="javascript:void(0)" onclick="openCheckout('${p.payment_link}')" style="color:var(--green)">Checkout</a>` : ''}
+          </div>
+          <span class="caret">&#9656;</span>
+        </div>
+        <div class="lib-body">
+          ${ads ? `<div class="ad-grid">${ads}</div>` : '<div class="empty">No ads yet — hit the Create 10 ads button above.</div>'}
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    el('library').innerHTML = '<div class="empty">Library unavailable — is the engine running?</div>';
+  }
+}
+
+// ── Ad regeneration (per product / per ad) ──
+let regenPolling = null;
+
+async function regen(pid, variantIdx) {
+  try {
+    const body = { product_id: pid };
+    if (variantIdx !== null && variantIdx !== undefined) body.variant = variantIdx;
+    const r = await fetchJSON('/api/product/regenerate', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body),
+    });
+    if (!r.ok) { alert(r.error || 'Could not start'); return; }
+    document.querySelectorAll('.regen-btn').forEach(b => b.disabled = true);
+    el('regenBanner').classList.add('show');
+    el('regenText').textContent = 'Starting...';
+    if (regenPolling) clearInterval(regenPolling);
+    regenPolling = setInterval(async () => {
+      try {
+        const s = await fetchJSON('/api/regen/status');
+        el('regenText').textContent = s.detail || 'Working...';
+        if (!s.running) {
+          clearInterval(regenPolling); regenPolling = null;
+          el('regenBanner').classList.remove('show');
+          document.querySelectorAll('.regen-btn').forEach(b => b.disabled = false);
+          if (s.error) alert('Ad job hit a problem: ' + s.error);
+          loadLibrary();
+        }
+      } catch (e) {}
+    }, 1500);
+  } catch (e) { alert('Engine not reachable'); }
+}
+
+// Refresh library when a run finishes
+const _origPoll = poll;
+poll = async function() {
+  await _origPoll();
+  try {
+    const s = await fetchJSON('/api/pipeline/status');
+    if (wasRunning && !s.running) loadLibrary();
+    wasRunning = !!s.running;
+  } catch (e) {}
+};
+
 // boot
 renderStages({});
 refreshServices();
+loadLibrary();
 poll();
 setInterval(poll, 1800);
 setInterval(refreshServices, 15000);

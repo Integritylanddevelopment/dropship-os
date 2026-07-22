@@ -89,9 +89,20 @@ def wait_health(port, timeout_sec=60):
     return False
 
 
+def engine_already_up() -> bool:
+    try:
+        req = urllib.request.Request("http://127.0.0.1:8889/health",
+                                     headers={"User-Agent": "launcher"})
+        with urllib.request.urlopen(req, timeout=2):
+            return True
+    except Exception:
+        return False
+
+
 def main():
     log("=" * 50)
     log("Mission Control launch (local stack)")
+    was_up = engine_already_up()
 
     for _, _, port in SERVICES:
         kill_port(port)
@@ -106,12 +117,16 @@ def main():
         results.append(f"{'[OK]' if ok else '[FAIL]'} {name} :{port}")
         log(results[-1])
 
-    # Open the UI regardless — engine is the one that matters
-    try:
-        os.startfile(UI_URL)
-        log(f"opened {UI_URL}")
-    except Exception as e:
-        log(f"browser open failed: {e}")
+    # Open the browser ONLY on a fresh start. Restarts keep the existing tab —
+    # the page reconnects by itself, no new tabs.
+    if not was_up:
+        try:
+            os.startfile(UI_URL)
+            log(f"opened {UI_URL}")
+        except Exception as e:
+            log(f"browser open failed: {e}")
+    else:
+        log("engine was already running - not opening another tab")
 
 
 if __name__ == "__main__":

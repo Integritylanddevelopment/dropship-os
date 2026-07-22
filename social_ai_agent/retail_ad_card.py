@@ -106,6 +106,7 @@ def generate_retail_ad(
     buyer_quote: str = "",
     output_path: str = "ad_card.png",
     trending: bool = True,
+    benefit_override: str = "",
 ) -> str | None:
     """Build a 1000x1500 buyer-facing ad card. Returns output path or None."""
     try:
@@ -154,9 +155,11 @@ def generate_retail_ad(
             draw.text((60, y), ln, font=h_font, fill=DARK)
             y += 74
 
-        # Benefit line (from real hooks) or real buyer quote
+        # Benefit line: AI-written copy first, then real buyer quote, then template
         b_font = _font(33, bold=False)
-        if buyer_quote:
+        if benefit_override:
+            benefit = benefit_override
+        elif buyer_quote:
             benefit = f'“{buyer_quote}” — real buyer comment'
         else:
             benefit = DEFAULT_BENEFIT

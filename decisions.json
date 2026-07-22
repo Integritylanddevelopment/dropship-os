@@ -1,32 +1,28 @@
 {
-  "generated_at": "2026-07-22T02:59:02.409482+00:00",
-  "count": 3,
+  "generated_at": "2026-07-22T03:44:46.521064+00:00",
+  "count": 5,
   "products": [
     {
-      "product_id": "malok_anti",
-      "title": "Malok Anti",
-      "keyword": "malok anti",
-      "score": 0.254,
+      "product_id": "tickle_toes",
+      "title": "Tickle Toes",
+      "keyword": "tickle toes",
+      "score": 0.265,
       "margin_pct": 0.667,
       "retail_price": 34.5,
       "recommendation": "skip",
-      "hooks": [
-        "problem-solving"
-      ],
-      "intent": [
-        "recommend"
-      ],
+      "hooks": [],
+      "intent": [],
       "n_signals": 2,
       "sources": [
         {
           "platform": "reddit",
-          "url": "https://reddit.com/r/WashingMachineReviews/comments/1kaoic2/can_malok_anti_barking_device_effectively_stop/",
-          "title": "Can MALOK Anti Barking Device Effectively Stop Excessive Barking? Detailed Review Inside"
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpzfc1/this_tickle_toes_has_worked_flawlessly_since_we/",
+          "title": "This Tickle Toes has worked flawlessly since we got it 24 years ago."
         },
         {
           "platform": "reddit",
-          "url": "https://reddit.com/r/WashingMachineReviews/comments/1k9yah3/does_malok_anti_barking_device_work_effectively/",
-          "title": "Does MALOK Anti Barking Device Work Effectively for Bark Control? Honest Review"
+          "url": "https://reddit.com/r/BuyItForLife/comments/1kpze6n/tickle_toes_has_worked_flawlessly_since_we_got_it/",
+          "title": "Tickle Toes has worked flawlessly since we got it in 2001"
         }
       ],
       "card_path": null,
@@ -39,36 +35,26 @@
       "payment_link": ""
     },
     {
-      "product_id": "pressure_washer",
-      "title": "Pressure Washer",
-      "keyword": "pressure washer",
-      "score": 0.237,
+      "product_id": "cheap_ipad",
+      "title": "Cheap Ipad",
+      "keyword": "cheap ipad",
+      "score": 0.154,
       "margin_pct": 0.667,
       "retail_price": 34.5,
       "recommendation": "skip",
-      "hooks": [
-        "problem-solving",
-        "visual-demo"
-      ],
-      "intent": [
-        "worth it"
-      ],
-      "n_signals": 3,
+      "hooks": [],
+      "intent": [],
+      "n_signals": 2,
       "sources": [
         {
           "platform": "reddit",
-          "url": "https://reddit.com/r/trustyconsumer/comments/1kjjqg6/why_dgivovo_g1541bl_electric_pressure_washer/",
-          "title": "Why DGIVOVO G1541-BL Electric Pressure Washer Review Captivates Homeowners?"
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1k9np91/so_my_cheap_12_ipad_screen_protector_survived_my/",
+          "title": "So, My Cheap $12 iPad Screen Protector Survived My Toddler"
         },
         {
           "platform": "reddit",
-          "url": "https://reddit.com/r/trustyconsumer/comments/1kd8r91/why_is_the_dewalt_cordless_pressure_washer_worth/",
-          "title": "Why is the DEWALT cordless pressure washer worth it? A detailed review"
-        },
-        {
-          "platform": "reddit",
-          "url": "https://reddit.com/r/BestPressureWasher/comments/1j08s6r/discover_if_the_dgivovo_g1541bl_pressure_washer/",
-          "title": "Discover if the DGIVOVO G1541-BL pressure washer is worth the investment review"
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1k9qrk9/so_my_cheap_12_ipad_screen_protector_survived_my/",
+          "title": "So, My Cheap $12 iPad Screen Protector Survived My Toddler"
         }
       ],
       "card_path": null,
@@ -81,36 +67,97 @@
       "payment_link": ""
     },
     {
-      "product_id": "bird_house",
-      "title": "Bird House",
-      "keyword": "bird house",
-      "score": 0.235,
+      "product_id": "gift_cards",
+      "title": "Gift Cards",
+      "keyword": "gift cards",
+      "score": 0.154,
       "margin_pct": 0.667,
       "retail_price": 34.5,
       "recommendation": "skip",
       "hooks": [
-        "problem-solving",
-        "visual-demo"
+        "giftable"
       ],
-      "intent": [
-        "affordable"
-      ],
-      "n_signals": 3,
+      "intent": [],
+      "n_signals": 2,
       "sources": [
         {
           "platform": "reddit",
-          "url": "https://reddit.com/r/haircarecom/comments/1kq4p7c/best_wood_bird_house_2025_top_picks_reviews/",
-          "title": "Best Wood Bird House 2025: Top Picks & Reviews"
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kkfv0z/normal_gift_cards/",
+          "title": "Normal gift cards..."
         },
         {
           "platform": "reddit",
-          "url": "https://reddit.com/r/haircarecom/comments/1kq2rkk/best_bird_house_poles_2025_top_reviews_buying/",
-          "title": "Best Bird House Poles 2025: Top Reviews & Buying Guide"
+          "url": "https://reddit.com/r/ofcoursethatsathing/comments/1kkft5t/we_have_love_gift_cards_for_gay_people/",
+          "title": "WE HAVE LOVE GIFT CARDS FOR GAY PEOPLE"
+        }
+      ],
+      "card_path": null,
+      "card_url": null,
+      "photo_url": "",
+      "supplier_title": "",
+      "supplier_cost": 0.0,
+      "compare_at": 0.0,
+      "landing_url": "",
+      "payment_link": ""
+    },
+    {
+      "product_id": "steamy_cat",
+      "title": "Steamy Cat",
+      "keyword": "steamy cat",
+      "score": 0.151,
+      "margin_pct": 0.667,
+      "retail_price": 31.5,
+      "recommendation": "skip",
+      "hooks": [],
+      "intent": [],
+      "n_signals": 4,
+      "sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kg4ulz/steamy_cat_brush/",
+          "title": "Steamy Cat Brush"
         },
         {
           "platform": "reddit",
-          "url": "https://reddit.com/r/TravelOne/comments/1koxz17/best_30_gal_trash_can_2025_top_reviews_guide/",
-          "title": "Best 30 Gal Trash Can 2025: Top Reviews &amp; Guide"
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kg3yj0/steamy_cat_brush/",
+          "title": "Steamy Cat Brush"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kg3xba/steamy_cat_brush/",
+          "title": "Steamy Cat Brush"
+        }
+      ],
+      "card_path": null,
+      "card_url": null,
+      "photo_url": "",
+      "supplier_title": "",
+      "supplier_cost": 0.0,
+      "compare_at": 0.0,
+      "landing_url": "",
+      "payment_link": ""
+    },
+    {
+      "product_id": "playing_cards",
+      "title": "Playing Cards",
+      "keyword": "playing cards",
+      "score": 0.151,
+      "margin_pct": 0.667,
+      "retail_price": 34.5,
+      "recommendation": "skip",
+      "hooks": [],
+      "intent": [],
+      "n_signals": 2,
+      "sources": [
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kpk0up/playing_cards_with_my_friends_faces_on_them/",
+          "title": "Playing cards with my friend's faces on them"
+        },
+        {
+          "platform": "reddit",
+          "url": "https://reddit.com/r/shutupandtakemymoney/comments/1kpjwc7/custom_playing_cards/",
+          "title": "Custom playing cards"
         }
       ],
       "card_path": null,

@@ -172,6 +172,20 @@ One-button UI at **http://127.0.0.1:8889/** (served by shipstack_engine.py). Des
 - Reddit blocks unauthenticated JSON (403) and Pullpush data is frozen ~2023 → need Reddit OAuth app for live trend signals.
 - TikTok OAuth incomplete; Meta/Instagram credentials empty.
 
+## Retail Pipeline (added 2026-07-21, evening)
+
+Content stage now produces BUYER-facing ads, not internal scorecards. Flow per winner: CJ supplier match (photo + true cost) → margin_calc retail pricing (.99) → `social_ai_agent/retail_ad_card.py` (photo hero, benefit line, price + SAVE pill, SHOP NOW) → `integrations/landing_pages.py` creates Stripe payment link (REST, no SDK) + one-pager on GitHub Pages (integritylanddevelopment.github.io/dropship-os/landing/<id>.html) → pin links to the store page. Product title = cleaned supplier listing title. Old scorecard generator (pinterest_poster.generate_product_card) left intact but no longer used by Mission Control. Winners deduped by product_id. NEVER put scores/margins on buyer-facing content.
+
+## Marketing Collateral Engine (added 2026-07-21, night)
+
+`asset_machine/collateral_engine.py` — turns gathered internet data (product, photos, buyer quotes, signals) into 10 ORIGINAL graded ad cards per product, all pointing at that product's ONE sales page. Built on the stored advisor workbook (`agents/advisors/garyvee.json`, `hormozi.json`, `kamil.json`).
+
+- 10 copy archetypes from the playbooks (hormozi_dream/offer/stop/secret, kamil_pov/tested/viral, garyvee_hot/question, proof_direct)
+- AI chain: Quinn bridge → **ALIEN GPU Ollama (100.66.135.31:11434, qwen2.5:7b)** → local Ollama → formula fallback. ALIEN is the standing copy generator per Alex's order.
+- **Hormozi Grader** with custom weights: offer_strength .30, emotional .20, problem_solution .20, cta_clarity .15, logical .15. Grades 0-100 + letter. Weak offers auto-improved (add guarantee, price anchor) then re-graded. AI rewrites only ship if they OUT-GRADE the formula version AND are ≥5 words (small models over-compress into caveman grammar otherwise).
+- 5 rotating visual layouts × 5 palettes = ads look like different creatives (Kamil multi-angle testing).
+- Pipeline posts the top-3 graded ads per product per run (anti-spam), all → same landing page.
+
 ## CREATIVE SOLUTION LOG - 2026-07-21 (Mission Control session)
 - Pinterest fake-success bug: API errors return {"code":29,"message":...} with HTTP 200 path through poster; social agent checked only for "error" key. Rule: a real pin ALWAYS has "id" — no id = failure. Fixed in agents/social_ai_agent.py + engines/mission_pipeline.py.
 - Pullpush.io (Pushshift mirror) data frozen ~2023 (421+ day old posts). trend_velocity falls back to engagement-based scoring (avg score/comments, capped 0.4) when no signal is <14d old.

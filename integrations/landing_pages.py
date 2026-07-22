@@ -75,6 +75,8 @@ def create_payment_link(product_name: str, price_usd: float,
         "line_items[0][quantity]": 1,
         "shipping_address_collection[allowed_countries][0]": "US",
         "shipping_address_collection[allowed_countries][1]": "CA",
+        # Phone required: the supplier (CJ) needs it on the shipping label
+        "phone_number_collection[enabled]": "true",
     })
     if "error" in link or not link.get("url"):
         return {"error": str(link.get("error", link))[:200]}

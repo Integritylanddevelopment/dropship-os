@@ -179,6 +179,90 @@ def api_pipeline_status():
     return jsonify(mission_pipeline.get_status())
 
 
+@app.route("/api/library", methods=["GET"])
+def api_library():
+    """Every product ever gathered + its collateral. Survives restarts."""
+    err = _require(mission_pipeline, "Mission pipeline")
+    if err:
+        return err
+    return jsonify({"products": mission_pipeline.load_library()})
+
+
+@app.route("/api/product/regenerate", methods=["POST"])
+def api_product_regenerate():
+    """Create/redo ads for one product, or retry a single ad (context-injected)."""
+    err = _require(mission_pipeline, "Mission pipeline")
+    if err:
+        return err
+    body = request.get_json(silent=True) or {}
+    pid = body.get("product_id", "")
+    if not pid:
+        return jsonify({"ok": False, "error": "product_id required"}), 400
+    variant = body.get("variant")
+    variant = int(variant) if variant is not None else None
+    result = mission_pipeline.start_regen(pid, variant)
+    return jsonify(result), (200 if result.get("ok") else 409)
+
+
+@app.route("/api/regen/status", methods=["GET"])
+def api_regen_status():
+    err = _require(mission_pipeline, "Mission pipeline")
+    if err:
+        return err
+    return jsonify(mission_pipeline.get_regen_status())
+
+
+# ── Orders + auto-fulfillment ────────────────────────────────────────────
+
+order_fulfillment = None
+try:
+    from integrations import order_fulfillment
+    logger.info("Order fulfillment loaded")
+except Exception as e:
+    logger.warning(f"Order fulfillment unavailable: {e}")
+
+
+@app.route("/api/orders", methods=["GET"])
+def api_orders():
+    err = _require(order_fulfillment, "Order fulfillment")
+    if err:
+        return err
+    orders = order_fulfillment.list_orders()
+    revenue = sum(o.get("amount", 0) for o in orders if o.get("status") != "failed")
+    return jsonify({"orders": orders, "count": len(orders),
+                    "revenue": round(revenue, 2),
+                    "auto": order_fulfillment.AUTO_FULFILL})
+
+
+@app.route("/api/orders/refresh", methods=["POST"])
+def api_orders_refresh():
+    err = _require(order_fulfillment, "Order fulfillment")
+    if err:
+        return err
+    return jsonify(order_fulfillment.process_cycle())
+
+
+@app.route("/api/orders/fulfill", methods=["POST"])
+def api_orders_fulfill():
+    err = _require(order_fulfillment, "Order fulfillment")
+    if err:
+        return err
+    body = request.get_json(silent=True) or {}
+    sid = body.get("session_id", "")
+    if not sid:
+        return jsonify({"ok": False, "error": "session_id required"}), 400
+    return jsonify(order_fulfillment.fulfill_order(sid, force=bool(body.get("force"))))
+
+
+@app.route("/api/orders/done", methods=["POST"])
+def api_orders_done():
+    err = _require(order_fulfillment, "Order fulfillment")
+    if err:
+        return err
+    body = request.get_json(silent=True) or {}
+    return jsonify(order_fulfillment.mark_done(body.get("session_id", "")))
+
+
 @app.route("/api/services", methods=["GET"])
 def api_services():
     """Health check across all ShipStack services for the UI status bar."""
@@ -490,5 +574,13 @@ if __name__ == "__main__":
     logger.info(f"Subsystems: DecisionEngine={DecisionEngine is not None}, "
                 f"ProductResearcher={ProductResearcher is not None}, "
                 f"DiscoveryPipeline={discovery_pipeline is not None}")
+
+    # Order watcher: checks Stripe every 5 min, auto-fulfills at CJ
+    if order_fulfillment is not None:
+        try:
+            order_fulfillment.start_background_loop(300)
+            logger.info("Order auto-fulfillment loop started (every 5 min)")
+        except Exception as e:
+            logger.warning(f"Order loop failed to start: {e}")
 
     app.run(host="0.0.0.0", port=PORT, debug=False)
