@@ -26,7 +26,7 @@ try:
 except ImportError:
     BASE_DIR = Path(__file__).parent.parent
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 
 # ── Graceful imports of posting subsystems ────────────────────────────────────
 # integrations/social_poster.py classes
@@ -75,6 +75,7 @@ QUINN_CHAT_URL = f"{QUINN_BRIDGE}/v1/chat/completions"
 
 POST_QUEUE_PATH = BASE_DIR / "content_pipeline" / "post_queue.json"
 CARDS_DIR = BASE_DIR / "pinterest_cards"
+POSTING_COMMAND_CENTER_PATH = BASE_DIR / "social_ai_agent" / "posting_command_center.html"
 
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
@@ -363,6 +364,20 @@ def health():
 @app.route('/platforms', methods=['GET'])
 def platforms():
     return jsonify(_platform_status())
+
+
+@app.route('/posting', methods=['GET'])
+@app.route('/posting-command-center', methods=['GET'])
+def posting_command_center():
+    if not POSTING_COMMAND_CENTER_PATH.exists():
+        return jsonify({
+            "error": "Posting command center file not found",
+            "path": str(POSTING_COMMAND_CENTER_PATH),
+        }), 404
+    return send_from_directory(
+        POSTING_COMMAND_CENTER_PATH.parent,
+        POSTING_COMMAND_CENTER_PATH.name,
+    )
 
 
 # ── Pinterest ─────────────────────────────────────────────────────────────────

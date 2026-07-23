@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShipStack Posting Command Center</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111417;
+      --panel: #1a2026;
+      --panel-2: #232b34;
+      --line: #313b46;
+      --text: #edf2f7;
+      --muted: #a3b1c0;
+      --green: #2f855a;
+      --amber: #b7791f;
+      --red: #c53030;
+      --blue: #2b6cb0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .title h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.45;
+    }
+
+    .link-row,
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.15s ease;
+    }
+
+    .btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn.primary { background: var(--blue); border-color: var(--blue); }
+    .btn.good { background: var(--green); border-color: var(--green); }
+    .btn.warn { background: var(--amber); border-color: var(--amber); }
+    .btn.bad { background: var(--red); border-color: var(--red); }
+    .btn.ghost { background: transparent; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      min-height: 120px;
+    }
+
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .big {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .sub {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section-title h2,
+    .section-title h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #2d3748;
+      color: var(--text);
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    .pill.good { background: rgba(47,133,90,0.22); color: #9ae6b4; }
+    .pill.warn { background: rgba(183,121,31,0.22); color: #f6e05e; }
+    .pill.bad { background: rgba(197,48,48,0.22); color: #feb2b2; }
+    .pill.info { background: rgba(43,108,176,0.22); color: #90cdf4; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .mini {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #10151a;
+      color: var(--text);
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .log {
+      white-space: pre-wrap;
+      background: #0f1317;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 120px;
+      color: #d6dee8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      .span-3, .span-4, .span-5, .span-6, .span-7, .span-8 { grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="title">
+        <h1>Posting Command Center</h1>
+        <p>
+          This page only manages the posting side. It reads Alex-approved ads, tracks account warmup,
+          and plans or runs posting without touching the discovery side or the main 8889 site.
+        </p>
+      </div>
+      <div class="link-row">
+        <a class="btn ghost" href="http://127.0.0.1:8889/" target="_blank" rel="noreferrer">Open Main Site</a>
+        <a class="btn ghost" href="http://127.0.0.1:8889/approved" target="_blank" rel="noreferrer">Open Approved Feed</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card span-3">
+        <div class="label">Approved queue</div>
+        <div class="big" id="readyCount">0</div>
+        <div class="sub">Approved items ready for posting right now.</div>
+      </div>
+      <div class="card span-3">
+        <div class="label">Accounts</div>
+        <div class="big" id="accountCount">0</div>
+        <div class="sub">Posting accounts tracked by the manager.</div>
+      </div>
+      <div class="card span-3">
+        <div class="label">Configured platforms</div>
+        <div class="big" id="platformCount">0</div>
+        <div class="sub">Platforms with credentials currently loaded.</div>
+      </div>
+      <div class="card span-3">
+        <div class="label">Last sync</div>
+        <div class="big" id="lastSyncLabel">Never</div>
+        <div class="sub" id="syncDetail">The approved feed has not been synced yet in this session.</div>
+      </div>
+
+      <div class="card span-8">
+        <div class="section-title">
+          <h2>Run posting manager</h2>
+          <div class="action-row">
+            <button class="btn" id="refreshBtn">Refresh</button>
+            <button class="btn primary" id="syncBtn">Sync approved feed</button>
+            <button class="btn warn" id="planBtn">Preview plan</button>
+            <button class="btn good" id="runBtn">Run live posting</button>
+          </div>
+        </div>
+        <div class="sub" style="margin-bottom: 12px;">
+          Preview uses dry-run mode. Live run sends only what the manager finds eligible under account warmup and platform readiness rules.
+        </div>
+        <div class="log" id="runLog">Loading manager state...</div>
+      </div>
+
+      <div class="card span-4">
+        <div class="section-title">
+          <h2>Platform readiness</h2>
+        </div>
+        <div id="platformPills"></div>
+      </div>
+
+      <div class="card span-7">
+        <div class="section-title">
+          <h3>Top queue items</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Ad</th>
+              <th>Grade</th>
+              <th>Platforms</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="queueRows">
+            <tr><td colspan="5" class="muted">Loading queue...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-5">
+        <div class="section-title">
+          <h3>Add or update account</h3>
+        </div>
+        <form id="accountForm">
+          <div class="form-grid">
+            <div>
+              <label class="mini">Platform</label>
+              <select name="platform" required>
+                <option value="pinterest">Pinterest</option>
+                <option value="youtube">YouTube</option>
+                <option value="tiktok">TikTok</option>
+                <option value="meta">Meta / Instagram</option>
+              </select>
+            </div>
+            <div>
+              <label class="mini">Handle</label>
+              <input name="handle" required placeholder="integrityproductsusa_pinterest" />
+            </div>
+            <div>
+              <label class="mini">Display name</label>
+              <input name="display_name" placeholder="Pinterest main" />
+            </div>
+            <div>
+              <label class="mini">Status</label>
+              <select name="status">
+                <option value="warming">Warming</option>
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+              </select>
+            </div>
+            <div>
+              <label class="mini">Warmup day</label>
+              <input name="warmup_day" type="number" min="1" value="1" />
+            </div>
+            <div>
+              <label class="mini">Daily limit (0 = auto)</label>
+              <input name="daily_limit" type="number" min="0" value="0" />
+            </div>
+            <div>
+              <label class="mini">Cooldown minutes</label>
+              <input name="cooldown_minutes" type="number" min="0" value="60" />
+            </div>
+            <div>
+              <label class="mini">Board ID (Pinterest only)</label>
+              <input name="board_id" placeholder="Pinterest board ID" />
+            </div>
+            <div class="full">
+              <label class="mini">
+                <input name="link_ready" type="checkbox" style="width:auto; margin-right:8px;" />
+                Link readiness confirmed
+              </label>
+            </div>
+            <div class="full">
+              <label class="mini">Notes</label>
+              <textarea name="notes" placeholder="Warmup notes, ownership, platform limits, etc."></textarea>
+            </div>
+            <div class="full">
+              <button class="btn primary" type="submit">Save account</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card span-12">
+        <div class="section-title">
+          <h3>Accounts</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Handle</th>
+              <th>Status</th>
+              <th>Warmup</th>
+              <th>Daily limit</th>
+              <th>Last post</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="accountRows">
+            <tr><td colspan="7" class="muted">Loading accounts...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      status: null,
+      queue: [],
+      accounts: [],
+      platforms: null,
+    };
+
+    const runLog = document.getElementById("runLog");
+
+    function setLog(message) {
+      runLog.textContent = message;
+    }
+
+    function toLocalString(value) {
+      if (!value) return "Never";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString();
+    }
+
+    function gradePill(letter, grade) {
+      const safeLetter = letter || "?";
+      const value = typeof grade === "number" ? grade : "-";
+      const cls = safeLetter === "A" ? "good" : safeLetter === "B" ? "info" : safeLetter === "C" ? "warn" : "bad";
+      return `<span class="pill ${cls}">${safeLetter} ${value}</span>`;
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, {
+        headers: { "Content-Type": "application/json" },
+        ...options,
+      });
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { raw: text };
+      }
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `Request failed: ${response.status}`);
+      }
+      return data;
+    }
+
+    function renderStatus() {
+      const manager = state.status || {};
+      const queue = manager.queue || {};
+      const accounts = manager.accounts || {};
+      const platformStatus = manager.platform_status || {};
+      const configuredPlatforms = Object.values(platformStatus).filter(item => item && item.configured).length;
+
+      document.getElementById("readyCount").textContent = queue.ready ?? 0;
+      document.getElementById("accountCount").textContent = accounts.total ?? 0;
+      document.getElementById("platformCount").textContent = configuredPlatforms;
+      document.getElementById("lastSyncLabel").textContent = manager.last_sync_at ? toLocalString(manager.last_sync_at) : "Never";
+      document.getElementById("syncDetail").textContent = manager.last_sync_error
+        ? manager.last_sync_error
+        : `${queue.total ?? 0} total queue items tracked.`;
+
+      const platformPills = [];
+      for (const [platform, details] of Object.entries(platformStatus)) {
+        const cls = details.configured ? "good" : "bad";
+        const label = `${platform} ${details.configured ? "ready" : "not ready"}`;
+        platformPills.push(`<span class="pill ${cls}">${label}</span>`);
+      }
+      document.getElementById("platformPills").innerHTML = platformPills.join("") || `<span class="pill">No platform data</span>`;
+    }
+
+    function renderQueue() {
+      const rows = state.queue.slice(0, 12).map(item => {
+        const platforms = (item.preferred_platforms || []).map(platform => `<span class="pill">${platform}</span>`).join("");
+        const statusClass = item.status === "ready" ? "good" : item.status === "posted" ? "info" : item.status === "paused" ? "warn" : "bad";
+        return `
+          <tr>
+            <td>
+              <div>${item.title || item.product_id}</div>
+              <div class="mini">${item.product_id}</div>
+            </td>
+            <td>
+              <div>${item.headline || "-"}</div>
+              <div class="mini">${item.subline || ""}</div>
+            </td>
+            <td>${gradePill(item.letter, item.grade)}</td>
+            <td>${platforms || '<span class="mini">No eligible platforms yet</span>'}</td>
+            <td><span class="pill ${statusClass}">${item.status}</span></td>
+          </tr>
+        `;
+      });
+      document.getElementById("queueRows").innerHTML = rows.join("") || `<tr><td colspan="5" class="muted">No queue items yet.</td></tr>`;
+    }
+
+    function renderAccounts() {
+      const rows = state.accounts.map(account => {
+        const statusClass = account.status === "active" ? "good" : account.status === "warming" ? "warn" : "bad";
+        const dailyLimit = account.daily_limit && Number(account.daily_limit) > 0 ? account.daily_limit : "auto";
+        return `
+          <tr>
+            <td>${account.platform}</td>
+            <td>
+              <div>${account.handle}</div>
+              <div class="mini">${account.display_name || ""}</div>
+            </td>
+            <td><span class="pill ${statusClass}">${account.status}</span></td>
+            <td>Day ${account.warmup_day || 1}</td>
+            <td>${dailyLimit}</td>
+            <td>${toLocalString(account.last_post_at)}</td>
+            <td>${account.notes || ""}</td>
+          </tr>
+        `;
+      });
+      document.getElementById("accountRows").innerHTML = rows.join("") || `<tr><td colspan="7" class="muted">No accounts saved yet.</td></tr>`;
+    }
+
+    async function loadAll() {
+      setLog("Refreshing posting manager...");
+      const [managerStatus, queueResult, accountsResult] = await Promise.all([
+        api("/manager/status"),
+        api("/manager/queue"),
+        api("/manager/accounts"),
+      ]);
+      state.status = managerStatus;
+      state.queue = queueResult.queue || [];
+      state.accounts = accountsResult.accounts || [];
+      renderStatus();
+      renderQueue();
+      renderAccounts();
+      setLog("Posting manager loaded.");
+    }
+
+    async function runSync() {
+      setLog("Syncing approved feed...");
+      const result = await api("/manager/sync", { method: "POST", body: JSON.stringify({}) });
+      await loadAll();
+      setLog(JSON.stringify(result, null, 2));
+    }
+
+    async function runManager(dryRun) {
+      setLog(dryRun ? "Building dry-run posting plan..." : "Running live posting...");
+      const result = await api("/manager/run", {
+        method: "POST",
+        body: JSON.stringify({
+          dry_run: dryRun,
+          limit: 10,
+          platforms: ["pinterest", "youtube", "tiktok", "meta"],
+        }),
+      });
+      await loadAll();
+      setLog(JSON.stringify(result, null, 2));
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", () => loadAll().catch(error => setLog(error.message)));
+    document.getElementById("syncBtn").addEventListener("click", () => runSync().catch(error => setLog(error.message)));
+    document.getElementById("planBtn").addEventListener("click", () => runManager(true).catch(error => setLog(error.message)));
+    document.getElementById("runBtn").addEventListener("click", () => runManager(false).catch(error => setLog(error.message)));
+
+    document.getElementById("accountForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.target);
+      const payload = Object.fromEntries(form.entries());
+      payload.link_ready = form.get("link_ready") === "on";
+      payload.warmup_day = Number(payload.warmup_day || 1);
+      payload.daily_limit = Number(payload.daily_limit || 0);
+      payload.cooldown_minutes = Number(payload.cooldown_minutes || 0);
+      setLog("Saving account...");
+      try {
+        const result = await api("/manager/accounts", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        event.target.reset();
+        await loadAll();
+        setLog(JSON.stringify(result, null, 2));
+      } catch (error) {
+        setLog(error.message);
+      }
+    });
+
+    loadAll().catch(error => {
+      setLog(error.message);
+    });
+  </script>
+</body>
+</html>
