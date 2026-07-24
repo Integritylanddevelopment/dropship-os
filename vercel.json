@@ -1,24 +1,101 @@
 {
   "devCommand": "npx serve . --listen 3000 --no-clipboard",
   "rewrites": [
-    { "source": "/api/health",            "destination": "/api/health" },
-    { "source": "/api/quinn/local-chat",  "destination": "/api/quinn/local-chat" },
-    { "source": "/api/webhook",           "destination": "/api/webhook" },
-    { "source": "/api/supplier",          "destination": "/api/supplier" },
-    { "source": "/thank-you",            "destination": "/thank-you.html" },
-    { "source": "/api/engine/(.*)", "destination": "/api/engine" },
-    { "source": "/store",              "destination": "/store.html" },
-    { "source": "/playbook",           "destination": "/playbook.html" },
-    { "source": "/hormozi",            "destination": "/hormozi.html" },
-    { "source": "/ecom-king",          "destination": "/ecom-king.html" },
-    { "source": "/pinterest",          "destination": "/pinterest.html" },
-    { "source": "/roi",                "destination": "/roi.html" },
-    { "source": "/content",            "destination": "/content.html" },
-    { "source": "/privacy",            "destination": "/privacy.html" },
-    { "source": "/pet-hair-remover",   "destination": "/pet-hair-remover.html" },
-    { "source": "/posture-corrector",  "destination": "/posture-corrector.html" },
-    { "source": "/facial-roller",      "destination": "/facial-roller.html" },
-    { "source": "/resistance-bands",   "destination": "/resistance-bands.html" },
-    { "source": "/ab-roller",          "destination": "/ab-roller.html" }
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "integrityproductsusa.com"
+        }
+      ],
+      "destination": "/integrityproductsusa.html"
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.integrityproductsusa.com"
+        }
+      ],
+      "destination": "/integrityproductsusa.html"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/api/quinn/local-chat",
+      "destination": "/api/quinn/local-chat"
+    },
+    {
+      "source": "/api/webhook",
+      "destination": "/api/webhook"
+    },
+    {
+      "source": "/api/supplier",
+      "destination": "/api/supplier"
+    },
+    {
+      "source": "/thank-you",
+      "destination": "/thank-you.html"
+    },
+    {
+      "source": "/api/engine/(.*)",
+      "destination": "/api/engine"
+    },
+    {
+      "source": "/store",
+      "destination": "/store.html"
+    },
+    {
+      "source": "/playbook",
+      "destination": "/playbook.html"
+    },
+    {
+      "source": "/hormozi",
+      "destination": "/hormozi.html"
+    },
+    {
+      "source": "/ecom-king",
+      "destination": "/ecom-king.html"
+    },
+    {
+      "source": "/pinterest",
+      "destination": "/pinterest.html"
+    },
+    {
+      "source": "/roi",
+      "destination": "/roi.html"
+    },
+    {
+      "source": "/content",
+      "destination": "/content.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/pet-hair-remover",
+      "destination": "/pet-hair-remover.html"
+    },
+    {
+      "source": "/posture-corrector",
+      "destination": "/posture-corrector.html"
+    },
+    {
+      "source": "/facial-roller",
+      "destination": "/facial-roller.html"
+    },
+    {
+      "source": "/resistance-bands",
+      "destination": "/resistance-bands.html"
+    },
+    {
+      "source": "/ab-roller",
+      "destination": "/ab-roller.html"
+    }
   ]
 }

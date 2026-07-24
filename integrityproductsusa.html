@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integrity Products USA</title>
+<meta name="description" content="Curated quality products at honest prices. Fast tracked shipping and 30-day returns.">
+<style>
+:root{--bg:#0b0c10;--card:#15171e;--line:#242732;--txt:#f4f5f7;--mut:#9aa0ac;--acc:#e8b04b;--acc2:#f2c46b;--good:#3ecf8e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+a{color:inherit;text-decoration:none}
+.bar{background:var(--acc);color:#1a1400;text-align:center;padding:9px;font-weight:700;font-size:.85rem;letter-spacing:.3px}
+header{position:sticky;top:0;z-index:20;background:rgba(11,12,16,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;font-size:1.15rem;letter-spacing:.5px;cursor:pointer}
+.brand span{color:var(--acc)}
+.tag{color:var(--mut);font-size:.78rem}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.hero{text-align:center;padding:54px 20px 34px}
+.hero h1{font-size:2.15rem;line-height:1.15;margin-bottom:12px}
+.hero h1 span{color:var(--acc)}
+.hero p{color:var(--mut);max-width:600px;margin:0 auto;font-size:1rem}
+.trust{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:20px;color:var(--mut);font-size:.82rem}
+.trust b{color:var(--txt)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;padding:20px 0 70px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:.18s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-4px);border-color:var(--acc);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.thumb{aspect-ratio:1/1;width:100%;object-fit:cover;background:#0f1117;display:block}
+.ph{aspect-ratio:1/1;width:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-weight:700;font-size:1.05rem;color:#1a1400;background:linear-gradient(135deg,var(--acc),#b9832f)}
+.cbody{padding:14px 15px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ctitle{font-weight:600;font-size:.95rem;line-height:1.3;min-height:2.5em}
+.price{display:flex;align-items:baseline;gap:8px;margin-top:auto}
+.price .now{font-size:1.2rem;font-weight:800;color:var(--acc2)}
+.price .was{color:var(--mut);text-decoration:line-through;font-size:.85rem}
+.badge{align-self:flex-start;background:rgba(62,207,142,.12);color:var(--good);font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.4px}
+.viewbtn{margin-top:6px;text-align:center;background:#1e222c;border:1px solid var(--line);border-radius:10px;padding:9px;font-weight:600;font-size:.85rem;color:var(--acc2)}
+/* product page */
+#product{display:none;padding:30px 0 80px}
+.back{color:var(--mut);font-size:.9rem;cursor:pointer;display:inline-block;margin-bottom:22px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:start}
+.pimg{width:100%;border-radius:18px;border:1px solid var(--line);background:#0f1117}
+.pph{aspect-ratio:1/1;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;font-weight:800;font-size:1.6rem;color:#1a1400;background:linear-gradient(135deg,var(--acc),#b9832f)}
+#ptitle{font-size:1.9rem;line-height:1.15;margin-bottom:14px}
+.psub{color:var(--mut);font-size:1.05rem;margin-bottom:22px}
+.pprice{display:flex;align-items:baseline;gap:12px;margin-bottom:22px}
+.pprice .now{font-size:2.1rem;font-weight:800;color:var(--acc2)}
+.pprice .was{color:var(--mut);text-decoration:line-through;font-size:1.1rem}
+.pprice .save{background:var(--acc);color:#1a1400;font-weight:800;font-size:.78rem;padding:4px 10px;border-radius:999px}
+.buy{display:block;text-align:center;background:var(--acc);color:#1a1400;font-weight:800;font-size:1.1rem;padding:16px;border-radius:12px;margin:6px 0 14px;transition:.15s}
+.buy:hover{background:var(--acc2)}
+.securenote{text-align:center;color:var(--mut);font-size:.8rem;margin-bottom:26px}
+.feat{list-style:none;display:flex;flex-direction:column;gap:12px;margin:22px 0}
+.feat li{display:flex;gap:11px;align-items:flex-start;font-size:.96rem}
+.feat .ck{color:var(--good);font-weight:800}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px}
+.stars{color:var(--acc);letter-spacing:2px;margin-bottom:6px}
+.rev p{font-size:.92rem}
+.rev .who{color:var(--mut);font-size:.8rem;margin-top:8px}
+footer{border-top:1px solid var(--line);padding:30px 20px;text-align:center;color:var(--mut);font-size:.82rem}
+footer b{color:var(--txt)}
+@media(max-width:720px){.pgrid{grid-template-columns:1fr}.hero h1{font-size:1.7rem}}
+</style>
+</head>
+<body>
+<div class="bar">FREE TRACKED SHIPPING TODAY &mdash; 30-Day Money-Back Guarantee</div>
+<header>
+  <div class="brand" onclick="showGrid()">INTEGRITY <span>PRODUCTS USA</span></div>
+  <div class="tag">Honest prices. Quality you can trust.</div>
+</header>
+
+<main id="store">
+  <div class="hero">
+    <h1>Quality products,<br><span>honest prices.</span></h1>
+    <p>Every item is hand-picked, quality-checked, and backed by our 30-day guarantee. Browse the collection below.</p>
+    <div class="trust">
+      <div><b>Free</b> tracked shipping</div>
+      <div><b>30-day</b> returns</div>
+      <div><b>Secure</b> Stripe checkout</div>
+      <div><b>US-based</b> support</div>
+    </div>
+  </div>
+  <div class="wrap"><div class="grid" id="grid"></div></div>
+</main>
+
+<section id="product" class="wrap"></section>
+
+<footer>
+  <p>&copy; 2026 <b>Integrity Products USA</b>. All rights reserved.</p>
+  <p style="margin-top:6px">Secure checkout by Stripe &middot; Free tracked shipping &middot; 30-day money-back guarantee</p>
+</footer>
+
+<script>
+const PRODUCTS = [{"title": "24 Pieces Of Short Square-shaped Gold-plated", "price": 19.99, "compare": 29.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/tickle_toes_v1.png", "headline": "Stop searching, find your match", "sub": "Short square-shaped gold-plated pieces at last. 30-day returns $19.99 (was $30)", "buy": "https://buy.stripe.com/4gMcN6doDfwf0fK7Lz3F60r"}, {"title": "Trapped Toyman", "price": 22.99, "compare": 34.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/trapped_toyman_v2.png", "headline": "Stop doing it the hard way. Do this instead.", "sub": "Trapped Toyman the fix people wish they'd found sooner. 30-day returns $22.99 (was $35)", "buy": "https://buy.stripe.com/cNi00kacr97R1jO4zn3F60q"}, {"title": "Compass Spin Necklaces For Women", "price": 23.99, "compare": 35.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/gift_cards_v1.png", "headline": "Never deal with doing it the hard way again", "sub": "Compass Spin Necklaces For Women handles it set it up once, done. 30-day returns $23.99 (was $36)", "buy": "https://buy.stripe.com/cNifZi70f97R9Qk6Hv3F60t"}, {"title": "Cat Comb For Removing Loose Fur Dog Grooming", "price": 18.99, "compare": 28.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/steamy_cat_v1.png", "headline": "Stop cat messes. Do this instead.", "sub": "Cat Comb For Removing Loose Fur Dog Grooming the fix people wish they'd found sooner. 30-day returns $18.99 (was $29)", "buy": "https://buy.stripe.com/cNi8wQ3O32Jt5A4fe13F60u"}, {"title": "Bear Outdoor Water Fountain With LED Lights", "price": 373.99, "compare": 560.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/phrase_bear_v2.png", "headline": "Stop doing it the hard way. Do this instead.", "sub": "Bear Outdoor Water Fountain With LED Lights the fix people wish they'd found sooner. 30-day returns $373.99 (was $561)", "buy": "https://buy.stripe.com/bJebJ2acr0Bl5A41nb3F60p"}, {"title": "Kitchen Cleaning Dishcloth Dishwashing Sponge", "price": 17.99, "compare": 26.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/kitchen_v2.png", "headline": "Finally fixed chaos", "sub": "Viral for a reason. 30-day returns $17.99 (was $27)", "buy": "https://buy.stripe.com/eVq5kEgAPck31jOd5T3F60n"}, {"title": "Mini Walk-in Greenhouse With PVC Cover", "price": 142.99, "compare": 214.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/bird_house_v1.png", "headline": "POV: you finally fixed plants dying every winter", "sub": "Mini Walk-in Greenhouse With PVC Cover going viral for a reason. 30-day returns $142.99 (was $215)", "buy": "https://buy.stripe.com/7sYfZiesH5VF9Qk9TH3F60k"}, {"title": "Color Blocked IPad Computer Bag", "price": 73.99, "compare": 110.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/cheap_ipad_v2.png", "headline": "Stop doing it the hard way. Do this instead.", "sub": "Color Blocked IPad Computer Bag the fix people wish they'd found sooner. 30-day returns $73.99 (was $111)", "buy": "https://buy.stripe.com/dRm9AUgAP97R6E8gi53F60s"}, {"title": "Monster Craft Kits With 10 Cards", "price": 29.99, "compare": 44.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/playing_cards_v2.png", "headline": "Stop doing it the hard way. Do this instead.", "sub": "Monster Craft Kits With 10 Cards the fix people wish they'd found sooner. 30-day returns $29.99 (was $45)", "buy": "https://buy.stripe.com/9B628s3O36ZJgeIfe13F60v"}, {"title": "Chefman Rj31", "price": 34.99, "compare": 52.99, "img": "https://raw.githubusercontent.com/Integritylanddevelopment/dropship-os/main/cards/chefman_rj31_v1.png", "headline": "Finally fixed the hard way", "sub": "Chefman Rj31 making waves. 30-day returns $34.99 (was $53)", "buy": "https://buy.stripe.com/dRm5kEacr2Jt3rWgi53F60o"}, {"title": "Rose Quartz Facial Roller", "price": 34.99, "compare": null, "img": "", "headline": "Rose Quartz Facial Roller", "sub": "Reduce puffiness and boost your glow in 5 minutes a day.", "buy": "https://buy.stripe.com/7sY5kEesH6ZJ0fKaXL3F60c"}, {"title": "Posture Corrector Brace", "price": 29.99, "compare": null, "img": "", "headline": "Posture Corrector Brace", "sub": "Train your back straight and relieve neck and shoulder strain.", "buy": "https://buy.stripe.com/dRm5kEacrck3aUo2rf3F60a"}, {"title": "11-Piece Resistance Band Set", "price": 39.99, "compare": null, "img": "", "headline": "11-Piece Resistance Band Set", "sub": "A full gym in a bag. Build strength anywhere, anytime.", "buy": "https://buy.stripe.com/3cIeVeacr1FpgeIaXL3F60d"}, {"title": "Ab Roller Wheel", "price": 24.99, "compare": null, "img": "", "headline": "Ab Roller Wheel", "sub": "Carve your core with the simplest, most effective ab tool.", "buy": "https://buy.stripe.com/8x214o84j1Fp5A48PD3F60e"}, {"title": "Pet Hair Remover Brush", "price": 19.99, "compare": null, "img": "", "headline": "Pet Hair Remover Brush", "sub": "Lift embedded fur off furniture and clothes in seconds.", "buy": "https://buy.stripe.com/4gM6oI84jdo73rW8PD3F60b"}];
+const grid = document.getElementById('grid');
+const store = document.getElementById('store');
+const page = document.getElementById('product');
+
+function money(n){return '$'+Number(n).toFixed(2);}
+function saveTxt(p){ if(!p.compare) return ''; const s=Math.round((1-p.price/p.compare)*100); return s>0? 'Save '+s+'%':''; }
+
+function cardImg(p){
+  if(p.img){ return '<img class="thumb" src="'+p.img+'" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;ph&quot;>'+p.title.replace(/'/g,"")+'</div>\'">'; }
+  return '<div class="ph">'+p.title+'</div>';
+}
+
+function renderGrid(){
+  grid.innerHTML = PRODUCTS.map((p,i)=>`
+    <div class="card" onclick="showProduct(${i})">
+      ${cardImg(p)}
+      <div class="cbody">
+        ${saveTxt(p)?`<span class="badge">${saveTxt(p)}</span>`:''}
+        <div class="ctitle">${p.title}</div>
+        <div class="price"><span class="now">${money(p.price)}</span>${p.compare?`<span class="was">${money(p.compare)}</span>`:''}</div>
+        <div class="viewbtn">View &amp; Buy &rarr;</div>
+      </div>
+    </div>`).join('');
+}
+
+function showProduct(i){
+  const p = PRODUCTS[i];
+  const big = p.img? `<img class="pimg" src="${p.img}" alt="" onerror="this.outerHTML='<div class=\'pph\'>${p.title.replace(/'/g,'')}</div>'">` : `<div class="pph">${p.title}</div>`;
+  page.innerHTML = `
+    <div class="back" onclick="showGrid()">&larr; Back to all products</div>
+    <div class="pgrid">
+      <div>${big}</div>
+      <div>
+        <h1 id="ptitle">${p.title}</h1>
+        <p class="psub">${p.sub||'Hand-picked quality, shipped fast and backed by our guarantee.'}</p>
+        <div class="pprice"><span class="now">${money(p.price)}</span>${p.compare?`<span class="was">${money(p.compare)}</span>`:''}${saveTxt(p)?`<span class="save">${saveTxt(p)}</span>`:''}</div>
+        <a class="buy" href="${p.buy}" rel="noopener">Buy Now &mdash; Secure Checkout</a>
+        <div class="securenote">&#128274; Secure payment via Stripe. Apple Pay, Google Pay &amp; all major cards.</div>
+        <ul class="feat">
+          <li><span class="ck">&#10003;</span> Free tracked shipping on this item</li>
+          <li><span class="ck">&#10003;</span> 30-day money-back guarantee &mdash; try it risk free</li>
+          <li><span class="ck">&#10003;</span> Quality-checked before it ships</li>
+          <li><span class="ck">&#10003;</span> US-based customer support</li>
+        </ul>
+        <div class="rev">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Exactly as described and arrived quickly. Great value for the price."</p>
+          <div class="who">&#10003; Verified Buyer</div>
+        </div>
+      </div>
+    </div>`;
+  store.style.display='none';
+  page.style.display='block';
+  window.scrollTo(0,0);
+}
+function showGrid(){ page.style.display='none'; store.style.display='block'; window.scrollTo(0,0); }
+renderGrid();
+</script>
+</body>
+</html>
